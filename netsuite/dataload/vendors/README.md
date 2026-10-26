@@ -36,6 +36,21 @@ Profile of the 1,770:
 
 IDs: V-##### (1,394), older V##### (339), RMP_# (37, created from Ramp).
 
+## Ramp export (2026-10-25)
+
+`data/ramp-vendors-sensitive-20261025.csv`: 578 Ramp vendors, 58 columns. Holds TINs, tax classification, tax address and bank details (ACH for 181): never display those values. Useful non-sensitive fields: Sage Intacct ID, Ramp category, owner, department, legal name, payment method, net terms, contacts, check mailing address, spend (30 day, 365 day, YTD, lifetime), last spend date, contract dates and amounts.
+
+- 551 Ramp vendors carry a Sage Intacct ID, all active in Sage, no duplicates: an exact link between the systems.
+- 27 Ramp vendors have no Sage ID (for example KPMG LLP, Baker Botts LLP, Oracle America, Navan, ClickHouse).
+
+Activity of the 1,770 active Sage vendors, using the latest of Sage last bill, Sage last payment and Ramp last spend:
+
+| | In Ramp | Not in Ramp | Total |
+|---|---|---|---|
+| Active since 2024-10-26 | 478 | 85 | 563 |
+| Last activity before 2024-10-26 | 8 | 292 | 300 |
+| No activity recorded | 65 | 842 | 907 |
+
 ## Load log
 
 | Date | File | Records | Errors | Outcome |
