@@ -71,7 +71,12 @@ for d, src in draft:
             bad(f"{col} not in Sage text", sid, d[col])
     L = lst.get(sid, {})
     for col, f in (("City", "City"), ("Province/State", "State or territory"), ("Postal Code/Zip", "ZIP or postal code")):
-        if src[col] == "sage" and d[col] != unmangle(L.get(f, "").strip(" ,")):
+        want = unmangle(L.get(f, "").strip(" ,"))
+        if col == "Postal Code/Zip" and src[col] == "rule" and d["Country"] == "United States" and want:
+            want = re.sub(r"^(\d{3,4})", lambda m: m.group(1).zfill(5), want)
+            if d[col] != want:
+                bad(f"{col} vs Sage list", sid, f"{d[col]!r} vs {L.get(f)!r}")
+        elif src[col] == "sage" and d[col] != want:
             bad(f"{col} vs Sage list", sid, f"{d[col]!r} vs {L.get(f)!r}")
     if src["Country"] == "sage":
         tails = {l.split(",")[-1].strip() for l in disp}

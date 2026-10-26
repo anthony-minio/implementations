@@ -206,6 +206,11 @@ for r in sage:
         S("Default Shipping", "TRUE", "rule")
     else:
         flags.append("No street address")
+    # US postal codes that lost their leading zero in Sage (7936 -> 07936).
+    z = re.fullmatch(r"(\d{3,4})(-\d{4})?", c["Postal Code/Zip"][0])
+    if z and c["Country"][0] == "United States" and c["Postal Code/Zip"][1] in ("sage", "sfdc"):
+        flags.append(f"Postal code leading zero restored: was {c['Postal Code/Zip'][0]}")
+        S("Postal Code/Zip", z.group(1).zfill(5) + (z.group(2) or ""), "rule")
     for k, v in CORRECT.get(cid, {}).items():
         flags.append(f"Corrected from Sage: {k} was {c[k][0] or 'blank'}")
         S(k, v, "rule")
