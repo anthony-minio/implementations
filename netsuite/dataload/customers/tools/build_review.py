@@ -57,6 +57,39 @@ def unmangle(v):
             return v
     return v
 
+# VAT ID holds VAT or GST registration numbers only, in the standard format with the country prefix.
+# Other tax IDs Sage holds (US EIN, company registration numbers) go to Other Tax ID.
+VAT_PREFIX = {"Austria": "AT", "Belgium": "BE", "Croatia": "HR", "Cyprus": "CY", "Denmark": "DK", "Finland": "FI",
+              "France": "FR", "Germany": "DE", "Ireland": "IE", "Italy": "IT", "Luxembourg": "LU", "Netherlands": "NL",
+              "Norway": "NO", "Poland": "PL", "Portugal": "PT", "Spain": "ES", "Sweden": "SE", "Switzerland": "CHE",
+              "United Kingdom": "GB"}
+VAT_SHAPE = {"AT": r"U\d{8}", "BE": r"[01]\d{9}", "HR": r"\d{11}", "CY": r"\d{8}[A-Z]", "DK": r"\d{8}", "FI": r"\d{8}",
+             "FR": r"[0-9A-Z]{2}\d{9}", "DE": r"\d{9}", "IE": r"\d{7}[A-Z]{1,2}", "IT": r"\d{11}", "LU": r"\d{8}",
+             "NL": r"\d{9}B\d{2}", "NO": r"\d{9}(MVA)?", "PL": r"\d{10}", "PT": r"\d{9}", "ES": r"[0-9A-Z]\d{7}[0-9A-Z]",
+             "SE": r"\d{12}", "CHE": r"\d{9}", "GB": r"\d{9}(\d{3})?"}
+
+def tax_id(country, raw):
+    """Return (vat_id, other_tax_id, note) for a Sage tax ID."""
+    raw = raw.strip()
+    clean = re.sub(r"[\s.\-]", "", raw).upper()
+    if country == "United States" and re.fullmatch(r"\d{9}", clean):
+        return "", f"US EIN {clean[:2]}-{clean[2:]}", "US employer ID, not a VAT number"
+    p = VAT_PREFIX.get(country)
+    if p:
+        body = clean[len(p):] if clean.startswith(p) else clean
+        if p == "BE" and re.fullmatch(r"\d{9}", body):
+            body = "0" + body
+        if re.fullmatch(VAT_SHAPE[p], body):
+            return p + body, "", "" if p + body == raw else f"formatted from {raw}"
+        return "", raw, f"not a {country} VAT number format"
+    if country in ("Saudi Arabia", "United Arab Emirates") and re.fullmatch(r"3\d{13}3|1\d{14}", clean):
+        return clean, "", ""
+    if country == "India" and re.fullmatch(r"\d{2}[A-Z]{5}\d{4}[A-Z][0-9A-Z]Z[0-9A-Z]", clean):
+        return clean, "", ""  # GSTIN, India's GST registration
+    if country == "Mexico" and re.fullmatch(r"[A-Z&]{3,4}\d{6}[0-9A-Z]{3}", clean):
+        return clean, "", ""  # RFC, Mexico's taxpayer ID used on invoices
+    return "", raw, "not recognized as a VAT number"
+
 def val(v):
     return "" if v in (None, "-") else str(v).strip()
 
@@ -121,7 +154,7 @@ COLS = ["External ID", "Subnet ID", "Customer ID", "Company Name", "Parent Compa
         "Postal Code/Zip", "Country", "Default Billing", "Default Shipping", "Account", "Terms", "VAT ID",
         "International VAT ID", "Taxable", "Avalara Entity", "Exemption Certificate No."]
 REQUIRED = {"Customer ID", "Company Name", "Subsidiary", "Status", "Primary Currency", "Customer Category"}
-ADDED = ["Question Categories", "Duplicate Action", "Merged Sage IDs", "Second Address", "Third Address", "Sage Customer ID", "Salesforce Account ID", "Additional Emails", "Billed To (Reseller)",
+ADDED = ["Question Categories", "Duplicate Action", "Merged Sage IDs", "Second Address", "Third Address", "Sage Customer ID", "Salesforce Account ID", "Additional Emails", "Other Tax ID", "Billed To (Reseller)",
          "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
 REVIEW = ["Sage type", "Sage terms", "Last invoice", "Balance", "Salesforce match"]
 
@@ -227,11 +260,16 @@ for r in sage:
             S("Terms", r["Term"])
             research[r["Term"]] = research.get(r["Term"], 0) + 1
             flags.append(f"Terms to research: {r['Term']}")
-    if r["Tax ID"]:
-        S("VAT ID", r["Tax ID"])
-    elif r["display_taxid"]:
-        S("VAT ID", r["display_taxid"].split(": ", 1)[1], "rule")
-        flags.append(f"VAT ID taken from Sage address: {r['display_taxid']}")
+    raw_tax = r["Tax ID"] or (r["display_taxid"].split(": ", 1)[1] if r["display_taxid"] else "")
+    other_tax = ""
+    if raw_tax:
+        vat, other_tax, why = tax_id(c["Country"][0] or r["display_country"], raw_tax)
+        if vat:
+            S("VAT ID", vat, "sage" if vat == raw_tax and r["Tax ID"] else "rule")
+        if why:
+            flags.append(f"Tax ID: {why}")
+        if not r["Tax ID"]:
+            flags.append(f"Tax ID taken from Sage address: {r['display_taxid']}")
     for k in REQUIRED:
         if not c[k][0]:
             c[k][1] = "miss"
@@ -263,6 +301,7 @@ for r in sage:
     if m:
         A("Salesforce Account ID", id18(m["Account ID"]), "sfdc" if how in ("exact", "confirmed") else "prop")
     A("Additional Emails", "; ".join(more))
+    A("Other Tax ID", other_tax)
     if billto:
         addr = ", ".join(x.strip(" ,") for x in [r["billto_line1"], r["billto_line2"], r["billto_citystatezip_country"]] if x.strip(" ,"))
         A("Billed To (Reseller)", r["billto_name"])
@@ -437,10 +476,19 @@ for g in (g for g in groups.values() if len(g) > 1):
         if x is not keep:
             x["cells"][DA] = ["Merge into " + kid, "rule"]
 
+# Bridge from the first Sage export (active customers) to the customers in the load.
+report_ids = {x["Customer ID"] for x in sage}
+onetime = [(i, r["Customer name"]) for i, r in lst.items() if i not in report_ids]
+inactive = [(x["Customer ID"], x["Customer name"]) for x in sage if x["Status"] != "Active"]
+merged_n = sum(1 for x in out if x["cells"][DA][0].startswith("Merge into"))
+investors_n = sum(1 for x in out if "Investor" in x["cells"][QI][0] and not x["cells"][DA][0].startswith("Merge into"))
+bridge = {"first": len(lst), "onetime": onetime, "report": len(sage), "inactive": inactive, "active": len(out),
+          "merged": merged_n, "kept": dup_groups, "load": len(out) - merged_n, "investors": investors_n}
+
 data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "rows": out, "built": TODAY.isoformat(),
         "renumber": renumber, "new_terms": sorted(new_terms.items(), key=lambda kv: int(kv[0].split()[1])),
         "research_terms": sorted(research.items(), key=lambda kv: -kv[1]),
-        "dup_groups": dup_groups, "parents_dropped": sum(parents_dropped.values()), "parents_dropped_n": len(parents_dropped), "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
+        "dup_groups": dup_groups, "bridge": bridge, "parents_dropped": sum(parents_dropped.values()), "parents_dropped_n": len(parents_dropped), "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
 with open("data/customer-load-draft.csv", "w", newline="", encoding="utf-8-sig") as o:
     w = csv.writer(o)
     w.writerow(COLS + ADDED + ["_src:" + c for c in COLS + ADDED])

@@ -76,6 +76,8 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 - 2026-10-26: Subnet IDs are a key identifier: one NetSuite customer per Subnet account; records with different Subnet IDs are never merged. Applied Materials, Davidson, L3Harris (incl. C-00333 L3 Technologies) and Saudi Telecom have several Subnet accounts; their 9 Sage records are kept separate and marked "Subnet ID to assign".
 - 2026-10-26: Subnet IDs paired by date (earlier Sage record with earlier Subnet account): C-00103 348, C-00462 879, C-00371 755, C-00592 1067, C-00241 537, C-00542 998. Records with different Subnet IDs are never merged. L3Harris proposed: C-00333 695, C-00385 784, C-00562 1026; 716 and 720 have no Sage record.
 - 2026-10-26: Duplicates merged, 14 groups, 16 records: keep the most recently invoiced record (else more data, then lower ID); merged records' Sage IDs, different addresses (Second and Third Address) and emails carried to the kept record. Added by email domain: Hollister into C-00640, Bank of Nova Scotia C-00039 and C-00049 into C-00405, SITE C-00465 into C-00204 (Subnet ID 478 carried), MoD C-00629 into C-00481. BMC Software and BMC Helix kept separate. `data/customer-load.csv` holds the 632 customers to load.
+- 2026-10-26: VAT ID holds VAT/GST registration numbers only, formatted with the country prefix; US EINs and company registration numbers moved to an added Other Tax ID column.
+- 2026-10-26: Count bridge: 650 active in the first Sage export, minus 2 one-time-use customers not in the customer list report (C-00012, C-00021; open question) = 648, minus 16 merged duplicates = 632 (616 without the 16 investor records).
 
 ## Template lists
 

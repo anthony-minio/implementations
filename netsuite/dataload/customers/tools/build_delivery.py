@@ -23,6 +23,7 @@ ADDED_NOTE = {
     "Sage Customer ID": "Added. Customer ID in Sage.",
     "Salesforce Account ID": "Added. 18-character case-safe Salesforce Account ID.",
     "Additional Emails": "Added. Every other email Sage holds for the customer.",
+    "Other Tax ID": "Added. Tax IDs in Sage that are not VAT numbers, for example a US EIN.",
     "Billed To (Reseller)": "Added. Reseller Sage invoices for this customer.",
     "Reseller Address": "Added. Reseller billing address from Sage.",
     "Reseller Invoice Email": "Added. Reseller billing email from Sage.",

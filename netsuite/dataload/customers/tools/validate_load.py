@@ -119,8 +119,14 @@ for d, src in draft:
         bad("Terms vs Sage", sid, f"{d['Terms']!r} from {t!r}")
     if d["Primary Currency"] != (H["Default currency"] or "USD"):
         bad("Currency vs Sage", sid, d["Primary Currency"])
-    if d["VAT ID"] and squash(d["VAT ID"]) not in squash(H["Tax ID"] + " " + " ".join(disp)):
-        bad("VAT ID vs Sage", sid, d["VAT ID"])
+    core = lambda t: re.sub(r"[^A-Z0-9]", "", (t or "").upper())
+    sage_tax = core(H["Tax ID"] + " " + " ".join(disp))
+    for col in ("VAT ID", "Other Tax ID"):
+        v = core(re.sub(r"^US EIN ", "", d[col]))
+        if v and not any(v[k:] in sage_tax for k in range(0, 4)):
+            bad(f"{col} vs Sage", sid, d[col])
+    if H["Tax ID"] and not (d["VAT ID"] or d["Other Tax ID"]):
+        bad("Sage Tax ID not loaded", sid, H["Tax ID"])
     if d["Salesforce Account ID"]:
         a = sf.get(d["Salesforce Account ID"][:15])
         if not a:

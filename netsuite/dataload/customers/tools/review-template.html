@@ -124,6 +124,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
   <section class="decisions">
     <h2>Notes</h2>
     <ol>
+      <li><b>Customer count.</b> <span id="n-bridge"></span></li>
       <li><b>Customer ID.</b> Sage IDs are not consistent. Customers with a Sage ID in the C-##### format keep it. The <span id="n-renum"></span> customers with an ID in another format (<span id="n-old"></span>) get the next numbers after the highest Sage C-##### (<span id="n-last"></span>): <span id="n-range"></span>. Their original Sage ID stays in Sage Customer ID.</li>
       <li><b>External ID.</b> Same value as Customer ID, so later loads and updates can find each customer by it.</li>
       <li><b>New customers.</b> After the load, NetSuite should auto-generate customer numbers in the same C-##### format, starting at <b id="n-next"></b>, the number after the last one in the load. In NetSuite: Setup > Company > Auto-Generated Numbers, Entities subtab, Customer: prefix C-, minimum 5 digits, initial number <span id="n-next2"></span>. Allow Override must be on during the import so the loaded numbers are kept.</li>
@@ -136,6 +137,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>Reseller billing.</b> For customers Sage invoices through a reseller, the reseller is spelled out in Billed To (Reseller), Reseller Address and Reseller Invoice Email, with Salesforce partners alongside, so it can be set up to best practice.</li>
       <li><b>Subsidiary.</b> The Sage exports do not record an entity for any customer. All customers are loaded to MinIO, Inc., the parent subsidiary, and bill from it.</li>
       <li><b>Terms.</b> Sage terms are mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Sage "30 Days" becomes Net 30, and so on. Sage day counts with no match on the list become new terms of the same length, which must be created in NetSuite before the load: <span id="n-newterms"></span>. Sage "5 years" becomes Net 1825 (5 x 365 days). "Due per Contract" is loaded as Sage has it and needs research before the load: <span id="n-research"></span>. <span id="d-blank"></span> customers have no terms in Sage and are left blank.</li>
+      <li><b>VAT ID.</b> Holds VAT or GST registration numbers only, in the standard format with the country prefix (for example Sage "813089973" for a German customer becomes DE813089973; "FR 56 527 594 493" becomes FR56527594493). India GSTINs, Mexico RFCs and Saudi and UAE VAT numbers are kept as Sage has them. Other tax IDs in Sage's Tax ID field are not VAT numbers and are in the added Other Tax ID column: four US EINs, a Hong Kong business registration number and a Cyprus company registration number. International VAT ID is left blank; SOA to confirm how they want VAT ID and International VAT ID used.</li>
       <li><b>Parent Company.</b> Salesforce links some accounts to a parent company, for example Royal Caribbean International to Royal Caribbean Group. For <span id="n-pardrop"></span> customers the parent is not a Sage customer: MinIO has no billing history with it and deals only with the subsidiary financially. Those parents are not loaded, and Parent Company is left blank for those customers. Parent links are kept where the parent is itself a customer in this load.</li>
       <li><b>Salesforce matching.</b> Customers are matched to Salesforce accounts by name. 37 names were close but not identical; each was reviewed on 2026-10-26 against city, country and email domain. 35 were confirmed. Two were left unmatched as different companies: Ministry of Defence (Singapore, not the UK ministry) and Bae Systems (kept separate from Salesforce's BAE Systems US).</li>
       <li><b>Sage data corrections.</b> Corrected in the load only; Sage itself is unchanged. Proctor &amp; Gamble: the billing address is in Lodz, Poland (street, postal code and VAT number are Polish), so the city "Cincinnati" is corrected to Lodz. Orange Côte d'Ivoire: country France corrected to Cote d'Ivoire, city Abidjan. NSN Brasil: the Sage city field held an attention note; city corrected to Sao Jose dos Pinhais, postal code 83085-058, and the note moved to Attention. Three addresses with garbled accents (for example "MontrÃ©al") are repaired to the correct characters. Five US postal codes that lost their leading zero in Sage (for example 7936) are restored to five digits (07936).</li>
@@ -150,7 +152,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
 const DATA = /*DATA*/null;
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Added columns", 12]];
+const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Added columns", 13]];
 const flagKey = (f) => f.replace(/:.*/, "");
 const COL = (n) => DATA.cols.indexOf(n);
 let RES = 0;
@@ -164,6 +166,8 @@ function init() {
   const cnt = (f) => DATA.rows.filter(f).length;
   $("#n-inv").textContent = cnt((r) => r.cells[QC][0].split("; ").includes("Investor"));
   $("#n-pardrop").textContent = DATA.parents_dropped;
+  const B = DATA.bridge, ids = (l) => l.map(([i, n]) => `${i} ${n}`).join(", ");
+  $("#n-bridge").textContent = `The first Sage export listed ${B.first} active customers. ${B.onetime.length} of them (${ids(B.onetime)}) are flagged One-time use in Sage and do not appear in the Sage customer list report the load is built from, so they are not in this file; open question: should they be loaded? The customer list report has ${B.report} customers: ${B.active} active plus ${B.inactive.length} inactive that are not loaded (${ids(B.inactive)}). That gives ${B.active} active customers (${B.first} - ${B.onetime.length} = ${B.active}). ${B.merged} of them are duplicates merged into ${B.kept} other customers (see Duplicate customers), leaving ${B.load} customers in the load (${B.active} - ${B.merged} = ${B.load}). The ${B.load} include ${B.investors} investor records (open question below); without them the load would be ${B.load - B.investors}.`;
   $("#d-dup").textContent = DATA.dup_groups;
 
   $("#d-blank").textContent = cnt((r) => !r.review[TI]);
