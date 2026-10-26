@@ -97,7 +97,7 @@ for r in sage:
     S("vendorId", vid, "rule" if sid in renumber else "sage")
     S("externalId", vid, "rule")
     if sid in renumber:
-        flags.append(f"Renumbered from Sage {sid}")
+        flags.append(f"Renumbered from Sage ID: {sid}")
     person = G(r, "This vendor is an individual person") == "Yes"
     S("isPerson", "TRUE" if person else "FALSE", "sage" if person else "rule")
     if person:
