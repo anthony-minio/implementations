@@ -11,8 +11,14 @@ SFDC = "data/sfdc-accounts-customers-20261025.xlsx"  # Lifecycle = Active or Cus
 PARTNERS = "data/sfdc-accounts-with-partners-20261025.xlsx"
 
 # NetSuite terms list (Anthony, 2026-10-26): Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150.
-TERMS = {"Due on Receipt": "Due on Receipt", "10 Days": "Net 10", "15 Days": "Net 15", "30 Days": "Net 30",
-         "Net 30": "Net 30", "45 Days": "Net 45", "60 Days": "Net 60", "150 Days": "Net 150"}
+# Any other Sage "N Days" term becomes a new Net N term; terms that are not a day count stay as Sage has them.
+TERMS_LIST = ["Due on Receipt", "Net 10", "Net 15", "Net 30", "Net 45", "Net 60", "Net 150"]
+
+def term(t):
+    m = re.match(r"(?:Net\s*)?(\d+)\s*days?$|Net\s*(\d+)$", t.strip(), re.I)
+    if m:
+        return f"Net {m.group(1) or m.group(2)}"
+    return "Due on Receipt" if t.strip().lower() == "due on receipt" else ""
 AP = re.compile(r"(^|[._-])(ap|accounts?[._-]?payables?|payables?|invoices?|vendorinvoices?|billing|bills?|purchas\w*|procure\w*|po|finance|accounting|acct|payments?)([._-]|\d|@|$)", re.I)
 
 def split_emails(*fields):
@@ -97,7 +103,7 @@ ADDED = ["Question Categories", "Sage Customer ID", "Salesforce Account ID", "Ad
          "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
 REVIEW = ["Sage type", "Sage terms", "Last invoice", "Balance", "Salesforce match"]
 
-out, unmapped = [], {}
+out, new_terms, research, parents_dropped = [], {}, {}, {}
 for r in sage:
     if r["Status"] != "Active":
         continue
@@ -120,11 +126,13 @@ for r in sage:
     if m:
         S("Subnet ID", m["Subnet Account Id"], "sfdc")
         if m["Parent Account ID"]:
+            # Parents that are not Sage customers have no billing history and are left out, so the link is dropped.
             par = by_id.get(m["Parent Account ID"])
-            S("Parent Company", m["Parent Account"], "sfdc")
-            if not par or not any(norm(par["Account Name"]) == norm(x["Customer name"]) for x in sage):
-                flags.append("Parent not in load")
-    S("Subsidiary", "MinIO, Inc.", "prop")
+            if par and any(norm(par["Account Name"]) == norm(x["Customer name"]) for x in sage):
+                S("Parent Company", m["Parent Account"], "sfdc")
+            else:
+                parents_dropped[m["Parent Account"]] = parents_dropped.get(m["Parent Account"], 0) + 1
+    S("Subsidiary", "MinIO, Inc.", "rule")
     if r["Default currency"]:
         S("Primary Currency", r["Default currency"])
     else:
@@ -169,12 +177,16 @@ for r in sage:
     if m and m["Billing Country"] and r["display_country"] and m["Billing Country"].lower() != r["display_country"].lower():
         flags.append(f"Country differs in Salesforce: {m['Billing Country']}")
     if r["Term"]:
-        t = TERMS.get(r["Term"], "")
+        t = term(r["Term"])
         if t:
             S("Terms", t, "rule" if t != r["Term"] else "sage")
+            if t not in TERMS_LIST:
+                new_terms[t] = new_terms.get(t, 0) + 1
+                flags.append(f"New NetSuite term: {t}")
         else:
-            flags.append(f"Terms not in NetSuite list: {r['Term']}")
-            unmapped[r["Term"]] = unmapped.get(r["Term"], 0) + 1
+            S("Terms", r["Term"])
+            research[r["Term"]] = research.get(r["Term"], 0) + 1
+            flags.append(f"Terms to research: {r['Term']}")
     S("VAT ID", r["Tax ID"])
     for k in REQUIRED:
         if not c[k][0]:
@@ -239,7 +251,9 @@ for x in out:
         x["flags"].append("Same Salesforce account as " + ", ".join(i for i in ids if i != x["cells"][2][0]))
 
 data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "rows": out, "built": TODAY.isoformat(),
-        "renumber": renumber, "unmapped_terms": sorted(unmapped.items(), key=lambda kv: -kv[1]), "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
+        "renumber": renumber, "new_terms": sorted(new_terms.items(), key=lambda kv: int(kv[0].split()[1])),
+        "research_terms": sorted(research.items(), key=lambda kv: -kv[1]),
+        "parents_dropped": sum(parents_dropped.values()), "parents_dropped_n": len(parents_dropped), "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
 tpl = open("tools/review-template.html", encoding="utf-8").read()
 open("data/customer-review.html", "w", encoding="utf-8").write(
     tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))

@@ -60,9 +60,11 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 - 2026-10-26: Spell out reseller billing in added columns (Billed To (Reseller), Reseller Address, Reseller Invoice Email, Salesforce Partners) for SOA to map to their best practice. Customer Invoice Email holds the customer's own email.
 - 2026-10-26: Status CUSTOMER-Closed Won for every customer (all are active in Sage). Renewals to be set from deal data later.
 - 2026-10-26: Customer Invoice Email is the first AP or purchasing address, else the first address; all other addresses go to an added Additional Emails column.
-- 2026-10-26: Terms mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Other Sage terms are flagged.
+- 2026-10-26: Terms mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Other Sage day counts become new Net N terms (Net 20, 28, 59, 65, 75, 90, 120) to create in NetSuite. Due per Contract and 5 years stay as in Sage, to research.
 - 2026-10-26: Added Question Categories column. Investors listed first (by name), then likely Salesforce matches to review (by name), then everyone else by Customer ID.
 - 2026-10-26: Investor records (C00001 to C00016) moved to the notes as an open question for SOA.
+- 2026-10-26: Subsidiary MinIO, Inc. for every customer.
+- 2026-10-26: Salesforce parents that are not Sage customers are left out (no billing history); Parent Company blank for those 35 customers.
 
 ## Template lists
 

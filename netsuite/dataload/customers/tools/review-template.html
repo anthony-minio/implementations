@@ -117,11 +117,8 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
   <section class="decisions">
     <h2>Open decisions</h2>
     <ol>
-      <li><b>Subsidiary.</b> The Sage exports do not say which entity each customer belongs to: the Entity column was blank on every row, which in Sage usually means the customer is shared at the top level. Every customer is proposed as MinIO, Inc. <span id="d-sub"></span> Which customers bill from MinIO Pvt. Ltd. or MinIO Singapore Pte. Ltd.? A Sage AR invoice report with the Entity column, or accounting, can answer it.</li>
-      <li><b>Customer Category.</b> A required NetSuite field that groups customers for reporting. The template allows Direct Customer, Reseller, End Customer and OEM/MSP. Proposed from the Sage customer type: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. These Sage types have no obvious category yet: <span id="d-cat"></span>.</li>
-      <li><b>Terms not on the NetSuite list.</b> <span id="d-terms"></span> Map each to a listed term, or add the term in NetSuite. <span id="d-blank"></span> customers have no terms in Sage and are left blank.</li>
+      <li><b>Customer Category.</b> A list MinIO defines in NetSuite to group customers for reporting; NetSuite does not ship with values. The four values here (Direct Customer, Reseller, End Customer, OEM/MSP) come from the template's List tab, and the template marks the field as required. Each customer gets one. Proposed from the Sage customer type: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. These Sage types have no obvious category yet: <span id="d-cat"></span>.</li>
       <li><b>Salesforce matches to confirm.</b> <span id="d-sfm"></span> customers matched a Salesforce account by a similar but not identical name, for example a spelling or punctuation difference. They are marked "Salesforce match" in Question Categories and listed after the investors. Confirm or reject each.</li>
-      <li><b>Parent Company.</b> Salesforce links some accounts to a parent, for example Royal Caribbean International to Royal Caribbean Group. NetSuite can show the same parent and child link, but the parent must exist as a customer. <span id="d-par"></span> customers have a parent that is not a Sage customer, so it is not in this load. Add those parents to the load as customers, or leave Parent Company blank for them?</li>
     </ol>
   </section>
 
@@ -135,7 +132,9 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>Status.</b> Every customer in this load is active in Sage (not marked inactive), so every customer is set to CUSTOMER-Closed Won. Customers that are renewals can be changed to CUSTOMER-Renewal when deal data is loaded.</li>
       <li><b>Customer Invoice Email.</b> The address invoices go to. Where Sage has an accounts payable or purchasing address (for example ap@, accounts.payable@, invoices@, purchasing@), that address is used; otherwise the first address Sage has. Every other address for the customer goes to Additional Emails.</li>
       <li><b>Reseller billing.</b> For customers Sage invoices through a reseller, the reseller is spelled out in Billed To (Reseller), Reseller Address and Reseller Invoice Email, with Salesforce partners alongside, so it can be set up to best practice.</li>
-      <li><b>Terms.</b> Sage terms are mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Sage "30 Days" becomes Net 30, and so on.</li>
+      <li><b>Subsidiary.</b> The Sage exports do not record an entity for any customer. All customers are loaded to MinIO, Inc., the parent subsidiary, and bill from it.</li>
+      <li><b>Terms.</b> Sage terms are mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Sage "30 Days" becomes Net 30, and so on. Sage day counts with no match on the list become new terms of the same length, which must be created in NetSuite before the load: <span id="n-newterms"></span>. Terms that are not a day count are loaded as Sage has them and need research before the load: <span id="n-research"></span>. <span id="d-blank"></span> customers have no terms in Sage and are left blank.</li>
+      <li><b>Parent Company.</b> Salesforce links some accounts to a parent company, for example Royal Caribbean International to Royal Caribbean Group. For <span id="n-pardrop"></span> customers the parent is not a Sage customer: MinIO has no billing history with it and deals only with the subsidiary financially. Those parents are not loaded, and Parent Company is left blank for those customers. Parent links are kept where the parent is itself a customer in this load.</li>
       <li><b>Added columns.</b> Question Categories, Sage Customer ID, Salesforce Account ID, Additional Emails and the reseller columns are not standard template columns. Sage Customer ID, Salesforce Account ID and Subnet ID are kept as their own fields so the source of each customer is explicit.</li>
     </ol>
   </section>
@@ -149,7 +148,7 @@ const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["
 const flagKey = (f) => f.replace(/:.*/, "");
 const COL = (n) => DATA.cols.indexOf(n);
 let RES = 0;
-const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Terms not in NetSuite list", "Category to decide", "No customer type", "Same Salesforce account as", "Likely Salesforce match, confirm", "Country differs in Salesforce", "Parent not in load"]);
+const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Terms to research", "Category to decide", "No customer type", "Same Salesforce account as", "Likely Salesforce match, confirm", "Country differs in Salesforce", "New NetSuite term"]);
 let state = { scope: "all", type: "", flag: "", q: "" };
 try { Object.assign(state, JSON.parse(localStorage.getItem("cust-review-2") || "{}")); } catch (e) {}
 
@@ -159,11 +158,10 @@ function init() {
   const cnt = (f) => DATA.rows.filter(f).length;
   $("#n-inv").textContent = cnt((r) => r.cells[QC][0] === "Investor");
   $("#d-sfm").textContent = cnt((r) => r.cells[QC][0] === "Salesforce match");
-  $("#d-par").textContent = cnt((r) => r.flags.includes("Parent not in load"));
+  $("#n-pardrop").textContent = DATA.parents_dropped;
   $("#d-blank").textContent = cnt((r) => !r.review[TI]);
-  $("#d-terms").textContent = DATA.unmapped_terms.length ? "Sage terms with no match: " + DATA.unmapped_terms.map(([t, n]) => `${t} (${n})`).join(", ") + "." : "None.";
-  const india = cnt((r) => r.cells[SUBI][0] === "India"), sg = cnt((r) => r.cells[SUBI][0] === "Singapore");
-  $("#d-sub").textContent = `For reference, ${india} customers have an address in India and ${sg} in Singapore.`;
+  $("#n-newterms").textContent = DATA.new_terms.map(([t, n]) => `${t} (${n})`).join(", ") || "none";
+  $("#n-research").textContent = DATA.research_terms.map(([t, n]) => `${t} (${n})`).join(", ") || "none";
   const catTypes = {};
   DATA.rows.forEach((r) => r.flags.includes("Category to decide") && (catTypes[r.review[0]] = (catTypes[r.review[0]] || 0) + 1));
   const noType = cnt((r) => r.flags.includes("No customer type"));
