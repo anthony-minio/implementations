@@ -29,6 +29,20 @@ Missing from the export: street address, email, phone, currency, terms, tax, act
 
 Customer types: Direct Sales 263, Direct Sales with Reseller 193, Chargebee 149, Reseller 12, Marketplace 6, Billing Vendor 2, MinIO Training Subscription 2, Event Sponsor 2, blank 21.
 
+## Sage customer list report (2026-10-25)
+
+Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header row per customer (type, term, tax ID, credit limit, balance, status, on hold, currency, territory, rep, last invoice date, delivery options), then Display, Primary, Bill-to and Ship-to contact blocks with address, phone and email. `tools/parse_sage_report.py` flattens it to one row per customer: `data/sage-customers-flat-20261025.csv`.
+
+- Status is Active on 648 of 652, so it cannot tell which customers to load. Activity has to come from last invoice date, balance, or contract dates.
+- Active with an invoice since 2024-10-26 or a non-zero balance: 289. Since 2025-10-26: 270.
+- No invoice in Sage: 283, of which 148 are type Chargebee (portal customers, billed outside Sage invoicing).
+- Bill-to contact differs from the customer on 205 customers, usually a reseller (for example billed to Insight).
+- Currency is blank on 566 and USD on 82. Terms are blank on 227 and use Sage names (30 Days, Due on Receipt, Due per Contract).
+
+## Salesforce accounts export (2026-10-25)
+
+449 accounts, all Lifecycle = Customer. 11 columns: Account Name, Lifecycle, Subnet Account Id, Billing State, Phone, Owner, Account Record Type, Partner Type, Domain, Website. No Account ID and no full address. 251 active Sage customers match a Salesforce account by normalized name.
+
 ## Template lists
 
 | List | Values |
