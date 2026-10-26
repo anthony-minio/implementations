@@ -1,0 +1,6 @@
+# Open questions
+
+1. **Order of Ramp sync and load.** Ramp's NetSuite sync works both ways: it can import existing NetSuite vendors and link Ramp merchants to them. Loading all 1,770 Sage vendors first and then connecting Ramp avoids two problems with syncing first: Ramp-created vendors carry no Sage ID, so the enrichment step has to match by name, and Ramp names that already exist in NetSuite raise duplicate-name errors. Which order does SOA recommend?
+2. **Subsidiary for INR and SGD vendors.** Ramp supports several entities mapped to NetSuite subsidiaries, but Ramp's export shows only MinIO, Inc. as a default entity (79 vendors, the rest blank). Vendors to look up: INR: V-01301 TDS Tax Payable, V-01311 Universal Actuaries and Benefit Consultants, V-01352 and V-01353 Zoho Corporation Private Limited, V-01354 91 Springboard Business Hub Private Limited, V-01380 Resurgent India Limited, V-01381 National Securities Depository Limited, V-01412 S P Nagarajan, V-01459 Vishnu Daya & Co LLP. SGD: V-00628 Cloud Expo Asia Pte. Ltd. Also GBP: V-00629 Reed Exhibitions Ltd. Several INR vendors have United States as their Sage country.
+3. **Bank details import.** SOA to provide the template for vendor bank details, and confirm whether Ramp syncs bank details to NetSuite.
+4. **Five bank accounts differ** between Sage and Ramp. Ramp is assumed current; confirm.
