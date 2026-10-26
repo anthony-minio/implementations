@@ -120,7 +120,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>Status.</b> Every customer is active. CUSTOMER-Closed Won is proposed for all; the template also allows CUSTOMER-Lost Customer and CUSTOMER-Renewal.</li>
       <li><b>Category.</b> Proposed: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. Marketplace, Chargebee, Billing Vendor, Training Subscription and Event Sponsor need a call.</li>
       <li><b>Terms.</b> Sage "30 Days" is proposed as Net 30, and so on. Terms must exist in NetSuite first. "Due per Contract" and "5 years" need a call.</li>
-      <li><b>External ID.</b> Proposed: the Sage customer ID, which every customer has and which later Sage history loads can reference. Salesforce Account ID and Subnet ID are their own columns. Likely Salesforce matches (yellow) need a yes or no.</li>
+      <li><b>IDs.</b> External ID is left blank. Sage Customer ID, Salesforce Account ID and Subnet ID are their own columns. Likely Salesforce matches (yellow) need a yes or no.</li>
       <li><b>Parent Company.</b> From Salesforce. A parent that is not itself in this load is flagged: load it first, or leave the parent off.</li>
     </ol>
   </section>
@@ -130,7 +130,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
 const DATA = /*DATA*/null;
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Added columns", 5]];
+const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Added columns", 6]];
 const flagKey = (f) => f.replace(/:.*/, "");
 const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Several emails", "Terms to map", "Category to decide", "No customer type", "Same Salesforce account as", "Likely Salesforce match, confirm", "Country differs in Salesforce", "Parent not in load"]);
 let state = { scope: "all", type: "", flag: "", q: "" };
@@ -140,7 +140,7 @@ function init() {
   const rows = DATA.rows, inS = rows.filter((r) => r.scope);
   const missing = inS.reduce((n, r) => n + r.cells.filter((c) => c[1] === "miss").length, 0);
   const flagged = inS.filter((r) => r.flags.some((f) => WARN.has(flagKey(f)))).length;
-  $("#stats").innerHTML = [[rows.length, "Customers to load"], [rows.filter((r) => r.cells[32][0]).length, "Billed through a reseller"], [flagged, "With a warning"], [missing, "Required cells missing"]]
+  $("#stats").innerHTML = [[rows.length, "Customers to load"], [rows.filter((r) => r.cells[33][0]).length, "Billed through a reseller"], [flagged, "With a warning"], [missing, "Required cells missing"]]
     .map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
   const types = [...new Set(rows.map((r) => r.review[0] || "(blank)"))].sort();
   $("#type").innerHTML = `<option value="">All types</option>` + types.map((t) => `<option>${esc(t)}</option>`).join("");
@@ -163,7 +163,7 @@ function render() {
   document.querySelectorAll("#scope button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === state.scope)));
   const q = state.q.trim().toLowerCase();
   const rows = DATA.rows.filter((r) =>
-    (state.scope === "all" || (state.scope === "reseller") === Boolean(r.cells[32][0])) &&
+    (state.scope === "all" || (state.scope === "reseller") === Boolean(r.cells[33][0])) &&
     (!state.type || (r.review[0] || "(blank)") === state.type) &&
     (!state.flag || (state.flag === "__none" ? !r.flags.length : r.flags.some((f) => flagKey(f) === state.flag))) &&
     (!q || r.cells.some((c) => c[0].toLowerCase().includes(q)) || r.review.some((v) => v.toLowerCase().includes(q))));
