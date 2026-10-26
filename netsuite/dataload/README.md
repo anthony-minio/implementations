@@ -4,7 +4,7 @@ Working folder for configuring NetSuite data uploads. One subfolder per load, ea
 
 | Folder | Load | Status |
 |---|---|---|
-| `noninventory-items/` | Non-inventory Item for Sale, 11 items | Waiting on accounts and revenue recognition |
+| `noninventory-items/` | Non-inventory Item for Sale, 11 items | Waiting on the license delivery trigger and the portal question |
 
 ## Reference values
 

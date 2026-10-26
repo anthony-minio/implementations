@@ -109,13 +109,18 @@ Include Children, Sales Description, Income account, Deferred Revenue
 account</td>
 </tr>
 <tr class="even">
-<td><strong>Open</strong></td>
-<td>6 columns. Department stays blank for now. Most are set per item
-group, under Values by group</td>
+<td><strong>Blank on purpose</strong></td>
+<td>Department, Base Price, Revenue Recogition Rule, Rev Rec Forecast
+Rule. No revenue recognition rules are set up yet</td>
 </tr>
 <tr class="odd">
+<td><strong>Open</strong></td>
+<td>Create Revenue Plans On, Direct Revenue Posting, Can be
+fulfilled/received</td>
+</tr>
+<tr class="even">
 <td><strong>Status</strong></td>
-<td>Waiting on accounting for accounts and revenue recognition</td>
+<td>Waiting on the license delivery trigger and the portal question</td>
 </tr>
 </tbody>
 </table>
@@ -425,15 +430,15 @@ AI inference.</td>
 </tr>
 <tr class="odd">
 <td><strong>Revenue Recogition Rule</strong></td>
-<td>[TBC]</td>
-<td>[TBC]</td>
-<td>[TBC]</td>
+<td>Blank: no rules set up yet</td>
+<td>Blank</td>
+<td>Blank</td>
 </tr>
 <tr class="even">
 <td><strong>Rev Rec Forecast Rule</strong></td>
-<td>[TBC]</td>
-<td>[TBC]</td>
-<td>[TBC]</td>
+<td>Blank: no rules set up yet</td>
+<td>Blank</td>
+<td>Blank</td>
 </tr>
 </tbody>
 </table>
@@ -463,19 +468,20 @@ Ltd.</td>
 </tr>
 <tr class="even">
 <td><strong>Base Price</strong></td>
-<td>[TBC: list price per item, or blank and priced on each order]</td>
+<td>Blank: not known</td>
 </tr>
 <tr class="odd">
 <td><strong>Create Revenue Plans On</strong></td>
-<td>[TBC]</td>
+<td>[TBC: depends on the license delivery trigger]</td>
 </tr>
 <tr class="even">
 <td><strong>Direct Revenue Posting</strong></td>
-<td>[TBC: usually No when revenue recognition runs in NetSuite]</td>
+<td>[TBC: No proposed for all 11 items]</td>
 </tr>
 <tr class="odd">
 <td><strong>Can be fulfilled/received</strong></td>
-<td>[TBC: usually No for services and licenses]</td>
+<td>[TBC: No proposed for support and training; license items depend on
+the delivery trigger]</td>
 </tr>
 </tbody>
 </table>
@@ -490,10 +496,6 @@ NetSuite matches it; child accounts may need the full path.</li>
 accounts and rule as the direct licenses?</li>
 <li><strong>Platform training subscription.</strong> Is it recognized
 like the live trainings or like a subscription?</li>
-<li><strong>Base Price.</strong> Do these items have list prices? How
-AIStor and MemKV licenses are measured (for example per TiB) is not
-known or may not be standard; the license descriptions leave the unit
-out for now.</li>
 <li><strong>Classes in production.</strong> License, Support, Training
 and Professional Services must exist in production before this
 load.</li>
@@ -524,6 +526,18 @@ no fulfillment, with the revenue start date set on the order line from
 the key issue date. Decide before the load: whether Can be
 fulfilled/received can change after items are used on transactions is
 unclear.</li>
+<li><strong>Portal sales.</strong> Smaller businesses and individuals
+buy AIStor through a portal, about monthly, and revenue is recognized
+immediately. These items defer revenue, so portal sales need either a
+separate portal item with Direct Revenue Posting = Yes and no deferred
+revenue account, or no item at all if portal sales reach NetSuite as a
+summary journal entry from the payment processor.</li>
+<li><strong>Revenue recognition rules.</strong> None are set up yet, so
+both rule columns stay blank. NetSuite may require a rule on items that
+have a deferred revenue account; the sandbox import will show whether
+the load fails without one. Either way the items need rules before they
+are used on transactions, added later with an update import keyed on
+External ID.</li>
 </ol>
 </section>
 </main>
