@@ -51,6 +51,10 @@ Activity of the 1,770 active Sage vendors, using the latest of Sage last bill, S
 | Last activity before 2024-10-26 | 8 | 292 | 300 |
 | No activity recorded | 65 | 842 | 907 |
 
+## Review table
+
+`tools/build_review.py` maps the 1,770 active Sage vendors to the template, links Ramp by Sage vendor ID, and writes `data/vendor-review.html` (from `tools/review-template.html`, published privately at https://claude.ai/artifact/43aBdfBgsyuiGNHAtGPSsw) and `data/vendor-load.csv` (the 1,219 not in Ramp, full tax IDs). Bank numbers and tax IDs are masked wherever they appear on the page; two Sage "Number" fields that hold bank account numbers are not loaded. `data/coa-sage-map.json` maps Sage accounts to COA Draft v1.
+
 ## Load log
 
 | Date | File | Records | Errors | Outcome |
