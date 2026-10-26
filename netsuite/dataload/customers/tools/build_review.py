@@ -5,10 +5,10 @@ import csv, datetime as dt, json, re
 import openpyxl
 
 TODAY = dt.date(2026, 10, 26)
-CUTOFF = dt.date(2024, 10, 26)  # invoiced in the last 2 years
 FLAT = "data/sage-customers-flat-20261025.csv"
 LIST = "data/sage-customers-20261026.csv"
 SFDC = "data/sfdc-accounts-20261025.xlsx"
+PARTNERS = "data/sfdc-accounts-with-partners-20261025.xlsx"
 
 TERMS = {"30 Days": "Net 30", "45 Days": "Net 45", "60 Days": "Net 60", "90 Days": "Net 90",
          "120 Days": "Net 120", "20 Days": "Net 20", "28 days": "Net 28", "Net 30": "Net 30",
@@ -32,6 +32,13 @@ ws = openpyxl.load_workbook(SFDC, read_only=True).active
 srows = list(ws.iter_rows(values_only=True))
 sf = {norm(r[0]): dict(zip(srows[0], r)) for r in srows[1:] if r and r[0]}
 
+# Accounts with Partners: link each account to its partner accounts, both directions, by normalized name.
+partners = {}
+for r in openpyxl.load_workbook(PARTNERS, read_only=True).active.iter_rows(values_only=True):
+    if r and isinstance(r[0], int) and r[2] and r[3]:
+        partners.setdefault(norm(r[2]), set()).add(r[3])
+        partners.setdefault(norm(r[3]), set()).add(r[2])
+
 names, near = {}, {}
 for r in sage:
     names.setdefault(r["Customer name"].strip().lower(), []).append(r["Customer ID"])
@@ -43,7 +50,8 @@ COLS = ["External ID", "Subnet ID", "Customer ID", "Company Name", "Parent Compa
         "Postal Code/Zip", "Country", "Default Billing", "Default Shipping", "Account", "Terms", "VAT ID",
         "International VAT ID", "Taxable", "Avalara Entity", "Exemption Certificate No."]
 REQUIRED = {"Customer ID", "Company Name", "Subsidiary", "Status", "Primary Currency", "Customer Category"}
-REVIEW = ["Sage type", "Last invoice", "Balance", "Sage bill-to", "Salesforce match"]
+ADDED = ["Billed To (Reseller)", "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
+REVIEW = ["Sage type", "Last invoice", "Balance", "Salesforce match"]
 
 out = []
 for r in sage:
@@ -55,7 +63,7 @@ for r in sage:
     flags = []
     investor = bool(re.match(r"C\d+$", cid))
     last, bal = date(r["Last invoice date"]), float(r["Balance"] or 0)
-    in_scope = not investor and ((last and last >= CUTOFF) or bal != 0)
+    in_scope = True  # every customer not marked inactive in Sage
     m = sf.get(norm(r["Customer name"]))
 
     S("Customer ID", cid)
@@ -68,10 +76,11 @@ for r in sage:
     else:
         S("Primary Currency", "USD", "prop")
     billto = r["billto_name"] and r["billto_name"] != r["display_name"]
-    email = (r["billto_email"] if billto and r["billto_email"] else r["display_email"])
+    email = r["display_email"]
     S("Customer Invoice Email", email)
     if email and (re.search(r"[;/ ,]", email.strip()) or len(email) > 64):
         flags.append("Several emails")
+    S("Status", "CUSTOMER-Closed Won", "prop")
     S("Individual (Type)", "FALSE", "prop")
     cat = CATEGORY.get(r["Customer type"], "")
     S("Customer Category", cat, "prop")
@@ -116,8 +125,6 @@ for r in sage:
         nd = [x for x in near[norm(r["Customer name"])] if x != cid]
         if nd:
             flags.append("Similar name: " + ", ".join(nd))
-    if billto:
-        flags.append("Billed to another party")
     if not m:
         flags.append("No Salesforce match")
     if not r["Customer type"] and not investor:
@@ -125,12 +132,20 @@ for r in sage:
     if not last:
         flags.append("No invoice in Sage")
 
+    added = [["", ""] for _ in ADDED]
+    if billto:
+        addr = ", ".join(x.strip(" ,") for x in [r["billto_line1"], r["billto_line2"], r["billto_citystatezip_country"]] if x.strip(" ,"))
+        added[0] = [r["billto_name"], "sage"]
+        added[1] = [addr.replace(",,", ","), "sage" if addr else ""]
+        added[2] = [r["billto_email"], "sage" if r["billto_email"] else ""]
+    p = partners.get(norm(r["Customer name"]))
+    if p:
+        added[3] = ["; ".join(sorted(p)), "sfdc"]
     review = [r["Customer type"], last.isoformat() if last else "", f"{bal:,.2f}" if bal else "",
-              r["billto_name"] if billto else "", m["Account Name"] if m else ""]
-    out.append({"scope": bool(in_scope), "cells": [c[k] for k in COLS], "review": review, "flags": flags})
+              m["Account Name"] if m else ""]
+    out.append({"scope": bool(in_scope), "cells": [c[k] for k in COLS] + added, "review": review, "flags": flags})
 
-data = {"cols": COLS, "required": sorted(REQUIRED), "review": REVIEW, "rows": out,
-        "built": TODAY.isoformat(), "cutoff": CUTOFF.isoformat()}
+data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "rows": out, "built": TODAY.isoformat()}
 tpl = open("tools/review-template.html", encoding="utf-8").read()
 open("data/customer-review.html", "w", encoding="utf-8").write(
     tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))

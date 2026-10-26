@@ -47,6 +47,11 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 
 `tools/build_review.py` maps active Sage customers to the template columns, matches Salesforce by name, flags issues, and writes `data/customer-review.html` from `tools/review-template.html`. The page holds customer data, so it stays in `data/` and is published privately at https://claude.ai/artifact/GemCL1YnPNaMYaVQNbsDVB. Rebuild with `python3 tools/build_review.py` from this folder, then republish.
 
+## Decisions
+
+- 2026-10-26: Load every Sage customer not marked inactive (648). No activity cutoff.
+- 2026-10-26: Spell out reseller billing in added columns (Billed To (Reseller), Reseller Address, Reseller Invoice Email, Salesforce Partners) for SOA to map to their best practice. Customer Invoice Email holds the customer's own email.
+
 ## Template lists
 
 | List | Values |

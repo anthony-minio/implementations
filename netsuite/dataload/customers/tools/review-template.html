@@ -65,8 +65,6 @@ th.req::after { content: " *"; color: var(--miss); }
 .rowlabel { position: sticky; left: 0; background: var(--surface); z-index: 1; font-family: var(--font-ui); font-size: .8rem; max-width: 15rem; min-width: 11rem; }
 thead .rowlabel { z-index: 3; background: var(--head); }
 .rowlabel small { display: block; color: var(--muted); font-family: var(--font-data); font-size: .7rem; }
-tr.out td { opacity: .55; }
-tr.out td.rowlabel { opacity: 1; }
 td.sfdc { color: var(--sfdc); background: var(--sfdc-bg); }
 td.prop { color: var(--prop); background: var(--prop-bg); font-style: italic; }
 td.miss { background: var(--miss-bg); }
@@ -84,7 +82,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
 <div class="wrap">
   <header>
     <h1>Customer load review</h1>
-    <p class="sub">Active Sage customers mapped to the NetSuite customer template, with Salesforce matched by name. A draft to work through together: values in the grid are not final.</p>
+    <p class="sub">Every Sage customer not marked inactive, mapped to the NetSuite customer template with Salesforce matched by name. Reseller billing is spelled out in added columns. A draft to work through together: values in the grid are not final.</p>
   </header>
 
   <div class="stats" id="stats"></div>
@@ -98,11 +96,11 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
 
   <div class="filters">
     <div class="field">
-      <span class="seg-label" id="scope-label">Scope</span>
+      <span class="seg-label" id="scope-label">Billing</span>
       <div class="seg" role="group" aria-labelledby="scope-label" id="scope">
-        <button type="button" data-v="in" aria-pressed="true">In scope</button>
-        <button type="button" data-v="out" aria-pressed="false">Out of scope</button>
-        <button type="button" data-v="all" aria-pressed="false">All active</button>
+        <button type="button" data-v="all" aria-pressed="true">All</button>
+        <button type="button" data-v="reseller" aria-pressed="false">Billed through a reseller</button>
+        <button type="button" data-v="direct" aria-pressed="false">Billed direct</button>
       </div>
     </div>
     <div class="field"><label for="type">Sage type</label><select id="type"></select></div>
@@ -116,10 +114,10 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
   <section class="decisions">
     <h2>Open decisions</h2>
     <ol>
-      <li><b>Active rule.</b> In scope means an open balance or an invoice in Sage since <span id="cutoff"></span>. Prepaid multi-year customers invoiced earlier need a contract end date from Salesforce.</li>
-      <li><b>Reseller billing.</b> Customers marked "Billed to another party" are invoiced to a reseller in Sage. Decide whether the reseller or the end customer is the NetSuite customer.</li>
+      <li><b>Investor records.</b> C00001 to C00016 look like investors and note holders, not customers. Load or leave out?</li>
+      <li><b>Reseller billing.</b> Spelled out in four added columns for SOA to map: who Sage bills, their address and invoice email, and Salesforce partners. Customer Invoice Email holds the customer's own email.</li>
       <li><b>Subsidiary.</b> Every customer is proposed as MinIO, Inc. Which customers bill from MinIO Pvt. Ltd. or MinIO Singapore Pte. Ltd.?</li>
-      <li><b>Status.</b> The template allows CUSTOMER-Lost Customer, CUSTOMER-Closed Won and CUSTOMER-Renewal. No rule yet.</li>
+      <li><b>Status.</b> Every customer is active. CUSTOMER-Closed Won is proposed for all; the template also allows CUSTOMER-Lost Customer and CUSTOMER-Renewal.</li>
       <li><b>Category.</b> Proposed: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. Marketplace, Chargebee, Billing Vendor, Training Subscription and Event Sponsor need a call.</li>
       <li><b>Terms.</b> Sage "30 Days" is proposed as Net 30, and so on. Terms must exist in NetSuite first. "Due per Contract" and "5 years" need a call.</li>
       <li><b>External ID.</b> Waiting on the Salesforce Account ID report. Name matching is used until then.</li>
@@ -131,18 +129,17 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
 const DATA = /*DATA*/null;
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7]];
+const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Reseller (added columns)", 4]];
 const flagKey = (f) => f.replace(/:.*/, "");
 const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Several emails", "Terms to map", "Category to decide", "No customer type"]);
-let state = { scope: "in", type: "", flag: "", q: "" };
-try { Object.assign(state, JSON.parse(localStorage.getItem("cust-review") || "{}")); } catch (e) {}
+let state = { scope: "all", type: "", flag: "", q: "" };
+try { Object.assign(state, JSON.parse(localStorage.getItem("cust-review-2") || "{}")); } catch (e) {}
 
 function init() {
-  $("#cutoff").textContent = DATA.cutoff;
   const rows = DATA.rows, inS = rows.filter((r) => r.scope);
   const missing = inS.reduce((n, r) => n + r.cells.filter((c) => c[1] === "miss").length, 0);
   const flagged = inS.filter((r) => r.flags.some((f) => WARN.has(flagKey(f)))).length;
-  $("#stats").innerHTML = [[rows.length, "Active in Sage"], [inS.length, "In scope"], [flagged, "In scope with a warning"], [missing, "Required cells missing"]]
+  $("#stats").innerHTML = [[rows.length, "Customers to load"], [rows.filter((r) => r.cells[31][0]).length, "Billed through a reseller"], [flagged, "With a warning"], [missing, "Required cells missing"]]
     .map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
   const types = [...new Set(rows.map((r) => r.review[0] || "(blank)"))].sort();
   $("#type").innerHTML = `<option value="">All types</option>` + types.map((t) => `<option>${esc(t)}</option>`).join("");
@@ -161,11 +158,11 @@ function init() {
 }
 
 function render() {
-  try { localStorage.setItem("cust-review", JSON.stringify(state)); } catch (e) {}
+  try { localStorage.setItem("cust-review-2", JSON.stringify(state)); } catch (e) {}
   document.querySelectorAll("#scope button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === state.scope)));
   const q = state.q.trim().toLowerCase();
   const rows = DATA.rows.filter((r) =>
-    (state.scope === "all" || (state.scope === "in") === r.scope) &&
+    (state.scope === "all" || (state.scope === "reseller") === Boolean(r.cells[31][0])) &&
     (!state.type || (r.review[0] || "(blank)") === state.type) &&
     (!state.flag || (state.flag === "__none" ? !r.flags.length : r.flags.some((f) => flagKey(f) === state.flag))) &&
     (!q || r.cells.some((c) => c[0].toLowerCase().includes(q)) || r.review.some((v) => v.toLowerCase().includes(q))));
@@ -175,7 +172,7 @@ function render() {
     const tds = r.cells.map((c) => `<td class="${c[1]}" title="${esc(c[0])}">${esc(c[0])}</td>`).join("");
     const rev = r.review.map((v) => `<td class="rev" title="${esc(v)}">${esc(v)}</td>`).join("");
     const fl = r.flags.map((f) => `<span class="chip${WARN.has(flagKey(f)) ? " warn" : ""}">${esc(f)}</span>`).join("");
-    return `<tr class="${r.scope ? "" : "out"}"><td class="rowlabel" title="${esc(name)}">${esc(name)}<small>${esc(id)}${r.scope ? "" : " · out of scope"}</small></td>${tds}${rev}<td class="flags">${fl}</td></tr>`;
+    return `<tr><td class="rowlabel" title="${esc(name)}">${esc(name)}<small>${esc(id)}</small></td>${tds}${rev}<td class="flags">${fl}</td></tr>`;
   }).join("");
 }
 init();
