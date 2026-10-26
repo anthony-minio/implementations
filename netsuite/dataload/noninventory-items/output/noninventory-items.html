@@ -1,0 +1,399 @@
+<title>NetSuite non-inventory items load</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+
+:root {
+--paper: #fbfcfd;
+--ink: #16202b;
+--muted: #5b6673;
+--rule: #c9d0d8;
+--accent: #2e74b5;
+--head-bg: #1f3b5c;
+--head-ink: #ffffff;
+--label-bg: #eef1f5;
+--tbc-bg: #fff3d6;
+--tbc-ink: #7a5300;
+--font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+--font-body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+--font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+}
+:root[data-theme="dark"] {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 1rem; line-height: 1.55; padding-inline: 16px; padding-block: 2rem 4rem; }
+.doc { max-width: 46rem; margin-inline: auto; }
+.doc-head { display: grid; gap: .35rem; padding-block-end: 1.25rem; border-bottom: 1px solid var(--rule); margin-block-end: 1.5rem; }
+.doc-title { color: var(--ink); font-family: var(--font-display); font-weight: 600; font-size: clamp(1.8rem, 5vw, 2.4rem); line-height: 1.15; margin: 0; text-wrap: balance; }
+.doc-sub { color: var(--muted); font-size: 1.1rem; margin: 0; }
+.doc-meta { font-family: var(--font-mono); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+h1, h2, h3 { color: var(--accent); line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+section.level1 { margin-block: 1rem 3rem; }
+section.level2 { margin-block-start: 2rem; }
+.head-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; margin-block-end: .75rem; }
+.head-row > :first-child { min-width: 0; }
+p, ol, ul { margin-block: 0 .9rem; max-width: 65ch; }
+li + li { margin-block-start: .35rem; }
+figure { margin: 1.25rem 0 1.5rem; display: grid; gap: .5rem; justify-items: center; }
+figure img { max-width: 100% !important; height: auto; border: 1px solid var(--rule); border-radius: 4px; background: #ffffff; }
+figure img[style*="6.5in"] { width: 100% !important; }
+figcaption { font-size: .85rem; font-style: italic; color: var(--muted); text-align: center; max-width: 60ch; }
+.table-wrap { overflow-x: auto; margin-block: 1rem 1.5rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { border: 1px solid var(--rule); padding: .4rem .6rem; text-align: left; vertical-align: top; }
+thead th { background: var(--head-bg); color: var(--head-ink); font-weight: 600; }
+table.kv td:first-child { background: var(--label-bg); font-weight: 600; width: 28%; }
+colgroup { display: none; }
+.tbc { font-family: var(--font-mono); font-size: .75em; background: var(--tbc-bg); color: var(--tbc-ink); padding: .05em .35em; border-radius: 3px; white-space: nowrap; }
+button.copy { font: 500 .75rem/1 var(--font-mono); letter-spacing: .03em; color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: .4rem .7rem; cursor: pointer; white-space: nowrap; }
+button.copy:hover { border-color: var(--accent); }
+button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.status { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); min-height: 1em; }
+@media (prefers-reduced-motion: no-preference) { button.copy { transition: border-color .15s; } }
+</style>
+
+<main class="doc">
+  <header class="doc-head">
+    <h1 class="doc-title">NetSuite non-inventory items load</h1>
+    <p class="doc-sub">Non-inventory Item for Sale import:
+MINIO_-_Noninventory_for_Sale.csv</p>
+    <div class="doc-meta">
+      <span>Draft · updated 2026-10-26</span>
+      <button type="button" class="copy" id="copy-all">Copy whole document</button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+  </header>
+<section id="overview" class="level1">
+<h1>Overview</h1>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Record type</strong></td>
+<td>Items &gt; Non-inventory Item for Sale</td>
+</tr>
+<tr class="even">
+<td><strong>Load file</strong></td>
+<td><code>MINIO_-_Noninventory_for_Sale.csv</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Items</strong></td>
+<td>11</td>
+</tr>
+<tr class="even">
+<td><strong>Filled</strong></td>
+<td>External ID, Item Name, Display Name/Code</td>
+</tr>
+<tr class="odd">
+<td><strong>Open</strong></td>
+<td>13 columns. Most are set per item group, below</td>
+</tr>
+<tr class="even">
+<td><strong>Status</strong></td>
+<td>Waiting on accounting for accounts and revenue recognition</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="items" class="level1">
+<h1>Items</h1>
+<p>External ID and Item Name both use the item ID. [TBC: confirm the
+item ID as Item Name, with the descriptive name as Display
+Name/Code]</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Item Name / External ID</strong></th>
+<th><strong>Display Name/Code</strong></th>
+<th><strong>Group</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>NS-SUPT-SLA-1H-UPB</strong></td>
+<td>1-Hour SLA / Unlimited Panic Buttons</td>
+<td>Support</td>
+</tr>
+<tr class="even">
+<td><strong>NS-SUPT-SLA-4H-UPB</strong></td>
+<td>4-Hour SLA / Unlimited Panic Buttons</td>
+<td>Support</td>
+</tr>
+<tr class="odd">
+<td><strong>NS-SUPT-SLA-24H-1PB</strong></td>
+<td>24-Hour SLA / 1 Panic Button</td>
+<td>Support</td>
+</tr>
+<tr class="even">
+<td><strong>NS-SUPT-SLA-48H-1PB</strong></td>
+<td>48-Hour SLA / 1 Panic Button</td>
+<td>Support</td>
+</tr>
+<tr class="odd">
+<td><strong>NS-SUPT-SLA-5D-0PB</strong></td>
+<td>5-day SLA / No Panic Buttons</td>
+<td>Support</td>
+</tr>
+<tr class="even">
+<td><strong>NS-TRAIN-LV-3D</strong></td>
+<td>3-day Live Virtual Training</td>
+<td>Training</td>
+</tr>
+<tr class="odd">
+<td><strong>NS-TRAIN-LV-4D</strong></td>
+<td>4-day Live Virtual Training</td>
+<td>Training</td>
+</tr>
+<tr class="even">
+<td><strong>NS-TRAIN-PLATFORM</strong></td>
+<td>Single Training Subscription to Platform</td>
+<td>Training</td>
+</tr>
+<tr class="odd">
+<td><strong>NS-LIC-AISTOR</strong></td>
+<td>AIStor License</td>
+<td>License</td>
+</tr>
+<tr class="even">
+<td><strong>NS-OEM-LIC-AISTOR</strong></td>
+<td>AIStor OEM License</td>
+<td>License</td>
+</tr>
+<tr class="odd">
+<td><strong>NS-LIC-MEMKV</strong></td>
+<td>MemKV License</td>
+<td>License</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="values-by-group" class="level1">
+<h1>Values by group</h1>
+<p>Every item in a group gets the same values.</p>
+<table>
+<thead>
+<tr class="header">
+<th><strong>Column</strong></th>
+<th><strong>Support</strong></th>
+<th><strong>Training</strong></th>
+<th><strong>License</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Department</strong></td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+</tr>
+<tr class="even">
+<td><strong>Class</strong></td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+</tr>
+<tr class="odd">
+<td><strong>Income account</strong></td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+</tr>
+<tr class="even">
+<td><strong>Deferred Revenue account</strong></td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+</tr>
+<tr class="odd">
+<td><strong>Revenue Recogition Rule</strong></td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+</tr>
+<tr class="even">
+<td><strong>Rev Rec Forecast Rule</strong></td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+<td>[TBC]</td>
+</tr>
+</tbody>
+</table>
+<p>Department, Class, accounts and rules must match existing NetSuite
+records, spelled as NetSuite shows them.</p>
+</section>
+<section id="values-for-all-items" class="level1">
+<h1>Values for all items</h1>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Subsidiary</strong></td>
+<td>[TBC: which MinIO entity sells these items]</td>
+</tr>
+<tr class="even">
+<td><strong>Include Children</strong></td>
+<td>[TBC: Yes if child subsidiaries also sell them]</td>
+</tr>
+<tr class="odd">
+<td><strong>Sales Description</strong></td>
+<td>[TBC: repeat the Display Name/Code, or other text]</td>
+</tr>
+<tr class="even">
+<td><strong>Base Price</strong></td>
+<td>[TBC: list price per item, or blank and priced on each order]</td>
+</tr>
+<tr class="odd">
+<td><strong>Create Revenue Plans On</strong></td>
+<td>[TBC]</td>
+</tr>
+<tr class="even">
+<td><strong>Direct Revenue Posting</strong></td>
+<td>[TBC: usually No when revenue recognition runs in NetSuite]</td>
+</tr>
+<tr class="odd">
+<td><strong>Can be fulfilled/received</strong></td>
+<td>[TBC: usually No for services and licenses]</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="open-questions" class="level1">
+<h1>Open questions</h1>
+<ol type="1">
+<li><strong>OEM license.</strong> Does AIStor OEM License use the same
+accounts and rule as the direct licenses?</li>
+<li><strong>Platform training subscription.</strong> Is it recognized
+like the live trainings or like a subscription?</li>
+<li><strong>Base Price.</strong> Do these items have list prices?</li>
+<li><strong>Template header.</strong> The template spells
+<code>Revenue Recogition Rule</code>. Kept as is; it only needs to match
+when mapping the import.</li>
+</ol>
+</section>
+</main>
+
+<script>
+(function () {
+  const status = document.getElementById("status");
+
+  // Tables pandoc wrote without a header row are key/value tables.
+  document.querySelectorAll(".doc table").forEach((t) => {
+    if (!t.querySelector("thead")) t.classList.add("kv");
+    const wrap = document.createElement("div");
+    wrap.className = "table-wrap";
+    t.before(wrap);
+    wrap.append(t);
+  });
+
+  // Mark open questions so they stand out while reviewing.
+  const walker = document.createTreeWalker(document.querySelector(".doc"), NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while (walker.nextNode()) if (walker.currentNode.nodeValue.includes("[TBC")) hits.push(walker.currentNode);
+  hits.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.nodeValue.split(/(\[TBC[^\]]*\])/).forEach((part) => {
+      if (!part) return;
+      if (part.startsWith("[TBC")) {
+        const s = document.createElement("span");
+        s.className = "tbc";
+        s.textContent = part;
+        frag.append(s);
+      } else frag.append(part);
+    });
+    node.replaceWith(frag);
+  });
+
+  // Inline the look Google Docs keeps on paste; it ignores page stylesheets.
+  function forPaste(root) {
+    root.querySelectorAll("button.copy, .doc-meta").forEach((b) => b.remove());
+    root.querySelectorAll(".head-row").forEach((r) => r.replaceWith(...r.childNodes));
+    root.querySelectorAll(".table-wrap").forEach((w) => w.replaceWith(...w.childNodes));
+    root.querySelectorAll("h1, h2, h3").forEach((h) => (h.style.color = "#2E74B5"));
+    root.querySelectorAll("table").forEach((t) => {
+      t.setAttribute("style", "border-collapse:collapse;width:100%");
+      const kv = t.classList.contains("kv");
+      t.querySelectorAll("th, td").forEach((c) => {
+        c.setAttribute("style", "border:1px solid #BFC7D1;padding:4px 6px;vertical-align:top;font-size:10pt");
+      });
+      t.querySelectorAll("thead th").forEach((c) => {
+        c.style.background = "#1F3B5C";
+        c.style.color = "#FFFFFF";
+        c.style.fontWeight = "bold";
+      });
+      if (kv) t.querySelectorAll("tr > td:first-child").forEach((c) => {
+        c.style.background = "#F2F4F7";
+        c.style.fontWeight = "bold";
+      });
+    });
+    root.querySelectorAll("img").forEach((img) => {
+      const m = /([\d.]+)in/.exec(img.getAttribute("style") || "");
+      if (m) img.setAttribute("width", Math.round(parseFloat(m[1]) * 96));
+      img.removeAttribute("style");
+    });
+    root.querySelectorAll("figcaption").forEach((c) => c.setAttribute("style", "font-style:italic;color:#555555;font-size:9pt"));
+    root.querySelectorAll(".tbc").forEach((s) => s.setAttribute("style", "background:#FFF3D6"));
+    return root;
+  }
+
+  async function copy(source, label) {
+    const clone = forPaste(source.cloneNode(true));
+    const html = clone.outerHTML;
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([source.innerText], { type: "text/plain" }),
+        }),
+      ]);
+      status.textContent = "Copied " + label + ". Paste into Google Docs.";
+    } catch (e) {
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      status.textContent = label + " is selected. Press Ctrl+C (Cmd+C on a Mac) to copy it.";
+    }
+  }
+
+  document.querySelectorAll("section.level1, section.level2").forEach((sec) => {
+    const h = sec.querySelector(":scope > h1, :scope > h2");
+    if (!h) return;
+    const row = document.createElement("div");
+    row.className = "head-row";
+    h.before(row);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "copy";
+    b.textContent = "Copy section";
+    const label = h.textContent.trim();
+    b.addEventListener("click", () => copy(sec, "“" + label + "”"));
+    row.append(h, b);
+  });
+
+  document.getElementById("copy-all").addEventListener("click", () => copy(document.querySelector(".doc"), "the whole document"));
+})();
+</script>

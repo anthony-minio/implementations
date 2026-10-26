@@ -1,0 +1,179 @@
+<title>$title$</title>
+<!--FONTS-->
+<style>
+/* Layout: a single document column like the Word file, with a copy control beside each section heading. */
+:root {
+  --paper: #fbfcfd;
+  --ink: #16202b;
+  --muted: #5b6673;
+  --rule: #c9d0d8;
+  --accent: #2e74b5;
+  --head-bg: #1f3b5c;
+  --head-ink: #ffffff;
+  --label-bg: #eef1f5;
+  --tbc-bg: #fff3d6;
+  --tbc-ink: #7a5300;
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+    --head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+  --head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+  color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 1rem; line-height: 1.55; padding-inline: 16px; padding-block: 2rem 4rem; }
+.doc { max-width: 46rem; margin-inline: auto; }
+.doc-head { display: grid; gap: .35rem; padding-block-end: 1.25rem; border-bottom: 1px solid var(--rule); margin-block-end: 1.5rem; }
+.doc-title { color: var(--ink); font-family: var(--font-display); font-weight: 600; font-size: clamp(1.8rem, 5vw, 2.4rem); line-height: 1.15; margin: 0; text-wrap: balance; }
+.doc-sub { color: var(--muted); font-size: 1.1rem; margin: 0; }
+.doc-meta { font-family: var(--font-mono); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+h1, h2, h3 { color: var(--accent); line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+section.level1 { margin-block: 1rem 3rem; }
+section.level2 { margin-block-start: 2rem; }
+.head-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; margin-block-end: .75rem; }
+.head-row > :first-child { min-width: 0; }
+p, ol, ul { margin-block: 0 .9rem; max-width: 65ch; }
+li + li { margin-block-start: .35rem; }
+figure { margin: 1.25rem 0 1.5rem; display: grid; gap: .5rem; justify-items: center; }
+figure img { max-width: 100% !important; height: auto; border: 1px solid var(--rule); border-radius: 4px; background: #ffffff; }
+figure img[style*="6.5in"] { width: 100% !important; }
+figcaption { font-size: .85rem; font-style: italic; color: var(--muted); text-align: center; max-width: 60ch; }
+.table-wrap { overflow-x: auto; margin-block: 1rem 1.5rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { border: 1px solid var(--rule); padding: .4rem .6rem; text-align: left; vertical-align: top; }
+thead th { background: var(--head-bg); color: var(--head-ink); font-weight: 600; }
+table.kv td:first-child { background: var(--label-bg); font-weight: 600; width: 28%; }
+colgroup { display: none; }
+.tbc { font-family: var(--font-mono); font-size: .75em; background: var(--tbc-bg); color: var(--tbc-ink); padding: .05em .35em; border-radius: 3px; white-space: nowrap; }
+button.copy { font: 500 .75rem/1 var(--font-mono); letter-spacing: .03em; color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: .4rem .7rem; cursor: pointer; white-space: nowrap; }
+button.copy:hover { border-color: var(--accent); }
+button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.status { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); min-height: 1em; }
+@media (prefers-reduced-motion: no-preference) { button.copy { transition: border-color .15s; } }
+</style>
+
+<main class="doc">
+  <header class="doc-head">
+    <h1 class="doc-title">$title$</h1>
+    <p class="doc-sub">$subtitle$</p>
+    <div class="doc-meta">
+      <span>Draft · updated $date$</span>
+      <button type="button" class="copy" id="copy-all">Copy whole document</button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+  </header>
+$body$
+</main>
+
+<script>
+(function () {
+  const status = document.getElementById("status");
+
+  // Tables pandoc wrote without a header row are key/value tables.
+  document.querySelectorAll(".doc table").forEach((t) => {
+    if (!t.querySelector("thead")) t.classList.add("kv");
+    const wrap = document.createElement("div");
+    wrap.className = "table-wrap";
+    t.before(wrap);
+    wrap.append(t);
+  });
+
+  // Mark open questions so they stand out while reviewing.
+  const walker = document.createTreeWalker(document.querySelector(".doc"), NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while (walker.nextNode()) if (walker.currentNode.nodeValue.includes("[TBC")) hits.push(walker.currentNode);
+  hits.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.nodeValue.split(/(\[TBC[^\]]*\])/).forEach((part) => {
+      if (!part) return;
+      if (part.startsWith("[TBC")) {
+        const s = document.createElement("span");
+        s.className = "tbc";
+        s.textContent = part;
+        frag.append(s);
+      } else frag.append(part);
+    });
+    node.replaceWith(frag);
+  });
+
+  // Inline the look Google Docs keeps on paste; it ignores page stylesheets.
+  function forPaste(root) {
+    root.querySelectorAll("button.copy, .doc-meta").forEach((b) => b.remove());
+    root.querySelectorAll(".head-row").forEach((r) => r.replaceWith(...r.childNodes));
+    root.querySelectorAll(".table-wrap").forEach((w) => w.replaceWith(...w.childNodes));
+    root.querySelectorAll("h1, h2, h3").forEach((h) => (h.style.color = "#2E74B5"));
+    root.querySelectorAll("table").forEach((t) => {
+      t.setAttribute("style", "border-collapse:collapse;width:100%");
+      const kv = t.classList.contains("kv");
+      t.querySelectorAll("th, td").forEach((c) => {
+        c.setAttribute("style", "border:1px solid #BFC7D1;padding:4px 6px;vertical-align:top;font-size:10pt");
+      });
+      t.querySelectorAll("thead th").forEach((c) => {
+        c.style.background = "#1F3B5C";
+        c.style.color = "#FFFFFF";
+        c.style.fontWeight = "bold";
+      });
+      if (kv) t.querySelectorAll("tr > td:first-child").forEach((c) => {
+        c.style.background = "#F2F4F7";
+        c.style.fontWeight = "bold";
+      });
+    });
+    root.querySelectorAll("img").forEach((img) => {
+      const m = /([\d.]+)in/.exec(img.getAttribute("style") || "");
+      if (m) img.setAttribute("width", Math.round(parseFloat(m[1]) * 96));
+      img.removeAttribute("style");
+    });
+    root.querySelectorAll("figcaption").forEach((c) => c.setAttribute("style", "font-style:italic;color:#555555;font-size:9pt"));
+    root.querySelectorAll(".tbc").forEach((s) => s.setAttribute("style", "background:#FFF3D6"));
+    return root;
+  }
+
+  async function copy(source, label) {
+    const clone = forPaste(source.cloneNode(true));
+    const html = clone.outerHTML;
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([source.innerText], { type: "text/plain" }),
+        }),
+      ]);
+      status.textContent = "Copied " + label + ". Paste into Google Docs.";
+    } catch (e) {
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      status.textContent = label + " is selected. Press Ctrl+C (Cmd+C on a Mac) to copy it.";
+    }
+  }
+
+  document.querySelectorAll("section.level1, section.level2").forEach((sec) => {
+    const h = sec.querySelector(":scope > h1, :scope > h2");
+    if (!h) return;
+    const row = document.createElement("div");
+    row.className = "head-row";
+    h.before(row);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "copy";
+    b.textContent = "Copy section";
+    const label = h.textContent.trim();
+    b.addEventListener("click", () => copy(sec, "“" + label + "”"));
+    row.append(h, b);
+  });
+
+  document.getElementById("copy-all").addEventListener("click", () => copy(document.querySelector(".doc"), "the whole document"));
+})();
+</script>

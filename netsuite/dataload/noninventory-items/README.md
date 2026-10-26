@@ -2,6 +2,8 @@
 
 Load file: `MINIO_-_Noninventory_for_Sale.csv`. 11 items. External ID, Item Name and Display Name/Code are filled from the item list Anthony provided on 2026-10-26; the other columns are open. Record type in the Import Assistant: Items > Non-inventory Item for Sale.
 
+Review page: `output/noninventory-items.html` (published at https://claude.ai/artifact/XVsuieEPEhFmdFtFzSbN9X), built from `sections/` with `bash tools/build.sh`. Never edit `output/` by hand.
+
 ## Columns
 
 | Column | What goes in it | Source / status |
