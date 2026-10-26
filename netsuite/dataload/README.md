@@ -5,6 +5,7 @@ Working folder for configuring NetSuite data uploads. One subfolder per load, ea
 | Folder | Load | Status |
 |---|---|---|
 | `noninventory-items/` | Non-inventory Item for Sale, 11 items | Waiting on the license delivery trigger and the portal question |
+| `customers/` | Customers, from Sage enriched with Salesforce | Waiting on Sage and Salesforce exports |
 
 ## Reference values
 
