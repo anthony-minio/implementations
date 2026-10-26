@@ -120,8 +120,18 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>Status.</b> Every customer is active. CUSTOMER-Closed Won is proposed for all; the template also allows CUSTOMER-Lost Customer and CUSTOMER-Renewal.</li>
       <li><b>Category.</b> Proposed: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. Marketplace, Chargebee, Billing Vendor, Training Subscription and Event Sponsor need a call.</li>
       <li><b>Terms.</b> Sage "30 Days" is proposed as Net 30, and so on. Terms must exist in NetSuite first. "Due per Contract" and "5 years" need a call.</li>
-      <li><b>IDs.</b> External ID is left blank. Sage Customer ID, Salesforce Account ID and Subnet ID are their own columns. Likely Salesforce matches (yellow) need a yes or no.</li>
+      <li><b>Salesforce matches.</b> Likely matches (yellow) need a yes or no.</li>
       <li><b>Parent Company.</b> From Salesforce. A parent that is not itself in this load is flagged: load it first, or leave the parent off.</li>
+    </ol>
+  </section>
+
+  <section class="decisions">
+    <h2>Notes</h2>
+    <ol>
+      <li><b>Customer ID.</b> Sage IDs are not consistent. Customers with a Sage ID in the C-##### format keep it. The <span id="n-renum"></span> customers with an ID in another format (<span id="n-old"></span>) get the next numbers after the highest Sage C-##### (<span id="n-last"></span>): <span id="n-range"></span>. Their original Sage ID stays in Sage Customer ID. These 16 are the investor records still open above; if they are left out, no renumbering is needed and new numbers start right after <span id="n-last2"></span>.</li>
+      <li><b>External ID.</b> Same value as Customer ID, so later loads and updates can find each customer by it.</li>
+      <li><b>New customers.</b> After the load, NetSuite should auto-generate customer numbers in the same C-##### format, starting at <b id="n-next"></b>, the number after the last one in the load. In NetSuite: Setup > Company > Auto-Generated Numbers, Entities subtab, Customer: prefix C-, minimum 5 digits, initial number <span id="n-next2"></span>. Allow Override must be on during the import so the loaded numbers are kept.</li>
+      <li><b>Sage Customer ID, Salesforce Account ID, Subnet ID.</b> Added columns, kept as their own fields so the source of each customer is explicit.</li>
     </ol>
   </section>
 </div>
@@ -137,6 +147,14 @@ let state = { scope: "all", type: "", flag: "", q: "" };
 try { Object.assign(state, JSON.parse(localStorage.getItem("cust-review-2") || "{}")); } catch (e) {}
 
 function init() {
+  const old = Object.keys(DATA.renumber), neu = Object.values(DATA.renumber);
+  $("#n-renum").textContent = old.length;
+  $("#n-old").textContent = old.length ? `${old[0]} to ${old[old.length - 1]}` : "none";
+  $("#n-last").textContent = DATA.last_std;
+  $("#n-last2").textContent = DATA.last_std;
+  $("#n-range").textContent = neu.length ? `${neu[0]} to ${neu[neu.length - 1]}` : "none";
+  $("#n-next").textContent = DATA.next_id;
+  $("#n-next2").textContent = String(parseInt(DATA.next_id.slice(2), 10));
   const rows = DATA.rows, inS = rows.filter((r) => r.scope);
   const missing = inS.reduce((n, r) => n + r.cells.filter((c) => c[1] === "miss").length, 0);
   const flagged = inS.filter((r) => r.flags.some((f) => WARN.has(flagKey(f)))).length;

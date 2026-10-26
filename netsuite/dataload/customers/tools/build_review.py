@@ -64,6 +64,14 @@ for r in openpyxl.load_workbook(PARTNERS, read_only=True).active.iter_rows(value
         partners.setdefault(norm(r[1]), set()).add(r[1 + 1])
         partners.setdefault(norm(r[2]), set()).add(r[1])
 
+# Customer ID: keep Sage C-##### numbers; give non-conforming Sage IDs the next numbers after the highest C-#####.
+std = [int(x["Customer ID"][2:]) for x in sage if re.match(r"C-\d{5}$", x["Customer ID"])]
+nxt = max(std) + 1
+renumber = {}
+for x in sorted((x for x in sage if x["Status"] == "Active" and not re.match(r"C-\d{5}$", x["Customer ID"])), key=lambda x: x["Customer ID"]):
+    renumber[x["Customer ID"]] = f"C-{nxt:05d}"
+    nxt += 1
+
 names, near = {}, {}
 for r in sage:
     names.setdefault(r["Customer name"].strip().lower(), []).append(r["Customer ID"])
@@ -91,7 +99,12 @@ for r in sage:
     in_scope = True  # every customer not marked inactive in Sage
     m, how = match(r["Customer name"])
 
-    S("Customer ID", cid)
+    if cid in renumber:
+        S("Customer ID", renumber[cid], "prop")
+        flags.append(f"Renumbered from Sage {cid}")
+    else:
+        S("Customer ID", cid)
+    S("External ID", c["Customer ID"][0], c["Customer ID"][1])
     S("Company Name", r["Customer name"])
     if m:
         S("Subnet ID", m["Subnet Account Id"], "sfdc")
@@ -202,7 +215,8 @@ for x in out:
     if len(ids) > 1:
         x["flags"].append("Same Salesforce account as " + ", ".join(i for i in ids if i != x["cells"][2][0]))
 
-data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "rows": out, "built": TODAY.isoformat()}
+data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "rows": out, "built": TODAY.isoformat(),
+        "renumber": renumber, "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
 tpl = open("tools/review-template.html", encoding="utf-8").read()
 open("data/customer-review.html", "w", encoding="utf-8").write(
     tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
