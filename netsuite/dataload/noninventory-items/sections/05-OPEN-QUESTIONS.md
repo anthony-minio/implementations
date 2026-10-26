@@ -1,6 +1,6 @@
 # Open questions
 
-1. **Deferred Revenue account.** COA Draft v1 has 23100 Deferred Revenue - ST, 23200 Deferred Revenue - LT, and under 23200: 23210 Deferred Revenue Unbilled, 23220 Deferred Revenue Billed, 23230 Deferred Revenue Paid. Which one do the items post to?
+1. **Deferred Revenue account.** COA Draft v1 has 23100 Deferred Revenue - ST, 23200 Deferred Revenue - LT, and under 23200: 23210 Deferred Revenue Unbilled, 23220 Deferred Revenue Billed, 23230 Deferred Revenue Paid. Which one do the items post to? An item takes one account, so NetSuite does not split short and long term on the transaction. Proposed: post to 23100 and reclass the part beyond 12 months to 23200 with a period-end journal entry. Unbilled, Billed and Paid look carried over from Sage's contract revenue setup; confirm whether they are still needed.
 2. **Account format.** The CSV uses number and name, such as `41100 License Revenue`. Confirm on a test import that NetSuite matches it; child accounts may need the full path.
 3. **OEM license.** Does AIStor OEM License use the same accounts and rule as the direct licenses?
 4. **Platform training subscription.** Is it recognized like the live trainings or like a subscription?
