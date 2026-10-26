@@ -117,7 +117,6 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
   <section class="decisions">
     <h2>Open decisions</h2>
     <ol>
-      <li><b>Customer Category.</b> A list MinIO defines in NetSuite to group customers for reporting; NetSuite does not ship with values. The four values here (Direct Customer, Reseller, End Customer, OEM/MSP) come from the template's List tab, and the template marks the field as required. Each customer gets one. Proposed from the Sage customer type: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. These Sage types have no obvious category yet: <span id="d-cat"></span>.</li>
       <li><b>Salesforce matches to confirm.</b> <span id="d-sfm"></span> customers matched a Salesforce account by a similar but not identical name, for example a spelling or punctuation difference. They are marked "Salesforce match" in Question Categories and listed after the investors. Confirm or reject each.</li>
     </ol>
   </section>
@@ -129,11 +128,12 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>External ID.</b> Same value as Customer ID, so later loads and updates can find each customer by it.</li>
       <li><b>New customers.</b> After the load, NetSuite should auto-generate customer numbers in the same C-##### format, starting at <b id="n-next"></b>, the number after the last one in the load. In NetSuite: Setup > Company > Auto-Generated Numbers, Entities subtab, Customer: prefix C-, minimum 5 digits, initial number <span id="n-next2"></span>. Allow Override must be on during the import so the loaded numbers are kept.</li>
       <li><b>Investor records, open question.</b> Sage has <span id="n-inv"></span> active records numbered C00001 to C00016 that look like investors and note holders (for example General Catalyst, Index Ventures, Interest Accrued on Notes), not customers. Should they be loaded into NetSuite as customers? They are in this file, marked "Investor" in Question Categories and listed first. If they are left out, no renumbering is needed and new numbers start right after <span id="n-last2"></span>.</li>
+      <li><b>Customer Category, open question.</b> A list MinIO defines in NetSuite to group customers for reporting; NetSuite does not ship with values. The four values in the template (Direct Customer, Reseller, End Customer, OEM/MSP) are set from the Sage customer type: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. These Sage types have no obvious category and are left blank, marked "SOA Category Unknown" in Question Categories and listed after the Salesforce matches: <span id="d-cat"></span>.</li>
       <li><b>Status.</b> Every customer in this load is active in Sage (not marked inactive), so every customer is set to CUSTOMER-Closed Won. Customers that are renewals can be changed to CUSTOMER-Renewal when deal data is loaded.</li>
       <li><b>Customer Invoice Email.</b> The address invoices go to. Where Sage has an accounts payable or purchasing address (for example ap@, accounts.payable@, invoices@, purchasing@), that address is used; otherwise the first address Sage has. Every other address for the customer goes to Additional Emails.</li>
       <li><b>Reseller billing.</b> For customers Sage invoices through a reseller, the reseller is spelled out in Billed To (Reseller), Reseller Address and Reseller Invoice Email, with Salesforce partners alongside, so it can be set up to best practice.</li>
       <li><b>Subsidiary.</b> The Sage exports do not record an entity for any customer. All customers are loaded to MinIO, Inc., the parent subsidiary, and bill from it.</li>
-      <li><b>Terms.</b> Sage terms are mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Sage "30 Days" becomes Net 30, and so on. Sage day counts with no match on the list become new terms of the same length, which must be created in NetSuite before the load: <span id="n-newterms"></span>. Terms that are not a day count are loaded as Sage has them and need research before the load: <span id="n-research"></span>. <span id="d-blank"></span> customers have no terms in Sage and are left blank.</li>
+      <li><b>Terms.</b> Sage terms are mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Sage "30 Days" becomes Net 30, and so on. Sage day counts with no match on the list become new terms of the same length, which must be created in NetSuite before the load: <span id="n-newterms"></span>. Sage "5 years" becomes Net 1825 (5 x 365 days). "Due per Contract" is loaded as Sage has it and needs research before the load: <span id="n-research"></span>. <span id="d-blank"></span> customers have no terms in Sage and are left blank.</li>
       <li><b>Parent Company.</b> Salesforce links some accounts to a parent company, for example Royal Caribbean International to Royal Caribbean Group. For <span id="n-pardrop"></span> customers the parent is not a Sage customer: MinIO has no billing history with it and deals only with the subsidiary financially. Those parents are not loaded, and Parent Company is left blank for those customers. Parent links are kept where the parent is itself a customer in this load.</li>
       <li><b>Added columns.</b> Question Categories, Sage Customer ID, Salesforce Account ID, Additional Emails and the reseller columns are not standard template columns. Sage Customer ID, Salesforce Account ID and Subnet ID are kept as their own fields so the source of each customer is explicit.</li>
     </ol>
@@ -156,8 +156,8 @@ function init() {
   RES = COL("Billed To (Reseller)");
   const QC = COL("Question Categories"), SUBI = COL("Country"), TI = DATA.review.indexOf("Sage terms");
   const cnt = (f) => DATA.rows.filter(f).length;
-  $("#n-inv").textContent = cnt((r) => r.cells[QC][0] === "Investor");
-  $("#d-sfm").textContent = cnt((r) => r.cells[QC][0] === "Salesforce match");
+  $("#n-inv").textContent = cnt((r) => r.cells[QC][0].split("; ").includes("Investor"));
+  $("#d-sfm").textContent = cnt((r) => r.cells[QC][0].split("; ").includes("Salesforce match"));
   $("#n-pardrop").textContent = DATA.parents_dropped;
   $("#d-blank").textContent = cnt((r) => !r.review[TI]);
   $("#n-newterms").textContent = DATA.new_terms.map(([t, n]) => `${t} (${n})`).join(", ") || "none";

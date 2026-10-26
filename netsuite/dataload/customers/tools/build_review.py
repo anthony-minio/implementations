@@ -15,6 +15,9 @@ PARTNERS = "data/sfdc-accounts-with-partners-20261025.xlsx"
 TERMS_LIST = ["Due on Receipt", "Net 10", "Net 15", "Net 30", "Net 45", "Net 60", "Net 150"]
 
 def term(t):
+    y = re.match(r"(\d+)\s*years?$", t.strip(), re.I)
+    if y:
+        return f"Net {int(y.group(1)) * 365}"
     m = re.match(r"(?:Net\s*)?(\d+)\s*days?$|Net\s*(\d+)$", t.strip(), re.I)
     if m:
         return f"Net {m.group(1) or m.group(2)}"
@@ -212,8 +215,9 @@ for r in sage:
 
     a = {k: ["", ""] for k in ADDED}
     A = lambda k, v, src="sage": a.__setitem__(k, [v, src if v else ""])
-    qc = "Investor" if investor else "Salesforce match" if how == "likely" else ""
-    A("Question Categories", qc, "rule")
+    qc = (["Investor"] if investor else []) + (["Salesforce match"] if how == "likely" else []) + \
+         (["SOA Category Unknown"] if not investor and not cat else [])
+    A("Question Categories", "; ".join(qc), "rule")
     A("Sage Customer ID", cid)
     if m:
         A("Salesforce Account ID", id18(m["Account ID"]), "sfdc" if how == "exact" else "prop")
@@ -233,10 +237,14 @@ for r in sage:
               (m["Account Name"] + (" (likely)" if how == "likely" else "")) if m else ""]
     out.append({"scope": bool(in_scope), "cells": [c[k] for k in COLS] + added, "review": review, "flags": flags})
 
-# Order: investors (by name), then Salesforce matches to review (by name), then everyone else by Customer ID.
+# Order: investors, then Salesforce matches to review, then SOA Category Unknown (each by name), then everyone else by Customer ID.
 QI = len(COLS)
-rank = {"Investor": 0, "Salesforce match": 1, "": 2}
-out.sort(key=lambda x: (rank[x["cells"][QI][0]], x["cells"][3][0].lower() if x["cells"][QI][0] else x["cells"][2][0]))
+RANK = ["Investor", "Salesforce match", "SOA Category Unknown"]
+def order(x):
+    q = x["cells"][QI][0]
+    r = min((RANK.index(p) for p in q.split("; ") if p in RANK), default=len(RANK))
+    return (r, x["cells"][3][0].lower() if q else x["cells"][2][0])
+out.sort(key=order)
 
 # Flag Sage customers that matched the same Salesforce account.
 SFI = len(COLS) + ADDED.index("Salesforce Account ID")
