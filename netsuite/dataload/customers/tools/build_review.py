@@ -278,9 +278,44 @@ for r in sage:
               (m["Account Name"] + (" (likely)" if how == "likely" else " (confirmed)" if how == "confirmed" else "")) if m else ""]
     out.append({"scope": bool(in_scope), "cells": [c[k] for k in COLS] + added, "review": review, "flags": flags})
 
+# Subnet IDs are a key identifier: one NetSuite customer per Subnet account. Where several Sage records matched the same
+# Salesforce account and that company has several Subnet accounts in Salesforce, Sage cannot tell which record is which
+# Subnet account, so Subnet ID and Salesforce Account ID are left to assign and the records are not merged.
+EXTRA_SUBNET_GROUP = {"C-00333": "L3Harris Technologies, Inc."}  # L3 Technologies, L3Harris's name before 2019
+SAI, SNI, QI0 = len(COLS) + ADDED.index("Salesforce Account ID"), COLS.index("Subnet ID"), len(COLS)
+base = lambda n: re.sub(r"\s*(\(\d+\)|-\d+)$", "", n).strip().lower()
+family = {}
+for a in accounts:
+    family.setdefault(base(a["Account Name"]), []).append(a)
+hits = {}
+for x in out:
+    if x["cells"][SAI][0]:
+        hits.setdefault(x["cells"][SAI][0][:15], []).append(x)
+for x in out:
+    sid = x["cells"][len(COLS) + ADDED.index("Sage Customer ID")][0]
+    acct = by_id.get(x["cells"][SAI][0][:15]) if x["cells"][SAI][0] else None
+    fam = family.get(base(acct["Account Name"])) if acct else family.get(base(EXTRA_SUBNET_GROUP.get(sid, "")))
+    if not fam:
+        continue
+    subnets = [a for a in fam if a["Subnet Account Id"]]
+    shared = acct and len(hits.get(acct["Account ID"], [])) > 1
+    if len({a["Subnet Account Id"] for a in subnets}) > 1 and (shared or sid in EXTRA_SUBNET_GROUP):
+        x["subnet_choices"] = "; ".join(f"{a['Subnet Account Id']} {a['Subnet Account Name']} ({id18(a['Account ID'])})" for a in subnets)
+        x["cells"][SNI] = ["", "miss"]
+        x["cells"][SAI] = ["", ""]
+        q = [p for p in x["cells"][QI0][0].split("; ") if p] + ["Subnet ID to assign"]
+        x["cells"][QI0] = ["; ".join(q), "rule"]
+        x["flags"] = [f for f in x["flags"] if not f.startswith("Same Salesforce account")]
+        x["cells"][len(COLS) + ADDED.index("Duplicate Action")] = ["Keep: separate Subnet accounts, Subnet ID to assign", "rule"]
+    x["review"].append(x.get("subnet_choices", ""))
+for x in out:
+    if len(x["review"]) < len(REVIEW) + 1:
+        x["review"].append("")
+REVIEW.append("Possible Subnet accounts")
+
 # Order: investors, then Salesforce matches to review, then SOA Category Unknown (each by name), then everyone else by Customer ID.
 QI = len(COLS)
-RANK = ["Investor", "Salesforce match", "SOA Category Unknown"]
+RANK = ["Investor", "Salesforce match", "Subnet ID to assign", "SOA Category Unknown"]
 def order(x):
     q = x["cells"][QI][0]
     r = min((RANK.index(p) for p in q.split("; ") if p in RANK), default=len(RANK))
@@ -322,6 +357,10 @@ for i in byid:
 dup_groups = 0
 for g in (g for g in groups.values() if len(g) > 1):
     xs = [byid[i] for i in g]
+    if any("Subnet ID to assign" in x["cells"][QI][0] for x in xs):
+        for x in xs:
+            x["cells"][DA] = ["Keep: separate Subnet accounts, Subnet ID to assign", "rule"]
+        continue
     if all(x["review"][LI] for x in xs) and len({x["cells"][CN][0] for x in xs}) > 1:
         for x in xs:
             x["cells"][DA] = ["Keep: separate entity, invoiced from different countries", "prop"]
