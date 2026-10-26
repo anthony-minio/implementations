@@ -43,6 +43,10 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 
 449 accounts, all Lifecycle = Customer. 11 columns: Account Name, Lifecycle, Subnet Account Id, Billing State, Phone, Owner, Account Record Type, Partner Type, Domain, Website. No Account ID and no full address. 251 active Sage customers match a Salesforce account by normalized name.
 
+## Review page
+
+`tools/build_review.py` maps active Sage customers to the template columns, matches Salesforce by name, flags issues, and writes `data/customer-review.html` from `tools/review-template.html`. The page holds customer data, so it stays in `data/` and is published privately at https://claude.ai/artifact/ (link in the session). Rebuild with `python3 tools/build_review.py` from this folder, then republish.
+
 ## Template lists
 
 | List | Values |
