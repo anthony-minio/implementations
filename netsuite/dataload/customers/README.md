@@ -43,6 +43,10 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 
 449 accounts, all Lifecycle = Customer. 11 columns: Account Name, Lifecycle, Subnet Account Id, Billing State, Phone, Owner, Account Record Type, Partner Type, Domain, Website. No Account ID and no full address. 251 active Sage customers match a Salesforce account by normalized name.
 
+## Validation
+
+`tools/validate_load.py` checks every value in `data/customer-load-draft.csv` against the raw Sage report, the Sage customer list and the Salesforce accounts file, independently of the parser and build: row set, unique IDs, names, address text, city/state/postal code, country, emails, reseller emails, terms, currency, VAT ID, Salesforce ID, Subnet ID, parent, stray characters, label text, encoding and NetSuite field lengths. Run it after every rebuild. 2026-10-26: no issues.
+
 ## Review page
 
 `tools/build_review.py` maps active Sage customers to the template columns, matches Salesforce by name, flags issues, and writes `data/customer-review.html` from `tools/review-template.html`. The page holds customer data, so it stays in `data/` and is published privately at https://claude.ai/artifact/GemCL1YnPNaMYaVQNbsDVB. Rebuild with `python3 tools/build_review.py` from this folder, then republish.
@@ -67,7 +71,7 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 - 2026-10-26: Salesforce parents that are not Sage customers are left out (no billing history); Parent Company blank for those 35 customers.
 - 2026-10-26: Customers whose Sage type has no obvious Customer Category (Chargebee, Marketplace, Billing Vendor, Training Subscription, Event Sponsor, no type) are left blank and marked "SOA Category Unknown" in Question Categories, listed after the Salesforce matches.
 - 2026-10-26: Likely Salesforce matches reviewed: 35 confirmed; C-00044 Ministry of Defence (Singapore) and C-00142 Bae Systems not matched.
-- 2026-10-26: Sage country corrected in the load for C-00387 Proctor & Gamble (United States) and C-00253 Orange Cote d'Ivoire (Abidjan, Cote d'Ivoire).
+- 2026-10-26: Sage corrections in the load: C-00387 Proctor & Gamble city Lodz (address is in Poland; replaces the earlier United States correction), C-00253 Orange Cote d'Ivoire (Abidjan, Cote d'Ivoire), C-00108 NSN Brasil (city, postal code and attention), garbled accents repaired.
 - Pending: duplicates. Proposed one customer per company, keeping the most recently invoiced, shown in the Duplicate Action column.
 
 ## Template lists

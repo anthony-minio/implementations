@@ -48,6 +48,15 @@ def id18(i):
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345"
     return i + "".join(alpha[sum(1 << n for n, ch in enumerate(i[k:k + 5]) if ch.isupper())] for k in (0, 5, 10))
 
+def unmangle(v):
+    """Repair UTF-8 text that Sage stored as if it were Windows-1252 (MontrÃ©al -> Montréal)."""
+    if re.search(r"Ã|Â|â€", v or ""):
+        try:
+            return v.encode("cp1252").decode("utf-8")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            return v
+    return v
+
 def val(v):
     return "" if v in (None, "-") else str(v).strip()
 
@@ -74,8 +83,10 @@ NOT_MATCHED = {"C-00044": "Ministry of Defence (Singapore), not Ministry of Defe
                "C-00142": "Bae Systems, kept separate from BAE Systems US"}
 REVIEWED = "2026-10-26"
 # Sage data errors corrected in the load (confirmed by Anthony on 2026-10-26).
-CORRECT = {"C-00387": {"Country": "United States"},
-           "C-00253": {"City": "Abidjan", "Country": "Cote d'Ivoire"}}
+CORRECT = {"C-00387": {"City": "Lodz"},
+           "C-00253": {"City": "Abidjan", "Country": "Cote d'Ivoire"},
+           "C-00108": {"Address 1": "Rodovia BR116 Contorno Leste 7000", "City": "Sao Jose dos Pinhais",
+                       "Postal Code/Zip": "83085-058", "Attention": "5011207568/Recieri Netto"}}
 
 def match(name):
     k = norm(name)
@@ -120,7 +131,11 @@ for r in sage:
         continue
     cid = r["Customer ID"]
     c = {k: ["", ""] for k in COLS}
-    S = lambda k, v, src="sage": c.__setitem__(k, [v, src if v else ""])
+    def S(k, v, src="sage"):
+        fixed = unmangle(v)
+        if fixed != v:
+            flags.append(f"Garbled characters repaired: {k}")
+        c[k] = [fixed, src if fixed else ""]
     flags = []
     investor = bool(re.match(r"C\d+$", cid))
     last, bal = date(r["Last invoice date"]), float(r["Balance"] or 0)
@@ -165,18 +180,20 @@ for r in sage:
     S("Customer Category", cat, "prop")
     if r["Customer type"] and not cat:
         flags.append("Category to decide")
-    phone = r["display_phone"]
+    # NetSuite phone fields hold 21 characters: write extensions as " x123".
+    phone = re.sub(r"\s*ext\s*:?\s*(\d+)$", r" x\1", r["display_phone"], flags=re.I)
     if phone:
         S("Phone", phone)
     elif m and m["Phone"]:
         S("Phone", m["Phone"], "sfdc")
-    S("Addressee", r["display_name"])
+    S("Attention", r["display_attention"])
+    S("Addressee", r["display_company"])
     S("Address 1", r["display_line1"].rstrip(","))
     S("Address 2", r["display_line2"].rstrip(","))
     l = lst.get(cid, {})
     S("City", l.get("City", "").rstrip(", ").strip())
-    S("Province/State", l.get("State or territory", ""))
-    S("Postal Code/Zip", l.get("ZIP or postal code", ""))
+    S("Province/State", l.get("State or territory", "").strip(" ,"))
+    S("Postal Code/Zip", l.get("ZIP or postal code", "").strip(" ,"))
     S("Country", r["display_country"])
     if not r["display_line1"] and m and m["Billing Street"]:
         S("Address 1", m["Billing Street"], "sfdc")
@@ -205,7 +222,11 @@ for r in sage:
             S("Terms", r["Term"])
             research[r["Term"]] = research.get(r["Term"], 0) + 1
             flags.append(f"Terms to research: {r['Term']}")
-    S("VAT ID", r["Tax ID"])
+    if r["Tax ID"]:
+        S("VAT ID", r["Tax ID"])
+    elif r["display_taxid"]:
+        S("VAT ID", r["display_taxid"].split(": ", 1)[1], "rule")
+        flags.append(f"VAT ID taken from Sage address: {r['display_taxid']}")
     for k in REQUIRED:
         if not c[k][0]:
             c[k][1] = "miss"
@@ -240,7 +261,7 @@ for r in sage:
     if billto:
         addr = ", ".join(x.strip(" ,") for x in [r["billto_line1"], r["billto_line2"], r["billto_citystatezip_country"]] if x.strip(" ,"))
         A("Billed To (Reseller)", r["billto_name"])
-        A("Reseller Address", addr.replace(",,", ","))
+        A("Reseller Address", re.sub(r"\s*,(\s*,)+", ",", addr))
         A("Reseller Invoice Email", r["billto_email"])
     p = partners.get(norm(r["Customer name"]))
     if not p and m:
@@ -313,6 +334,11 @@ data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "r
         "renumber": renumber, "new_terms": sorted(new_terms.items(), key=lambda kv: int(kv[0].split()[1])),
         "research_terms": sorted(research.items(), key=lambda kv: -kv[1]),
         "dup_groups": dup_groups, "parents_dropped": sum(parents_dropped.values()), "parents_dropped_n": len(parents_dropped), "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
+with open("data/customer-load-draft.csv", "w", newline="", encoding="utf-8-sig") as o:
+    w = csv.writer(o)
+    w.writerow(COLS + ADDED + ["_src:" + c for c in COLS + ADDED])
+    for x in out:
+        w.writerow([c[0] for c in x["cells"]] + [c[1] for c in x["cells"]])
 tpl = open("tools/review-template.html", encoding="utf-8").read()
 open("data/customer-review.html", "w", encoding="utf-8").write(
     tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
