@@ -4,10 +4,10 @@ Every item in a group gets the same values.
 
 | **Column** | **Support** | **Training** | **License** |
 |---|---|---|---|
-| **Department** | [TBC] | [TBC] | [TBC] |
+| **Department** | [TBC: see open questions] | [TBC] | [TBC] |
 | **Class** | Support | Training | License |
-| **Income account** | [TBC] | [TBC] | [TBC] |
-| **Deferred Revenue account** | [TBC] | [TBC] | [TBC] |
+| **Income account** | 41200 Support Revenue | 42200 Training Revenue | 41100 License Revenue |
+| **Deferred Revenue account** | [TBC: 23100 Deferred Revenue - ST?] | [TBC] | [TBC] |
 | **Revenue Recogition Rule** | [TBC] | [TBC] | [TBC] |
 | **Rev Rec Forecast Rule** | [TBC] | [TBC] | [TBC] |
 
