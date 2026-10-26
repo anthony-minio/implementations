@@ -1,0 +1,520 @@
+<title>NetSuite vendor load</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+
+:root {
+--paper: #fbfcfd;
+--ink: #16202b;
+--muted: #5b6673;
+--rule: #c9d0d8;
+--accent: #2e74b5;
+--head-bg: #1f3b5c;
+--head-ink: #ffffff;
+--label-bg: #eef1f5;
+--tbc-bg: #fff3d6;
+--tbc-ink: #7a5300;
+--font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+--font-body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+--font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+}
+:root[data-theme="dark"] {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 1rem; line-height: 1.55; padding-inline: 16px; padding-block: 2rem 4rem; }
+.doc { max-width: 46rem; margin-inline: auto; }
+.doc-head { display: grid; gap: .35rem; padding-block-end: 1.25rem; border-bottom: 1px solid var(--rule); margin-block-end: 1.5rem; }
+.doc-title { color: var(--ink); font-family: var(--font-display); font-weight: 600; font-size: clamp(1.8rem, 5vw, 2.4rem); line-height: 1.15; margin: 0; text-wrap: balance; }
+.doc-sub { color: var(--muted); font-size: 1.1rem; margin: 0; }
+.doc-meta { font-family: var(--font-mono); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+h1, h2, h3 { color: var(--accent); line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+section.level1 { margin-block: 1rem 3rem; }
+section.level2 { margin-block-start: 2rem; }
+.head-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; margin-block-end: .75rem; }
+.head-row > :first-child { min-width: 0; }
+p, ol, ul { margin-block: 0 .9rem; max-width: 65ch; }
+li + li { margin-block-start: .35rem; }
+figure { margin: 1.25rem 0 1.5rem; display: grid; gap: .5rem; justify-items: center; }
+figure img { max-width: 100% !important; height: auto; border: 1px solid var(--rule); border-radius: 4px; background: #ffffff; }
+figure img[style*="6.5in"] { width: 100% !important; }
+figcaption { font-size: .85rem; font-style: italic; color: var(--muted); text-align: center; max-width: 60ch; }
+.table-wrap { overflow-x: auto; margin-block: 1rem 1.5rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { border: 1px solid var(--rule); padding: .4rem .6rem; text-align: left; vertical-align: top; }
+thead th { background: var(--head-bg); color: var(--head-ink); font-weight: 600; }
+table.kv td:first-child { background: var(--label-bg); font-weight: 600; width: 28%; }
+colgroup { display: none; }
+.tbc { font-family: var(--font-mono); font-size: .75em; background: var(--tbc-bg); color: var(--tbc-ink); padding: .05em .35em; border-radius: 3px; white-space: nowrap; }
+button.copy { font: 500 .75rem/1 var(--font-mono); letter-spacing: .03em; color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: .4rem .7rem; cursor: pointer; white-space: nowrap; }
+button.copy:hover { border-color: var(--accent); }
+button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.status { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); min-height: 1em; }
+@media (prefers-reduced-motion: no-preference) { button.copy { transition: border-color .15s; } }
+</style>
+
+<main class="doc">
+  <header class="doc-head">
+    <h1 class="doc-title">NetSuite vendor load</h1>
+    <p class="doc-sub">Vendor import:
+MINIO_Vendor_Template_10192026.xlsx</p>
+    <div class="doc-meta">
+      <span>Draft · updated 2026-10-26</span>
+      <button type="button" class="copy" id="copy-all">Copy whole document</button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+  </header>
+<section id="overview" class="level1">
+<h1>Overview</h1>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Template</strong></td>
+<td><code>MINIO_Vendor_Template_10192026.xlsx</code> from SOA: 61
+columns, tabs Field Restrictions, Vendor Template, Vendor Category</td>
+</tr>
+<tr class="even">
+<td><strong>Required</strong></td>
+<td>Company Name (marked red). First and Last Name are required instead
+when the vendor is an individual</td>
+</tr>
+<tr class="odd">
+<td><strong>Source of truth</strong></td>
+<td>Sage Intacct vendor detail export, 1,770 active vendors</td>
+</tr>
+<tr class="even">
+<td><strong>Enrichment</strong></td>
+<td>Ramp vendor export, 578 vendors. 551 carry the Sage vendor ID, so
+the link is exact</td>
+</tr>
+<tr class="odd">
+<td><strong>Not loaded</strong></td>
+<td>Bank details (ACH and wire). The template has no bank fields</td>
+</tr>
+<tr class="even">
+<td><strong>Status</strong></td>
+<td>Mapping drafted. Waiting on scope and the open questions below</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="column-mapping" class="level1">
+<h1>Column mapping</h1>
+<p>Same approach as the customer load: Sage first, Ramp fills gaps,
+rules marked as rules.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Template column</strong></th>
+<th><strong>Field</strong></th>
+<th><strong>Source</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>ExternalID</strong></td>
+<td>externalId</td>
+<td>Same as Vendor ID</td>
+</tr>
+<tr class="even">
+<td><strong>Vendor ID</strong></td>
+<td>vendorId</td>
+<td>Sage vendor ID. V-##### kept; older V##### (339) and Ramp-created
+RMP_# (37) get the next numbers after V-01768 [TBC: same rule as
+customers]</td>
+</tr>
+<tr class="odd">
+<td><strong>Individual</strong></td>
+<td>isPerson</td>
+<td>Sage “This vendor is an individual person” (34 are)</td>
+</tr>
+<tr class="even">
+<td><strong>First Name, Middle Name, Last Name</strong></td>
+<td>firstName, middleName, lastName</td>
+<td>Sage contact name, individuals only</td>
+</tr>
+<tr class="odd">
+<td><strong>Company Name</strong></td>
+<td>companyName</td>
+<td>Sage vendor name. Required</td>
+</tr>
+<tr class="even">
+<td><strong>Vendor Category</strong></td>
+<td>category</td>
+<td>Sage vendor type, mapped to the template list: AR reseller to AR
+Reseller, Tax to Tax agency, MinIO employee to MinIO Employee. 922
+vendors have no type</td>
+</tr>
+<tr class="odd">
+<td><strong>Primary Subsidiary</strong></td>
+<td>subsidiary</td>
+<td>MinIO, Inc. [TBC: vendors with INR (9) or SGD (1) currency may
+belong to MinIO Pvt. Ltd. or MinIO Singapore Pte. Ltd.]</td>
+</tr>
+<tr class="even">
+<td><strong>Phone, Fax</strong></td>
+<td>phone, fax</td>
+<td>Sage, else Ramp contact phone</td>
+</tr>
+<tr class="odd">
+<td><strong>Email</strong></td>
+<td>email</td>
+<td>Sage email, else Ramp contact email. Field holds 300 characters</td>
+</tr>
+<tr class="even">
+<td><strong>Comments</strong></td>
+<td>comments</td>
+<td>Sage comments</td>
+</tr>
+<tr class="odd">
+<td><strong>Email Preference, Send Transaction Via Email / Fax /
+Print</strong></td>
+<td>emailpreference, emailTransactions, faxTransactions,
+printTransactions</td>
+<td>Blank, NetSuite defaults</td>
+</tr>
+<tr class="even">
+<td><strong>Address 1 (Label, Attention, Addressee, Phone, Address 1 and
+2, City, State, Zip, Country, Default Shipping, Default
+Billing)</strong></td>
+<td>address1_*</td>
+<td>Sage pay-to address, else primary contact address, else Ramp check
+mailing address. Label “Remit-to”, Default Billing TRUE</td>
+</tr>
+<tr class="odd">
+<td><strong>Address 2 (same fields)</strong></td>
+<td>address2_*</td>
+<td>Sage return-to address where different from address 1. Label
+“Return-to”, Default Shipping TRUE</td>
+</tr>
+<tr class="even">
+<td><strong>Legal Name</strong></td>
+<td>legalName</td>
+<td>Ramp vendor legal name (149), else Sage 1099 name</td>
+</tr>
+<tr class="odd">
+<td><strong>Account</strong></td>
+<td>accountNumber</td>
+<td>Sage “Number”: the account number the vendor assigned to MinIO (26
+vendors)</td>
+</tr>
+<tr class="even">
+<td><strong>Terms</strong></td>
+<td>terms</td>
+<td>Sage term, else Ramp net terms, mapped to the NetSuite list (Due on
+Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150). 132 vendors
+have terms in Sage</td>
+</tr>
+<tr class="odd">
+<td><strong>Default Expense Account</strong></td>
+<td>defaultExpenseAccount</td>
+<td>Sage default expense account, mapped through the Sage# column of COA
+Draft v1 (for example Sage 62000 to 62600 Consultants). Set on 109
+vendors; 2 Sage accounts have no mapping</td>
+</tr>
+<tr class="even">
+<td><strong>Default Payables Account</strong></td>
+<td>defaultPayablesAccount</td>
+<td>20100 Accounts Payable - Trade [TBC]</td>
+</tr>
+<tr class="odd">
+<td><strong>Credit Limit, Incoterm</strong></td>
+<td>creditLimit, incoterm</td>
+<td>Blank. Sage has none</td>
+</tr>
+<tr class="even">
+<td><strong>Tax ID</strong></td>
+<td>taxIdNum</td>
+<td>Sage tax ID (232), else Ramp TIN (140). Sensitive [TBC: load in this
+file or enter separately]</td>
+</tr>
+<tr class="odd">
+<td><strong>1099 Eligible</strong></td>
+<td>is1099Eligible</td>
+<td>TRUE when Sage has a Form 1099 type (21) or the vendor type is 1099
+Vendor (88)</td>
+</tr>
+<tr class="even">
+<td><strong>Vendor Bill tolerances (6 columns)</strong></td>
+<td>purchaseorder<em>, receipt</em></td>
+<td>Blank. MinIO does not use purchase orders or item receipts</td>
+</tr>
+<tr class="odd">
+<td><strong>Primary Currency</strong></td>
+<td>currency</td>
+<td>Sage default currency, else USD</td>
+</tr>
+<tr class="even">
+<td><strong>Additional Currency 1, 2</strong></td>
+<td>additionalCurrency1, 2</td>
+<td>Blank</td>
+</tr>
+<tr class="odd">
+<td><strong>Legacy Vendor ID</strong></td>
+<td>Legacy Vendor ID</td>
+<td>Sage vendor ID as it is in Sage</td>
+</tr>
+<tr class="even">
+<td><strong>Source System</strong></td>
+<td>Source System</td>
+<td>Sage Intacct, or “Sage Intacct; Ramp” where Ramp filled a value</td>
+</tr>
+</tbody>
+</table>
+<section id="added-columns" class="level2">
+<h2>Added columns</h2>
+<p>Not in the template, kept for review and for the record, as on the
+customer load: Question Categories, Duplicate Action, Ramp Vendor ID,
+Ramp Category, Owner, Department, Last activity (latest of Sage last
+bill, Sage last payment, Ramp last spend), Ramp 365-day spend,
+Flags.</p>
+</section>
+</section>
+<section id="scope" class="level1">
+<h1>Scope</h1>
+<p>Sage has 1,770 active vendors, but most have no recorded activity.
+Activity is the latest of Sage last bill, Sage last payment and Ramp
+last spend.</p>
+<table>
+<thead>
+<tr class="header">
+<th><strong>Activity</strong></th>
+<th><strong>In Ramp</strong></th>
+<th><strong>Not in Ramp</strong></th>
+<th><strong>Total</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Since 2024-10-26</strong></td>
+<td>478</td>
+<td>85</td>
+<td>563</td>
+</tr>
+<tr class="even">
+<td><strong>Before 2024-10-26</strong></td>
+<td>8</td>
+<td>292</td>
+<td>300</td>
+</tr>
+<tr class="odd">
+<td><strong>None recorded</strong></td>
+<td>65</td>
+<td>842</td>
+<td>907</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td>551</td>
+<td>1,219</td>
+<td>1,770</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr class="header">
+<th><strong>Sage vendor type</strong></th>
+<th><strong>Vendors</strong></th>
+<th><strong>Never billed in Sage</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Blank</strong></td>
+<td>922</td>
+<td>565</td>
+</tr>
+<tr class="even">
+<td><strong>Credit Cards</strong></td>
+<td>427</td>
+<td>418</td>
+</tr>
+<tr class="odd">
+<td><strong>MinIO employee</strong></td>
+<td>136</td>
+<td>62</td>
+</tr>
+<tr class="even">
+<td><strong>AR reseller</strong></td>
+<td>127</td>
+<td>125</td>
+</tr>
+<tr class="odd">
+<td><strong>1099 Vendor</strong></td>
+<td>88</td>
+<td>17</td>
+</tr>
+<tr class="even">
+<td><strong>Tax</strong></td>
+<td>28</td>
+<td>15</td>
+</tr>
+<tr class="odd">
+<td><strong>Other types</strong></td>
+<td>42</td>
+<td>18</td>
+</tr>
+</tbody>
+</table>
+<p>The export of all active vendors lists 1,775. The 5 not in the detail
+export are flagged One-time use in Sage. The Sage vendor list report has
+1,788: the 1,775 plus 13 inactive.</p>
+<p>27 Ramp vendors have no Sage vendor, for example KPMG LLP, Baker
+Botts LLP, Oracle America and Navan.</p>
+</section>
+<section id="open-questions" class="level1">
+<h1>Open questions</h1>
+<ol type="1">
+<li><strong>Scope.</strong> Load all 1,770 active vendors as with
+customers, or only vendors with activity since 2024-10-26 (563) plus any
+with an open balance?</li>
+<li><strong>Ramp as the vendor master.</strong> If Ramp syncs vendors to
+NetSuite, vendors paid through Ramp may be created by the sync. Does the
+load cover all vendors, or only those outside Ramp?</li>
+<li><strong>Credit card merchants.</strong> 427 vendors of type Credit
+Cards, 418 never billed. Load or leave out?</li>
+<li><strong>MinIO employees.</strong> 136 vendors of type MinIO
+employee, used for reimbursements. NetSuite usually reimburses through
+employee records. Load as vendors or leave out?</li>
+<li><strong>AR resellers.</strong> 127 resellers set up as vendors, 125
+never billed. Load only those MinIO pays?</li>
+<li><strong>Ramp-only vendors.</strong> 27 Ramp vendors have no Sage
+vendor. Add them to the load?</li>
+<li><strong>Tax IDs.</strong> Sage and Ramp hold tax IDs and Ramp holds
+W-9 classification. Put Tax ID in the load file, or have it entered
+separately to keep it out of circulated files?</li>
+<li><strong>Subsidiary.</strong> Vendors with INR or SGD currency: MinIO
+Pvt. Ltd. or MinIO Singapore Pte. Ltd.?</li>
+<li><strong>Vendor ID numbering and duplicates.</strong> Apply the
+customer rules: keep V-#####, renumber V##### and RMP_#, merge
+duplicates into the most recently used record, NetSuite auto-numbers new
+vendors from the next number.</li>
+<li><strong>Default Payables Account.</strong> 20100 Accounts Payable -
+Trade for every vendor?</li>
+</ol>
+</section>
+</main>
+
+<script>
+(function () {
+  const status = document.getElementById("status");
+
+  // Tables pandoc wrote without a header row are key/value tables.
+  document.querySelectorAll(".doc table").forEach((t) => {
+    if (!t.querySelector("thead")) t.classList.add("kv");
+    const wrap = document.createElement("div");
+    wrap.className = "table-wrap";
+    t.before(wrap);
+    wrap.append(t);
+  });
+
+  // Mark open questions so they stand out while reviewing.
+  const walker = document.createTreeWalker(document.querySelector(".doc"), NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while (walker.nextNode()) if (walker.currentNode.nodeValue.includes("[TBC")) hits.push(walker.currentNode);
+  hits.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.nodeValue.split(/(\[TBC[^\]]*\])/).forEach((part) => {
+      if (!part) return;
+      if (part.startsWith("[TBC")) {
+        const s = document.createElement("span");
+        s.className = "tbc";
+        s.textContent = part;
+        frag.append(s);
+      } else frag.append(part);
+    });
+    node.replaceWith(frag);
+  });
+
+  // Inline the look Google Docs keeps on paste; it ignores page stylesheets.
+  function forPaste(root) {
+    root.querySelectorAll("button.copy, .doc-meta").forEach((b) => b.remove());
+    root.querySelectorAll(".head-row").forEach((r) => r.replaceWith(...r.childNodes));
+    root.querySelectorAll(".table-wrap").forEach((w) => w.replaceWith(...w.childNodes));
+    root.querySelectorAll("h1, h2, h3").forEach((h) => (h.style.color = "#2E74B5"));
+    root.querySelectorAll("table").forEach((t) => {
+      t.setAttribute("style", "border-collapse:collapse;width:100%");
+      const kv = t.classList.contains("kv");
+      t.querySelectorAll("th, td").forEach((c) => {
+        c.setAttribute("style", "border:1px solid #BFC7D1;padding:4px 6px;vertical-align:top;font-size:10pt");
+      });
+      t.querySelectorAll("thead th").forEach((c) => {
+        c.style.background = "#1F3B5C";
+        c.style.color = "#FFFFFF";
+        c.style.fontWeight = "bold";
+      });
+      if (kv) t.querySelectorAll("tr > td:first-child").forEach((c) => {
+        c.style.background = "#F2F4F7";
+        c.style.fontWeight = "bold";
+      });
+    });
+    root.querySelectorAll("img").forEach((img) => {
+      const m = /([\d.]+)in/.exec(img.getAttribute("style") || "");
+      if (m) img.setAttribute("width", Math.round(parseFloat(m[1]) * 96));
+      img.removeAttribute("style");
+    });
+    root.querySelectorAll("figcaption").forEach((c) => c.setAttribute("style", "font-style:italic;color:#555555;font-size:9pt"));
+    root.querySelectorAll(".tbc").forEach((s) => s.setAttribute("style", "background:#FFF3D6"));
+    return root;
+  }
+
+  async function copy(source, label) {
+    const clone = forPaste(source.cloneNode(true));
+    const html = clone.outerHTML;
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([source.innerText], { type: "text/plain" }),
+        }),
+      ]);
+      status.textContent = "Copied " + label + ". Paste into Google Docs.";
+    } catch (e) {
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      status.textContent = label + " is selected. Press Ctrl+C (Cmd+C on a Mac) to copy it.";
+    }
+  }
+
+  document.querySelectorAll("section.level1, section.level2").forEach((sec) => {
+    const h = sec.querySelector(":scope > h1, :scope > h2");
+    if (!h) return;
+    const row = document.createElement("div");
+    row.className = "head-row";
+    h.before(row);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "copy";
+    b.textContent = "Copy section";
+    const label = h.textContent.trim();
+    b.addEventListener("click", () => copy(sec, "“" + label + "”"));
+    row.append(h, b);
+  });
+
+  document.getElementById("copy-all").addEventListener("click", () => copy(document.querySelector(".doc"), "the whole document"));
+})();
+</script>
