@@ -56,7 +56,7 @@ assert len(COLS) == len(FIELDS) == 61
 REQUIRED = {"companyName"}
 ADDED = ["Question Categories", "Sage Vendor ID", "Ramp Vendor ID", "In Ramp", "Bank Details",
          "Bank Source", "Bank Name", "Bank Account Type", "Bank Routing Number", "Bank Account Number"]
-REVIEW = ["Sage type", "Last activity", "Ramp 365-day spend", "Ramp category", "Ramp owner", "Ramp department"]
+REVIEW = ["Sage type", "Ramp created", "Last activity", "Ramp 365-day spend", "Ramp category", "Ramp owner", "Ramp department"]
 
 # Vendor ID: keep V-#####; older V##### and Ramp-created RMP_# get the next numbers after the highest V-#####.
 std = [int(G(r, "Vendor ID")[2:]) for r in sage if re.match(r"V-\d{5}$", G(r, "Vendor ID"))]
@@ -225,7 +225,7 @@ for r in sage:
              [bk[0], "rule" if bk[0] else ""], [bk[1], ("ramp" if bk[0] == "Ramp" else "sage") if bk[1] else ""],
              [bk[2], "sage" if bk[2] else ""], [bk[3], ("ramp" if bk[0] == "Ramp" else "sage") if bk[3] else ""],
              [bk[4], ("ramp" if bk[0] == "Ramp" else "sage") if bk[4] else ""]]
-    review = [t, last.isoformat() if last else "", f"{float(rp['Total 365 day spend'] or 0):,.2f}" if rp else "",
+    review = [t, rp["Creation date"][:10] if rp else "", last.isoformat() if last else "", f"{float(rp['Total 365 day spend'] or 0):,.2f}" if rp else "",
               rp["Ramp category"] if rp else "", rp["Owner name"] if rp else "", rp["Department"] if rp else ""]
     cells = [c[f] for f in FIELDS] + added
     load_rows.append(cells)
@@ -273,7 +273,7 @@ for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
             if cells[j][0]:
                 page[j][0] = "•••" + re.sub(r"\W", "", cells[j][0])[-4:]
     last = date(rp["Last spend date"])
-    review = ["", last.isoformat() if last else "", f"{float(rp['Total 365 day spend'] or 0):,.2f}", rp["Ramp category"], rp["Owner name"], rp["Department"]]
+    review = ["", rp["Creation date"][:10], last.isoformat() if last else "", f"{float(rp['Total 365 day spend'] or 0):,.2f}", rp["Ramp category"], rp["Owner name"], rp["Department"]]
     out.append({"cells": page, "review": review, "flags": ["Created by the Ramp sync; no Sage vendor"], "active": bool(last and last >= ACTIVE_FROM)})
 
 QI = len(FIELDS)
@@ -291,7 +291,7 @@ bridge = {"export": len(export) - 1, "onetime": [(x[0], x[1]) for x in export[1:
           "in_ramp": sum(1 for x in out if x["cells"][QI][0].startswith("Ramp matched")), "ramp_total": len(ramp_rows),
           "sage_only": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only")),
           "sage_only_recent": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only") and x["active"]),
-          "sage_only_none": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only") and not x["review"][1]),
+          "sage_only_none": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only") and not x["review"][REVIEW.index("Last activity")]),
           "bank": {"ramp": sum(1 for b in bank_file if b[3] == "Ramp"), "sage": sum(1 for b in bank_file if b[3] == "Sage")},
           "ramp_only": [r["Vendor name"] for r in ramp_rows if not r["Sage Intacct ID"].strip()]}
 data = {"cols": COLS + ADDED, "fields": FIELDS + ADDED, "required": ["Company Name"], "review": REVIEW, "rows": out,
