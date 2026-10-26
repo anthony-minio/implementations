@@ -87,8 +87,27 @@ for d, src in draft:
     if bt and bt[0].strip() not in ("..", "") and bt[0].strip() == (disp[0].strip() if disp else ""):
         own |= set(e.lower() for e in EMAIL.findall(" ".join(bt)))
     got = set(e.lower() for e in [d["Customer Invoice Email"]] + d["Additional Emails"].split("; ") if e)
-    if got != own:
+    for m in [i for i in d["Merged Sage IDs"].split(", ") if i]:
+        mb = raw[m]["blocks"]
+        own |= set(e.lower() for e in EMAIL.findall(" ".join(mb.get("Display contact:", []) + mb.get("Primary contact:", []))))
+        mbt = mb.get("Bill-to contact:", [])
+        if mbt and mbt[0].strip() == (mb.get("Display contact:", [""])[0].strip()):
+            own |= set(e.lower() for e in EMAIL.findall(" ".join(mbt)))
+    if d["Merged Sage IDs"] and got <= own and d["Customer Invoice Email"].lower() in own:
+        pass
+    elif got != own:
         bad("Emails vs Sage", sid, f"missing {sorted(own - got)}, extra {sorted(got - own)}")
+    for col in ("Second Address", "Third Address"):
+        if d[col]:
+            m = re.search(r"\(from (C-?\d+)(, address from Salesforce)?\)$", d[col])
+            if not m or m.group(1) not in d["Merged Sage IDs"].split(", "):
+                bad("Extra address source", sid, d[col])
+            else:
+                mt = squash(" ".join(raw[m.group(1)]["blocks"].get("Display contact:", [])))
+                for part in ([] if m.group(2) else d[col][:m.start()].split(", ")):
+                    part = re.sub(r"^0(\d{4})$", r"\1", part)
+                    if part and squash(part) not in mt and squash(part) not in squash(" ".join(lst.get(m.group(1), {}).values())):
+                        bad("Extra address not in merged Sage record", sid, part)
     if d["Reseller Invoice Email"]:
         rb = set(e.lower() for e in EMAIL.findall(" ".join(bt)))
         if not set(e.lower() for e in EMAIL.findall(d["Reseller Invoice Email"])) <= rb:

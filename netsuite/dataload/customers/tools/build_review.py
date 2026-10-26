@@ -121,7 +121,7 @@ COLS = ["External ID", "Subnet ID", "Customer ID", "Company Name", "Parent Compa
         "Postal Code/Zip", "Country", "Default Billing", "Default Shipping", "Account", "Terms", "VAT ID",
         "International VAT ID", "Taxable", "Avalara Entity", "Exemption Certificate No."]
 REQUIRED = {"Customer ID", "Company Name", "Subsidiary", "Status", "Primary Currency", "Customer Category"}
-ADDED = ["Question Categories", "Duplicate Action", "Sage Customer ID", "Salesforce Account ID", "Additional Emails", "Billed To (Reseller)",
+ADDED = ["Question Categories", "Duplicate Action", "Merged Sage IDs", "Second Address", "Third Address", "Sage Customer ID", "Salesforce Account ID", "Additional Emails", "Billed To (Reseller)",
          "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
 REVIEW = ["Sage type", "Sage terms", "Last invoice", "Balance", "Salesforce match"]
 
@@ -369,6 +369,9 @@ for x in out:
             for o in (mm.group(1) or mm.group(2)).split(", "):
                 if o in byid:
                     parent[find(o)] = find(x["cells"][CI][0])
+# Duplicates found by shared email domain and confirmed by Anthony on 2026-10-26 (same company, different name).
+for a, b in [("C-00575", "C-00640"), ("C-00039", "C-00405"), ("C-00049", "C-00405"), ("C-00465", "C-00204"), ("C-00629", "C-00481")]:
+    parent[find(a)] = find(b)
 groups = {}
 for i in byid:
     groups.setdefault(find(i), []).append(i)
@@ -391,10 +394,48 @@ for g in (g for g in groups.values() if len(g) > 1):
     keep = max(xs, key=lambda x: (x["review"][LI], sum(bool(c[0]) for c in x["cells"]), -int(re.sub(r"\D", "", x["cells"][CI][0]))))
     kid = keep["cells"][CI][0]
     others = [x["cells"][CI][0] for x in xs if x is not keep]
-    keep["cells"][DA] = ["Keep, merges " + ", ".join(others), "prop"]
+    keep["cells"][DA] = ["Keep, merges " + ", ".join(others), "rule"]
+    # Carry the merged records across: their Sage IDs, their addresses as second and third addresses, their emails.
+    MI, A2, A3 = (len(COLS) + ADDED.index(k) for k in ("Merged Sage IDs", "Second Address", "Third Address"))
+    SCI = len(COLS) + ADDED.index("Sage Customer ID")
+    AE = len(COLS) + ADDED.index("Additional Emails")
+    keep["cells"][MI] = [", ".join(x["cells"][SCI][0] for x in xs if x is not keep), "rule"]
+    def one_line(x):
+        parts = [x["cells"][COLS.index(k)][0] for k in ("Attention", "Address 1", "Address 2", "City", "Province/State", "Postal Code/Zip", "Country")]
+        return ", ".join(p for p in parts if p)
+    sq = lambda t: re.sub(r"[^a-z0-9]", "", t.lower())
+    def parts(x):
+        return {sq(x["cells"][COLS.index(k)][0]) for k in ("Address 1", "Address 2", "City", "Province/State", "Postal Code/Zip", "Country")} - {""}
+    kept_parts = [parts(keep)]
+    seen_addr = {sq(one_line(keep))}
+    extra = []
+    for x in sorted((x for x in xs if x is not keep), key=lambda x: x["review"][LI], reverse=True):
+        line = one_line(x)
+        if any(parts(x) <= p for p in kept_parts):
+            continue  # same address, at most missing a field or the contact name
+        kept_parts.append(parts(x))
+        if line and sq(line) not in seen_addr:
+            seen_addr.add(sq(line))
+            via = ", address from Salesforce" if x["cells"][COLS.index("Address 1")][1] == "sfdc" else ""
+            extra.append(f"{line} (from {x['cells'][SCI][0]}{via})")
+    for col, v in zip((A2, A3), extra):
+        keep["cells"][col] = [v, "rule"]
+    if len(extra) > 2:
+        keep["flags"].append("More than three addresses: " + " | ".join(extra[2:]))
+    have = {e.lower() for e in [keep["cells"][COLS.index("Customer Invoice Email")][0]] + keep["cells"][AE][0].split("; ") if e}
+    more = [e for x in xs if x is not keep for e in [x["cells"][COLS.index("Customer Invoice Email")][0]] + x["cells"][AE][0].split("; ")
+            if e and e.lower() not in have and not have.add(e.lower())]
+    if more:
+        keep["cells"][AE] = ["; ".join(p for p in [keep["cells"][AE][0]] + more if p), keep["cells"][AE][1] or "rule"]
+    if not keep["cells"][SNI][0]:
+        donor = [x for x in xs if x is not keep and x["cells"][SNI][0]]
+        if len(donor) == 1:
+            keep["cells"][SNI] = [donor[0]["cells"][SNI][0], "rule"]
+            keep["cells"][SAI] = [donor[0]["cells"][SAI][0], "rule"]
+            keep["flags"].append(f"Subnet ID from merged {donor[0]['cells'][SCI][0]}")
     for x in xs:
         if x is not keep:
-            x["cells"][DA] = ["Merge into " + kid, "prop"]
+            x["cells"][DA] = ["Merge into " + kid, "rule"]
 
 data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "rows": out, "built": TODAY.isoformat(),
         "renumber": renumber, "new_terms": sorted(new_terms.items(), key=lambda kv: int(kv[0].split()[1])),
@@ -405,6 +446,12 @@ with open("data/customer-load-draft.csv", "w", newline="", encoding="utf-8-sig")
     w.writerow(COLS + ADDED + ["_src:" + c for c in COLS + ADDED])
     for x in out:
         w.writerow([c[0] for c in x["cells"]] + [c[1] for c in x["cells"]])
+with open("data/customer-load.csv", "w", newline="", encoding="utf-8-sig") as o:
+    w = csv.writer(o)
+    w.writerow(COLS + ADDED)
+    for x in out:
+        if not x["cells"][DA][0].startswith("Merge into"):
+            w.writerow([c[0] for c in x["cells"]])
 tpl = open("tools/review-template.html", encoding="utf-8").read()
 open("data/customer-review.html", "w", encoding="utf-8").write(
     tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))

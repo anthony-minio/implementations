@@ -75,7 +75,7 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 - 2026-10-26: Leidos C-00489 (Chargebee, never invoiced, same email) merges into Leidos Holdings C-00516; Reston address is primary.
 - 2026-10-26: Subnet IDs are a key identifier: one NetSuite customer per Subnet account; records with different Subnet IDs are never merged. Applied Materials, Davidson, L3Harris (incl. C-00333 L3 Technologies) and Saudi Telecom have several Subnet accounts; their 9 Sage records are kept separate and marked "Subnet ID to assign".
 - 2026-10-26: Subnet IDs paired by date (earlier Sage record with earlier Subnet account): C-00103 348, C-00462 879, C-00371 755, C-00592 1067, C-00241 537, C-00542 998. Records with different Subnet IDs are never merged. L3Harris proposed: C-00333 695, C-00385 784, C-00562 1026; 716 and 720 have no Sage record.
-- Pending: duplicates. Proposed one customer per company, keeping the most recently invoiced, shown in the Duplicate Action column.
+- 2026-10-26: Duplicates merged, 14 groups, 16 records: keep the most recently invoiced record (else more data, then lower ID); merged records' Sage IDs, different addresses (Second and Third Address) and emails carried to the kept record. Added by email domain: Hollister into C-00640, Bank of Nova Scotia C-00039 and C-00049 into C-00405, SITE C-00465 into C-00204 (Subnet ID 478 carried), MoD C-00629 into C-00481. BMC Software and BMC Helix kept separate. `data/customer-load.csv` holds the 632 customers to load.
 
 ## Template lists
 
