@@ -47,6 +47,12 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 
 `tools/build_review.py` maps active Sage customers to the template columns, matches Salesforce by name, flags issues, and writes `data/customer-review.html` from `tools/review-template.html`. The page holds customer data, so it stays in `data/` and is published privately at https://claude.ai/artifact/GemCL1YnPNaMYaVQNbsDVB. Rebuild with `python3 tools/build_review.py` from this folder, then republish.
 
+## Salesforce reports (2026-10-25, copied from Salesforce Classic)
+
+- `data/sfdc-accounts-customers-20261025.xlsx`: Lifecycle = Active or Customer, 1,271 accounts with Account ID, parent, billing and shipping address, Subnet ID, phone, website. 15-character Account IDs: 7 pairs differ only by case, so External ID uses the 18-character case-safe ID, computed from the 15-character ID.
+- `data/sfdc-accounts-with-partners-20261025.xlsx`: 1,418 account-partner rows.
+- Matching Sage to Salesforce by name: 276 exact, 37 likely (to confirm), 335 no match. 967 Salesforce accounts have no Sage customer and are not loaded.
+
 ## Decisions
 
 - 2026-10-26: Load every Sage customer not marked inactive (648). No activity cutoff.

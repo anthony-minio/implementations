@@ -120,7 +120,8 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>Status.</b> Every customer is active. CUSTOMER-Closed Won is proposed for all; the template also allows CUSTOMER-Lost Customer and CUSTOMER-Renewal.</li>
       <li><b>Category.</b> Proposed: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. Marketplace, Chargebee, Billing Vendor, Training Subscription and Event Sponsor need a call.</li>
       <li><b>Terms.</b> Sage "30 Days" is proposed as Net 30, and so on. Terms must exist in NetSuite first. "Due per Contract" and "5 years" need a call.</li>
-      <li><b>External ID.</b> Waiting on the Salesforce Account ID report. Name matching is used until then.</li>
+      <li><b>External ID.</b> The matched Salesforce Account ID, converted to the 18-character case-safe form. Likely matches (yellow) need a yes or no. Customers with no Salesforce match have no External ID yet.</li>
+      <li><b>Parent Company.</b> From Salesforce. A parent that is not itself in this load is flagged: load it first, or leave the parent off.</li>
     </ol>
   </section>
 </div>
@@ -131,7 +132,7 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Reseller (added columns)", 4]];
 const flagKey = (f) => f.replace(/:.*/, "");
-const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Several emails", "Terms to map", "Category to decide", "No customer type"]);
+const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Several emails", "Terms to map", "Category to decide", "No customer type", "Same Salesforce account as", "Likely Salesforce match, confirm", "Country differs in Salesforce", "Parent not in load"]);
 let state = { scope: "all", type: "", flag: "", q: "" };
 try { Object.assign(state, JSON.parse(localStorage.getItem("cust-review-2") || "{}")); } catch (e) {}
 
