@@ -69,6 +69,14 @@ for a in accounts:
 sfkeys = list(sf)
 by_id = {a["Account ID"]: a for a in accounts}
 
+# Likely name matches reviewed by Anthony on 2026-10-26: all confirmed except these, which are not the same company.
+NOT_MATCHED = {"C-00044": "Ministry of Defence (Singapore), not Ministry of Defence UK",
+               "C-00142": "Bae Systems, kept separate from BAE Systems US"}
+REVIEWED = "2026-10-26"
+# Sage data errors corrected in the load (confirmed by Anthony on 2026-10-26).
+CORRECT = {"C-00387": {"Country": "United States"},
+           "C-00253": {"City": "Abidjan", "Country": "Cote d'Ivoire"}}
+
 def match(name):
     k = norm(name)
     if k in sf:
@@ -102,7 +110,7 @@ COLS = ["External ID", "Subnet ID", "Customer ID", "Company Name", "Parent Compa
         "Postal Code/Zip", "Country", "Default Billing", "Default Shipping", "Account", "Terms", "VAT ID",
         "International VAT ID", "Taxable", "Avalara Entity", "Exemption Certificate No."]
 REQUIRED = {"Customer ID", "Company Name", "Subsidiary", "Status", "Primary Currency", "Customer Category"}
-ADDED = ["Question Categories", "Sage Customer ID", "Salesforce Account ID", "Additional Emails", "Billed To (Reseller)",
+ADDED = ["Question Categories", "Duplicate Action", "Sage Customer ID", "Salesforce Account ID", "Additional Emails", "Billed To (Reseller)",
          "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
 REVIEW = ["Sage type", "Sage terms", "Last invoice", "Balance", "Salesforce match"]
 
@@ -118,6 +126,10 @@ for r in sage:
     last, bal = date(r["Last invoice date"]), float(r["Balance"] or 0)
     in_scope = True  # every customer not marked inactive in Sage
     m, how = match(r["Customer name"])
+    if cid in NOT_MATCHED:
+        m, how = None, ""
+    elif how == "likely":
+        how = "confirmed"
 
     if cid in renumber:
         S("Customer ID", renumber[cid], "rule")
@@ -177,7 +189,10 @@ for r in sage:
         S("Default Shipping", "TRUE", "rule")
     else:
         flags.append("No street address")
-    if m and m["Billing Country"] and r["display_country"] and m["Billing Country"].lower() != r["display_country"].lower():
+    for k, v in CORRECT.get(cid, {}).items():
+        flags.append(f"Corrected from Sage: {k} was {c[k][0] or 'blank'}")
+        S(k, v, "rule")
+    if m and m["Billing Country"] and c["Country"][0] and m["Billing Country"].lower() != c["Country"][0].lower():
         flags.append(f"Country differs in Salesforce: {m['Billing Country']}")
     if r["Term"]:
         t = term(r["Term"])
@@ -206,8 +221,8 @@ for r in sage:
             flags.append("Similar name: " + ", ".join(nd))
     if not m:
         flags.append("No Salesforce match")
-    elif how == "likely":
-        flags.append("Likely Salesforce match, confirm")
+    elif how == "confirmed":
+        flags.append("Salesforce match confirmed by name review")
     if not r["Customer type"] and not investor:
         flags.append("No customer type")
     if not last:
@@ -220,7 +235,7 @@ for r in sage:
     A("Question Categories", "; ".join(qc), "rule")
     A("Sage Customer ID", cid)
     if m:
-        A("Salesforce Account ID", id18(m["Account ID"]), "sfdc" if how == "exact" else "prop")
+        A("Salesforce Account ID", id18(m["Account ID"]), "sfdc" if how in ("exact", "confirmed") else "prop")
     A("Additional Emails", "; ".join(more))
     if billto:
         addr = ", ".join(x.strip(" ,") for x in [r["billto_line1"], r["billto_line2"], r["billto_citystatezip_country"]] if x.strip(" ,"))
@@ -234,7 +249,7 @@ for r in sage:
         A("Salesforce Partners", "; ".join(sorted(p)), "sfdc")
     added = [a[k] for k in ADDED]
     review = [r["Customer type"], r["Term"], last.isoformat() if last else "", f"{bal:,.2f}" if bal else "",
-              (m["Account Name"] + (" (likely)" if how == "likely" else "")) if m else ""]
+              (m["Account Name"] + (" (likely)" if how == "likely" else " (confirmed)" if how == "confirmed" else "")) if m else ""]
     out.append({"scope": bool(in_scope), "cells": [c[k] for k in COLS] + added, "review": review, "flags": flags})
 
 # Order: investors, then Salesforce matches to review, then SOA Category Unknown (each by name), then everyone else by Customer ID.
@@ -258,14 +273,50 @@ for x in out:
     if len(ids) > 1:
         x["flags"].append("Same Salesforce account as " + ", ".join(i for i in ids if i != x["cells"][2][0]))
 
+# Duplicates (proposed): one customer per company. Keep the one invoiced most recently; if neither was invoiced,
+# the one with more data, then the lower ID. Keep both when both were invoiced from different countries.
+CI, CN, LI = COLS.index("Customer ID"), COLS.index("Country"), REVIEW.index("Last invoice")
+DA = len(COLS) + ADDED.index("Duplicate Action")
+byid = {x["cells"][CI][0]: x for x in out}
+parent = {}
+def find(i):
+    while parent.get(i, i) != i:
+        i = parent[i]
+    return i
+for x in out:
+    for f in x["flags"]:
+        mm = re.match(r"(?:Duplicate name|Similar name): (.*)|Same Salesforce account as (.*)", f)
+        if mm:
+            for o in (mm.group(1) or mm.group(2)).split(", "):
+                if o in byid:
+                    parent[find(o)] = find(x["cells"][CI][0])
+groups = {}
+for i in byid:
+    groups.setdefault(find(i), []).append(i)
+dup_groups = 0
+for g in (g for g in groups.values() if len(g) > 1):
+    xs = [byid[i] for i in g]
+    if all(x["review"][LI] for x in xs) and len({x["cells"][CN][0] for x in xs}) > 1:
+        for x in xs:
+            x["cells"][DA] = ["Keep: separate entity, invoiced from different countries", "prop"]
+        continue
+    dup_groups += 1
+    keep = max(xs, key=lambda x: (x["review"][LI], sum(bool(c[0]) for c in x["cells"]), -int(re.sub(r"\D", "", x["cells"][CI][0]))))
+    kid = keep["cells"][CI][0]
+    others = [x["cells"][CI][0] for x in xs if x is not keep]
+    keep["cells"][DA] = ["Keep, merges " + ", ".join(others), "prop"]
+    for x in xs:
+        if x is not keep:
+            x["cells"][DA] = ["Merge into " + kid, "prop"]
+
 data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "rows": out, "built": TODAY.isoformat(),
         "renumber": renumber, "new_terms": sorted(new_terms.items(), key=lambda kv: int(kv[0].split()[1])),
         "research_terms": sorted(research.items(), key=lambda kv: -kv[1]),
-        "parents_dropped": sum(parents_dropped.values()), "parents_dropped_n": len(parents_dropped), "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
+        "dup_groups": dup_groups, "parents_dropped": sum(parents_dropped.values()), "parents_dropped_n": len(parents_dropped), "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
 tpl = open("tools/review-template.html", encoding="utf-8").read()
 open("data/customer-review.html", "w", encoding="utf-8").write(
     tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
 SM = REVIEW.index("Salesforce match")
-matched = {norm(x["review"][SM].replace(" (likely)", "")) for x in out if x["review"][SM]}
+matched = {norm(re.sub(r" \((likely|confirmed)\)$", "", x["review"][SM])) for x in out if x["review"][SM]}
 print(f"{len(out)} customers; Salesforce exact {sum(1 for x in out if x['review'][SM] and '(likely)' not in x['review'][SM])}, likely {sum('(likely)' in x['review'][SM] for x in out)}, none {sum(not x['review'][SM] for x in out)}")
 print(f"Salesforce accounts with no Sage customer: {sum(1 for a in accounts if norm(a['Account Name']) not in matched)} of {len(accounts)}")

@@ -25,9 +25,11 @@ def contact(c):
         return {}
     d = {"name": name, "phone": "", "email": "", "fax": "", "addr": []}
     for l in lines:
-        m = re.match(r"(Phone|Email|Fax|Mobile|Cell|Pager|URL):\s*(.*)", l)
+        m = re.match(r"(Phone|Email|Fax|Mobile|Mobile phone|Cell|Pager|URL):\s*(.*)", l)
         if m:
-            d[m.group(1).lower()] = m.group(2).strip()
+            k = m.group(1).lower()
+            k = "phone" if k in ("mobile", "mobile phone", "cell") and not d["phone"] else k
+            d[k] = m.group(2).strip()
         else:
             d["addr"].append(l)
     # Last address line ends with the country.

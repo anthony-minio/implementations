@@ -117,7 +117,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
   <section class="decisions">
     <h2>Open decisions</h2>
     <ol>
-      <li><b>Salesforce matches to confirm.</b> <span id="d-sfm"></span> customers matched a Salesforce account by a similar but not identical name, for example a spelling or punctuation difference. They are marked "Salesforce match" in Question Categories and listed after the investors. Confirm or reject each.</li>
+      <li><b>Duplicate customers.</b> Some companies appear more than once in Sage, under the same or a similar name, or matched to the same Salesforce account. Proposed: load one customer per company, the one invoiced most recently (if none was invoiced, the one with more complete data). The others are not loaded; their Sage IDs are kept on the surviving customer so Sage history can be traced. Exception: two records that were both invoiced from different countries are separate billing entities and both are kept. See Duplicate Action, <span id="d-dup"></span> groups.</li>
     </ol>
   </section>
 
@@ -135,6 +135,8 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>Subsidiary.</b> The Sage exports do not record an entity for any customer. All customers are loaded to MinIO, Inc., the parent subsidiary, and bill from it.</li>
       <li><b>Terms.</b> Sage terms are mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Sage "30 Days" becomes Net 30, and so on. Sage day counts with no match on the list become new terms of the same length, which must be created in NetSuite before the load: <span id="n-newterms"></span>. Sage "5 years" becomes Net 1825 (5 x 365 days). "Due per Contract" is loaded as Sage has it and needs research before the load: <span id="n-research"></span>. <span id="d-blank"></span> customers have no terms in Sage and are left blank.</li>
       <li><b>Parent Company.</b> Salesforce links some accounts to a parent company, for example Royal Caribbean International to Royal Caribbean Group. For <span id="n-pardrop"></span> customers the parent is not a Sage customer: MinIO has no billing history with it and deals only with the subsidiary financially. Those parents are not loaded, and Parent Company is left blank for those customers. Parent links are kept where the parent is itself a customer in this load.</li>
+      <li><b>Salesforce matching.</b> Customers are matched to Salesforce accounts by name. 37 names were close but not identical; each was reviewed on 2026-10-26 against city, country and email domain. 35 were confirmed. Two were left unmatched as different companies: Ministry of Defence (Singapore, not the UK ministry) and Bae Systems (kept separate from Salesforce's BAE Systems US).</li>
+      <li><b>Sage data corrections.</b> Two Sage addresses had the wrong country and are corrected in the load: Proctor &amp; Gamble (Cincinnati, Poland corrected to United States) and Orange Côte d'Ivoire (country France corrected to Abidjan, Cote d'Ivoire). Sage itself is unchanged.</li>
       <li><b>Added columns.</b> Question Categories, Sage Customer ID, Salesforce Account ID, Additional Emails and the reseller columns are not standard template columns. Sage Customer ID, Salesforce Account ID and Subnet ID are kept as their own fields so the source of each customer is explicit.</li>
     </ol>
   </section>
@@ -144,11 +146,11 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
 const DATA = /*DATA*/null;
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Added columns", 8]];
+const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Added columns", 9]];
 const flagKey = (f) => f.replace(/:.*/, "");
 const COL = (n) => DATA.cols.indexOf(n);
 let RES = 0;
-const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Terms to research", "Category to decide", "No customer type", "Same Salesforce account as", "Likely Salesforce match, confirm", "Country differs in Salesforce", "New NetSuite term"]);
+const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Terms to research", "Category to decide", "No customer type", "Same Salesforce account as", "Country differs in Salesforce", "New NetSuite term"]);
 let state = { scope: "all", type: "", flag: "", q: "" };
 try { Object.assign(state, JSON.parse(localStorage.getItem("cust-review-2") || "{}")); } catch (e) {}
 
@@ -157,8 +159,8 @@ function init() {
   const QC = COL("Question Categories"), SUBI = COL("Country"), TI = DATA.review.indexOf("Sage terms");
   const cnt = (f) => DATA.rows.filter(f).length;
   $("#n-inv").textContent = cnt((r) => r.cells[QC][0].split("; ").includes("Investor"));
-  $("#d-sfm").textContent = cnt((r) => r.cells[QC][0].split("; ").includes("Salesforce match"));
   $("#n-pardrop").textContent = DATA.parents_dropped;
+  $("#d-dup").textContent = DATA.dup_groups;
   $("#d-blank").textContent = cnt((r) => !r.review[TI]);
   $("#n-newterms").textContent = DATA.new_terms.map(([t, n]) => `${t} (${n})`).join(", ") || "none";
   $("#n-research").textContent = DATA.research_terms.map(([t, n]) => `${t} (${n})`).join(", ") || "none";
