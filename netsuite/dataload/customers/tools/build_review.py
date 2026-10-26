@@ -75,7 +75,7 @@ COLS = ["External ID", "Subnet ID", "Customer ID", "Company Name", "Parent Compa
         "Postal Code/Zip", "Country", "Default Billing", "Default Shipping", "Account", "Terms", "VAT ID",
         "International VAT ID", "Taxable", "Avalara Entity", "Exemption Certificate No."]
 REQUIRED = {"Customer ID", "Company Name", "Subsidiary", "Status", "Primary Currency", "Customer Category"}
-ADDED = ["Billed To (Reseller)", "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
+ADDED = ["Salesforce Account ID", "Billed To (Reseller)", "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
 REVIEW = ["Sage type", "Last invoice", "Balance", "Salesforce match"]
 
 out = []
@@ -92,9 +92,9 @@ for r in sage:
     m, how = match(r["Customer name"])
 
     S("Customer ID", cid)
+    S("External ID", cid, "prop")
     S("Company Name", r["Customer name"])
     if m:
-        S("External ID", id18(m["Account ID"]), "sfdc" if how == "exact" else "prop")
         S("Subnet ID", m["Subnet Account Id"], "sfdc")
         if m["Parent Account ID"]:
             par = by_id.get(m["Parent Account ID"])
@@ -174,28 +174,31 @@ for r in sage:
         flags.append("No invoice in Sage")
 
     added = [["", ""] for _ in ADDED]
+    if m:
+        added[0] = [id18(m["Account ID"]), "sfdc" if how == "exact" else "prop"]
     if billto:
         addr = ", ".join(x.strip(" ,") for x in [r["billto_line1"], r["billto_line2"], r["billto_citystatezip_country"]] if x.strip(" ,"))
-        added[0] = [r["billto_name"], "sage"]
-        added[1] = [addr.replace(",,", ","), "sage" if addr else ""]
-        added[2] = [r["billto_email"], "sage" if r["billto_email"] else ""]
+        added[1] = [r["billto_name"], "sage"]
+        added[2] = [addr.replace(",,", ","), "sage" if addr else ""]
+        added[3] = [r["billto_email"], "sage" if r["billto_email"] else ""]
     p = partners.get(norm(r["Customer name"]))
     if not p and m:
         p = partners.get(norm(m["Account Name"]))
     if p:
-        added[3] = ["; ".join(sorted(p)), "sfdc"]
+        added[4] = ["; ".join(sorted(p)), "sfdc"]
     review = [r["Customer type"], last.isoformat() if last else "", f"{bal:,.2f}" if bal else "",
               (m["Account Name"] + (" (likely)" if how == "likely" else "")) if m else ""]
     out.append({"scope": bool(in_scope), "cells": [c[k] for k in COLS] + added, "review": review, "flags": flags})
 
-# External ID must be unique: flag Sage customers that matched the same Salesforce account.
+# Flag Sage customers that matched the same Salesforce account.
+SFI = len(COLS)
 seen = {}
 for x in out:
-    e = x["cells"][0][0].lower()
+    e = x["cells"][SFI][0].lower()
     if e:
         seen.setdefault(e, []).append(x["cells"][2][0])
 for x in out:
-    ids = seen.get(x["cells"][0][0].lower(), [])
+    ids = seen.get(x["cells"][SFI][0].lower(), [])
     if len(ids) > 1:
         x["flags"].append("Same Salesforce account as " + ", ".join(i for i in ids if i != x["cells"][2][0]))
 

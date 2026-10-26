@@ -49,13 +49,14 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 
 ## Salesforce reports (2026-10-25, copied from Salesforce Classic)
 
-- `data/sfdc-accounts-customers-20261025.xlsx`: Lifecycle = Active or Customer, 1,271 accounts with Account ID, parent, billing and shipping address, Subnet ID, phone, website. 15-character Account IDs: 7 pairs differ only by case, so External ID uses the 18-character case-safe ID, computed from the 15-character ID.
+- `data/sfdc-accounts-customers-20261025.xlsx`: Lifecycle = Active or Customer, 1,271 accounts with Account ID, parent, billing and shipping address, Subnet ID, phone, website. 15-character Account IDs: 7 pairs differ only by case, so the Salesforce Account ID column uses the 18-character case-safe ID, computed from the 15-character ID.
 - `data/sfdc-accounts-with-partners-20261025.xlsx`: 1,418 account-partner rows.
 - Matching Sage to Salesforce by name: 276 exact, 37 likely (to confirm), 335 no match. 967 Salesforce accounts have no Sage customer and are not loaded.
 
 ## Decisions
 
 - 2026-10-26: Load every Sage customer not marked inactive (648). No activity cutoff.
+- 2026-10-26: Salesforce Account ID and Subnet ID are their own fields in the load. External ID proposed as the Sage customer ID.
 - 2026-10-26: Spell out reseller billing in added columns (Billed To (Reseller), Reseller Address, Reseller Invoice Email, Salesforce Partners) for SOA to map to their best practice. Customer Invoice Email holds the customer's own email.
 
 ## Template lists
