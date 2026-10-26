@@ -58,6 +58,11 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 - 2026-10-26: Load every Sage customer not marked inactive (648). No activity cutoff.
 - 2026-10-26: Customer ID keeps Sage C-##### numbers; the 16 non-conforming Sage IDs (C00001 to C00016) get C-00642 to C-00657. External ID = Customer ID. NetSuite auto-numbers new customers as C-##### from C-00658. Sage Customer ID, Salesforce Account ID and Subnet ID are their own fields in the load.
 - 2026-10-26: Spell out reseller billing in added columns (Billed To (Reseller), Reseller Address, Reseller Invoice Email, Salesforce Partners) for SOA to map to their best practice. Customer Invoice Email holds the customer's own email.
+- 2026-10-26: Status CUSTOMER-Closed Won for every customer (all are active in Sage). Renewals to be set from deal data later.
+- 2026-10-26: Customer Invoice Email is the first AP or purchasing address, else the first address; all other addresses go to an added Additional Emails column.
+- 2026-10-26: Terms mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Other Sage terms are flagged.
+- 2026-10-26: Added Question Categories column. Investors listed first (by name), then likely Salesforce matches to review (by name), then everyone else by Customer ID.
+- 2026-10-26: Investor records (C00001 to C00016) moved to the notes as an open question for SOA.
 
 ## Template lists
 

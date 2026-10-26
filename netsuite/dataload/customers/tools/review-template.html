@@ -41,6 +41,7 @@ h2 { font-size: 1.05rem; font-weight: 600; margin: 0; }
 .key { padding: 2px 8px; border-radius: 3px; border: 1px solid var(--rule); background: var(--surface); }
 .key.sage { }
 .key.sfdc { color: var(--sfdc); background: var(--sfdc-bg); border-color: transparent; }
+.key.rule { color: var(--accent); background: var(--accent-soft); border-color: transparent; }
 .key.prop { color: var(--prop); background: var(--prop-bg); border-color: transparent; font-style: italic; }
 .key.miss { color: var(--miss); background: var(--miss-bg); border-color: transparent; }
 .filters { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; }
@@ -66,6 +67,7 @@ th.req::after { content: " *"; color: var(--miss); }
 thead .rowlabel { z-index: 3; background: var(--head); }
 .rowlabel small { display: block; color: var(--muted); font-family: var(--font-data); font-size: .7rem; }
 td.sfdc { color: var(--sfdc); background: var(--sfdc-bg); }
+td.rule { color: var(--accent); background: var(--accent-soft); }
 td.prop { color: var(--prop); background: var(--prop-bg); font-style: italic; }
 td.miss { background: var(--miss-bg); }
 td.rev { background: var(--head); font-family: var(--font-ui); }
@@ -90,6 +92,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
   <div class="legend" aria-label="Where each value comes from">
     <span class="key sage">From Sage</span>
     <span class="key sfdc">From Salesforce</span>
+    <span class="key rule">Set by rule</span>
     <span class="key prop">Proposed</span>
     <span class="key miss">Required, missing</span>
   </div>
@@ -114,24 +117,26 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
   <section class="decisions">
     <h2>Open decisions</h2>
     <ol>
-      <li><b>Investor records.</b> C00001 to C00016 look like investors and note holders, not customers. Load or leave out?</li>
-      <li><b>Reseller billing.</b> Spelled out in four added columns for SOA to map: who Sage bills, their address and invoice email, and Salesforce partners. Customer Invoice Email holds the customer's own email.</li>
-      <li><b>Subsidiary.</b> Every customer is proposed as MinIO, Inc. Which customers bill from MinIO Pvt. Ltd. or MinIO Singapore Pte. Ltd.?</li>
-      <li><b>Status.</b> Every customer is active. CUSTOMER-Closed Won is proposed for all; the template also allows CUSTOMER-Lost Customer and CUSTOMER-Renewal.</li>
-      <li><b>Category.</b> Proposed: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. Marketplace, Chargebee, Billing Vendor, Training Subscription and Event Sponsor need a call.</li>
-      <li><b>Terms.</b> Sage "30 Days" is proposed as Net 30, and so on. Terms must exist in NetSuite first. "Due per Contract" and "5 years" need a call.</li>
-      <li><b>Salesforce matches.</b> Likely matches (yellow) need a yes or no.</li>
-      <li><b>Parent Company.</b> From Salesforce. A parent that is not itself in this load is flagged: load it first, or leave the parent off.</li>
+      <li><b>Subsidiary.</b> The Sage exports do not say which entity each customer belongs to: the Entity column was blank on every row, which in Sage usually means the customer is shared at the top level. Every customer is proposed as MinIO, Inc. <span id="d-sub"></span> Which customers bill from MinIO Pvt. Ltd. or MinIO Singapore Pte. Ltd.? A Sage AR invoice report with the Entity column, or accounting, can answer it.</li>
+      <li><b>Customer Category.</b> A required NetSuite field that groups customers for reporting. The template allows Direct Customer, Reseller, End Customer and OEM/MSP. Proposed from the Sage customer type: Direct Sales to Direct Customer, Direct Sales with Reseller to End Customer, Reseller to Reseller. These Sage types have no obvious category yet: <span id="d-cat"></span>.</li>
+      <li><b>Terms not on the NetSuite list.</b> <span id="d-terms"></span> Map each to a listed term, or add the term in NetSuite. <span id="d-blank"></span> customers have no terms in Sage and are left blank.</li>
+      <li><b>Salesforce matches to confirm.</b> <span id="d-sfm"></span> customers matched a Salesforce account by a similar but not identical name, for example a spelling or punctuation difference. They are marked "Salesforce match" in Question Categories and listed after the investors. Confirm or reject each.</li>
+      <li><b>Parent Company.</b> Salesforce links some accounts to a parent, for example Royal Caribbean International to Royal Caribbean Group. NetSuite can show the same parent and child link, but the parent must exist as a customer. <span id="d-par"></span> customers have a parent that is not a Sage customer, so it is not in this load. Add those parents to the load as customers, or leave Parent Company blank for them?</li>
     </ol>
   </section>
 
   <section class="decisions">
     <h2>Notes</h2>
     <ol>
-      <li><b>Customer ID.</b> Sage IDs are not consistent. Customers with a Sage ID in the C-##### format keep it. The <span id="n-renum"></span> customers with an ID in another format (<span id="n-old"></span>) get the next numbers after the highest Sage C-##### (<span id="n-last"></span>): <span id="n-range"></span>. Their original Sage ID stays in Sage Customer ID. These 16 are the investor records still open above; if they are left out, no renumbering is needed and new numbers start right after <span id="n-last2"></span>.</li>
+      <li><b>Customer ID.</b> Sage IDs are not consistent. Customers with a Sage ID in the C-##### format keep it. The <span id="n-renum"></span> customers with an ID in another format (<span id="n-old"></span>) get the next numbers after the highest Sage C-##### (<span id="n-last"></span>): <span id="n-range"></span>. Their original Sage ID stays in Sage Customer ID.</li>
       <li><b>External ID.</b> Same value as Customer ID, so later loads and updates can find each customer by it.</li>
       <li><b>New customers.</b> After the load, NetSuite should auto-generate customer numbers in the same C-##### format, starting at <b id="n-next"></b>, the number after the last one in the load. In NetSuite: Setup > Company > Auto-Generated Numbers, Entities subtab, Customer: prefix C-, minimum 5 digits, initial number <span id="n-next2"></span>. Allow Override must be on during the import so the loaded numbers are kept.</li>
-      <li><b>Sage Customer ID, Salesforce Account ID, Subnet ID.</b> Added columns, kept as their own fields so the source of each customer is explicit.</li>
+      <li><b>Investor records, open question.</b> Sage has <span id="n-inv"></span> active records numbered C00001 to C00016 that look like investors and note holders (for example General Catalyst, Index Ventures, Interest Accrued on Notes), not customers. Should they be loaded into NetSuite as customers? They are in this file, marked "Investor" in Question Categories and listed first. If they are left out, no renumbering is needed and new numbers start right after <span id="n-last2"></span>.</li>
+      <li><b>Status.</b> Every customer in this load is active in Sage (not marked inactive), so every customer is set to CUSTOMER-Closed Won. Customers that are renewals can be changed to CUSTOMER-Renewal when deal data is loaded.</li>
+      <li><b>Customer Invoice Email.</b> The address invoices go to. Where Sage has an accounts payable or purchasing address (for example ap@, accounts.payable@, invoices@, purchasing@), that address is used; otherwise the first address Sage has. Every other address for the customer goes to Additional Emails.</li>
+      <li><b>Reseller billing.</b> For customers Sage invoices through a reseller, the reseller is spelled out in Billed To (Reseller), Reseller Address and Reseller Invoice Email, with Salesforce partners alongside, so it can be set up to best practice.</li>
+      <li><b>Terms.</b> Sage terms are mapped to the NetSuite list: Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150. Sage "30 Days" becomes Net 30, and so on.</li>
+      <li><b>Added columns.</b> Question Categories, Sage Customer ID, Salesforce Account ID, Additional Emails and the reseller columns are not standard template columns. Sage Customer ID, Salesforce Account ID and Subnet ID are kept as their own fields so the source of each customer is explicit.</li>
     </ol>
   </section>
 </div>
@@ -140,13 +145,29 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
 const DATA = /*DATA*/null;
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Added columns", 6]];
+const GROUPS = [["Identity", 7], ["Billing and contact", 7], ["Address", 10], ["Financial", 7], ["Added columns", 8]];
 const flagKey = (f) => f.replace(/:.*/, "");
-const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Several emails", "Terms to map", "Category to decide", "No customer type", "Same Salesforce account as", "Likely Salesforce match, confirm", "Country differs in Salesforce", "Parent not in load"]);
+const COL = (n) => DATA.cols.indexOf(n);
+let RES = 0;
+const WARN = new Set(["Duplicate name", "Similar name", "Investor or non-sales", "Terms not in NetSuite list", "Category to decide", "No customer type", "Same Salesforce account as", "Likely Salesforce match, confirm", "Country differs in Salesforce", "Parent not in load"]);
 let state = { scope: "all", type: "", flag: "", q: "" };
 try { Object.assign(state, JSON.parse(localStorage.getItem("cust-review-2") || "{}")); } catch (e) {}
 
 function init() {
+  RES = COL("Billed To (Reseller)");
+  const QC = COL("Question Categories"), SUBI = COL("Country"), TI = DATA.review.indexOf("Sage terms");
+  const cnt = (f) => DATA.rows.filter(f).length;
+  $("#n-inv").textContent = cnt((r) => r.cells[QC][0] === "Investor");
+  $("#d-sfm").textContent = cnt((r) => r.cells[QC][0] === "Salesforce match");
+  $("#d-par").textContent = cnt((r) => r.flags.includes("Parent not in load"));
+  $("#d-blank").textContent = cnt((r) => !r.review[TI]);
+  $("#d-terms").textContent = DATA.unmapped_terms.length ? "Sage terms with no match: " + DATA.unmapped_terms.map(([t, n]) => `${t} (${n})`).join(", ") + "." : "None.";
+  const india = cnt((r) => r.cells[SUBI][0] === "India"), sg = cnt((r) => r.cells[SUBI][0] === "Singapore");
+  $("#d-sub").textContent = `For reference, ${india} customers have an address in India and ${sg} in Singapore.`;
+  const catTypes = {};
+  DATA.rows.forEach((r) => r.flags.includes("Category to decide") && (catTypes[r.review[0]] = (catTypes[r.review[0]] || 0) + 1));
+  const noType = cnt((r) => r.flags.includes("No customer type"));
+  $("#d-cat").textContent = Object.entries(catTypes).sort((a, b) => b[1] - a[1]).map(([t, n]) => `${t} (${n})`).join(", ") + (noType ? `, and ${noType} customers with no Sage type` : "");
   const old = Object.keys(DATA.renumber), neu = Object.values(DATA.renumber);
   $("#n-renum").textContent = old.length;
   $("#n-old").textContent = old.length ? `${old[0]} to ${old[old.length - 1]}` : "none";
@@ -158,7 +179,7 @@ function init() {
   const rows = DATA.rows, inS = rows.filter((r) => r.scope);
   const missing = inS.reduce((n, r) => n + r.cells.filter((c) => c[1] === "miss").length, 0);
   const flagged = inS.filter((r) => r.flags.some((f) => WARN.has(flagKey(f)))).length;
-  $("#stats").innerHTML = [[rows.length, "Customers to load"], [rows.filter((r) => r.cells[33][0]).length, "Billed through a reseller"], [flagged, "With a warning"], [missing, "Required cells missing"]]
+  $("#stats").innerHTML = [[rows.length, "Customers to load"], [rows.filter((r) => r.cells[RES][0]).length, "Billed through a reseller"], [flagged, "With a warning"], [missing, "Required cells missing"]]
     .map(([n, l]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
   const types = [...new Set(rows.map((r) => r.review[0] || "(blank)"))].sort();
   $("#type").innerHTML = `<option value="">All types</option>` + types.map((t) => `<option>${esc(t)}</option>`).join("");
@@ -181,7 +202,7 @@ function render() {
   document.querySelectorAll("#scope button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === state.scope)));
   const q = state.q.trim().toLowerCase();
   const rows = DATA.rows.filter((r) =>
-    (state.scope === "all" || (state.scope === "reseller") === Boolean(r.cells[33][0])) &&
+    (state.scope === "all" || (state.scope === "reseller") === Boolean(r.cells[RES][0])) &&
     (!state.type || (r.review[0] || "(blank)") === state.type) &&
     (!state.flag || (state.flag === "__none" ? !r.flags.length : r.flags.some((f) => flagKey(f) === state.flag))) &&
     (!q || r.cells.some((c) => c[0].toLowerCase().includes(q)) || r.review.some((v) => v.toLowerCase().includes(q))));

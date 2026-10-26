@@ -10,9 +10,19 @@ LIST = "data/sage-customers-20261026.csv"
 SFDC = "data/sfdc-accounts-customers-20261025.xlsx"  # Lifecycle = Active or Customer, Classic report copy
 PARTNERS = "data/sfdc-accounts-with-partners-20261025.xlsx"
 
-TERMS = {"30 Days": "Net 30", "45 Days": "Net 45", "60 Days": "Net 60", "90 Days": "Net 90",
-         "120 Days": "Net 120", "20 Days": "Net 20", "28 days": "Net 28", "Net 30": "Net 30",
-         "Due on Receipt": "Due on Receipt"}
+# NetSuite terms list (Anthony, 2026-10-26): Due on Receipt, Net 10, Net 15, Net 30, Net 45, Net 60, Net 150.
+TERMS = {"Due on Receipt": "Due on Receipt", "10 Days": "Net 10", "15 Days": "Net 15", "30 Days": "Net 30",
+         "Net 30": "Net 30", "45 Days": "Net 45", "60 Days": "Net 60", "150 Days": "Net 150"}
+AP = re.compile(r"(^|[._-])(ap|accounts?[._-]?payables?|payables?|invoices?|vendorinvoices?|billing|bills?|purchas\w*|procure\w*|po|finance|accounting|acct|payments?)([._-]|\d|@|$)", re.I)
+
+def split_emails(*fields):
+    seen = []
+    for f in fields:
+        for e in re.split(r"[;/,\s]+", f or ""):
+            e = e.strip().strip(".")
+            if "@" in e and e.lower() not in [x.lower() for x in seen]:
+                seen.append(e)
+    return seen
 CATEGORY = {"Direct Sales": "Direct Customer", "Direct Sales with Reseller": "End Customer", "Reseller": "Reseller"}
 
 def norm(s):
@@ -83,10 +93,11 @@ COLS = ["External ID", "Subnet ID", "Customer ID", "Company Name", "Parent Compa
         "Postal Code/Zip", "Country", "Default Billing", "Default Shipping", "Account", "Terms", "VAT ID",
         "International VAT ID", "Taxable", "Avalara Entity", "Exemption Certificate No."]
 REQUIRED = {"Customer ID", "Company Name", "Subsidiary", "Status", "Primary Currency", "Customer Category"}
-ADDED = ["Sage Customer ID", "Salesforce Account ID", "Billed To (Reseller)", "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
-REVIEW = ["Sage type", "Last invoice", "Balance", "Salesforce match"]
+ADDED = ["Question Categories", "Sage Customer ID", "Salesforce Account ID", "Additional Emails", "Billed To (Reseller)",
+         "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
+REVIEW = ["Sage type", "Sage terms", "Last invoice", "Balance", "Salesforce match"]
 
-out = []
+out, unmapped = [], {}
 for r in sage:
     if r["Status"] != "Active":
         continue
@@ -100,11 +111,11 @@ for r in sage:
     m, how = match(r["Customer name"])
 
     if cid in renumber:
-        S("Customer ID", renumber[cid], "prop")
+        S("Customer ID", renumber[cid], "rule")
         flags.append(f"Renumbered from Sage {cid}")
     else:
         S("Customer ID", cid)
-    S("External ID", c["Customer ID"][0], c["Customer ID"][1])
+    S("External ID", c["Customer ID"][0], "rule")
     S("Company Name", r["Customer name"])
     if m:
         S("Subnet ID", m["Subnet Account Id"], "sfdc")
@@ -119,12 +130,14 @@ for r in sage:
     else:
         S("Primary Currency", "USD", "prop")
     billto = r["billto_name"] and r["billto_name"] != r["display_name"]
-    email = r["display_email"]
-    S("Customer Invoice Email", email)
-    if email and (re.search(r"[;/ ,]", email.strip()) or len(email) > 64):
-        flags.append("Several emails")
-    S("Status", "CUSTOMER-Closed Won", "prop")
-    S("Individual (Type)", "FALSE", "prop")
+    # Invoice email: the first AP or purchasing address, else the first address; the rest go to Additional Emails.
+    emails = split_emails(r["display_email"], r["primary_email"], "" if billto else r["billto_email"])
+    ap = [e for e in emails if AP.search(e.split("@")[0])]
+    inv = (ap or emails or [""])[0]
+    S("Customer Invoice Email", inv)
+    more = [e for e in emails if e != inv]
+    S("Status", "CUSTOMER-Closed Won", "rule")
+    S("Individual (Type)", "FALSE", "rule")
     cat = CATEGORY.get(r["Customer type"], "")
     S("Customer Category", cat, "prop")
     if r["Customer type"] and not cat:
@@ -149,8 +162,8 @@ for r in sage:
         S("Postal Code/Zip", m["Billing Zip/Postal Code"], "sfdc")
         S("Country", m["Billing Country"], "sfdc")
     if c["Address 1"][0]:
-        S("Default Billing", "TRUE", "prop")
-        S("Default Shipping", "TRUE", "prop")
+        S("Default Billing", "TRUE", "rule")
+        S("Default Shipping", "TRUE", "rule")
     else:
         flags.append("No street address")
     if m and m["Billing Country"] and r["display_country"] and m["Billing Country"].lower() != r["display_country"].lower():
@@ -158,10 +171,10 @@ for r in sage:
     if r["Term"]:
         t = TERMS.get(r["Term"], "")
         if t:
-            S("Terms", t, "prop" if t != r["Term"] else "sage")
+            S("Terms", t, "rule" if t != r["Term"] else "sage")
         else:
-            S("Terms", r["Term"])
-            flags.append("Terms to map")
+            flags.append(f"Terms not in NetSuite list: {r['Term']}")
+            unmapped[r["Term"]] = unmapped.get(r["Term"], 0) + 1
     S("VAT ID", r["Tax ID"])
     for k in REQUIRED:
         if not c[k][0]:
@@ -185,26 +198,36 @@ for r in sage:
     if not last:
         flags.append("No invoice in Sage")
 
-    added = [["", ""] for _ in ADDED]
-    added[0] = [cid, "sage"]
+    a = {k: ["", ""] for k in ADDED}
+    A = lambda k, v, src="sage": a.__setitem__(k, [v, src if v else ""])
+    qc = "Investor" if investor else "Salesforce match" if how == "likely" else ""
+    A("Question Categories", qc, "rule")
+    A("Sage Customer ID", cid)
     if m:
-        added[1] = [id18(m["Account ID"]), "sfdc" if how == "exact" else "prop"]
+        A("Salesforce Account ID", id18(m["Account ID"]), "sfdc" if how == "exact" else "prop")
+    A("Additional Emails", "; ".join(more))
     if billto:
         addr = ", ".join(x.strip(" ,") for x in [r["billto_line1"], r["billto_line2"], r["billto_citystatezip_country"]] if x.strip(" ,"))
-        added[2] = [r["billto_name"], "sage"]
-        added[3] = [addr.replace(",,", ","), "sage" if addr else ""]
-        added[4] = [r["billto_email"], "sage" if r["billto_email"] else ""]
+        A("Billed To (Reseller)", r["billto_name"])
+        A("Reseller Address", addr.replace(",,", ","))
+        A("Reseller Invoice Email", r["billto_email"])
     p = partners.get(norm(r["Customer name"]))
     if not p and m:
         p = partners.get(norm(m["Account Name"]))
     if p:
-        added[5] = ["; ".join(sorted(p)), "sfdc"]
-    review = [r["Customer type"], last.isoformat() if last else "", f"{bal:,.2f}" if bal else "",
+        A("Salesforce Partners", "; ".join(sorted(p)), "sfdc")
+    added = [a[k] for k in ADDED]
+    review = [r["Customer type"], r["Term"], last.isoformat() if last else "", f"{bal:,.2f}" if bal else "",
               (m["Account Name"] + (" (likely)" if how == "likely" else "")) if m else ""]
     out.append({"scope": bool(in_scope), "cells": [c[k] for k in COLS] + added, "review": review, "flags": flags})
 
+# Order: investors (by name), then Salesforce matches to review (by name), then everyone else by Customer ID.
+QI = len(COLS)
+rank = {"Investor": 0, "Salesforce match": 1, "": 2}
+out.sort(key=lambda x: (rank[x["cells"][QI][0]], x["cells"][3][0].lower() if x["cells"][QI][0] else x["cells"][2][0]))
+
 # Flag Sage customers that matched the same Salesforce account.
-SFI = len(COLS) + 1
+SFI = len(COLS) + ADDED.index("Salesforce Account ID")
 seen = {}
 for x in out:
     e = x["cells"][SFI][0].lower()
@@ -216,10 +239,11 @@ for x in out:
         x["flags"].append("Same Salesforce account as " + ", ".join(i for i in ids if i != x["cells"][2][0]))
 
 data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "rows": out, "built": TODAY.isoformat(),
-        "renumber": renumber, "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
+        "renumber": renumber, "unmapped_terms": sorted(unmapped.items(), key=lambda kv: -kv[1]), "last_std": f"C-{max(std):05d}", "next_id": f"C-{nxt:05d}"}
 tpl = open("tools/review-template.html", encoding="utf-8").read()
 open("data/customer-review.html", "w", encoding="utf-8").write(
     tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
-matched = {norm(x["review"][3].replace(" (likely)", "")) for x in out if x["review"][3]}
-print(f"{len(out)} customers; Salesforce exact {sum(1 for x in out if x['review'][3] and '(likely)' not in x['review'][3])}, likely {sum('(likely)' in x['review'][3] for x in out)}, none {sum(not x['review'][3] for x in out)}")
+SM = REVIEW.index("Salesforce match")
+matched = {norm(x["review"][SM].replace(" (likely)", "")) for x in out if x["review"][SM]}
+print(f"{len(out)} customers; Salesforce exact {sum(1 for x in out if x['review'][SM] and '(likely)' not in x['review'][SM])}, likely {sum('(likely)' in x['review'][SM] for x in out)}, none {sum(not x['review'][SM] for x in out)}")
 print(f"Salesforce accounts with no Sage customer: {sum(1 for a in accounts if norm(a['Account Name']) not in matched)} of {len(accounts)}")
