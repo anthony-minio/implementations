@@ -54,6 +54,8 @@ th, td { border: 1px solid var(--rule); padding: .4rem .6rem; text-align: left; 
 thead th { background: var(--head-bg); color: var(--head-ink); font-weight: 600; }
 table.kv td:first-child { background: var(--label-bg); font-weight: 600; width: 28%; }
 colgroup { display: none; }
+.wide { margin-inline: calc((100% - min(100vw - 32px, 120rem)) / 2); }
+.wide th, .wide td { white-space: nowrap; }
 .tbc { font-family: var(--font-mono); font-size: .75em; background: var(--tbc-bg); color: var(--tbc-ink); padding: .05em .35em; border-radius: 3px; white-space: nowrap; }
 button.copy { font: 500 .75rem/1 var(--font-mono); letter-spacing: .03em; color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: .4rem .7rem; cursor: pointer; white-space: nowrap; }
 button.copy:hover { border-color: var(--accent); }

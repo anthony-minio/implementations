@@ -56,6 +56,8 @@ th, td { border: 1px solid var(--rule); padding: .4rem .6rem; text-align: left; 
 thead th { background: var(--head-bg); color: var(--head-ink); font-weight: 600; }
 table.kv td:first-child { background: var(--label-bg); font-weight: 600; width: 28%; }
 colgroup { display: none; }
+.wide { margin-inline: calc((100% - min(100vw - 32px, 120rem)) / 2); }
+.wide th, .wide td { white-space: nowrap; }
 .tbc { font-family: var(--font-mono); font-size: .75em; background: var(--tbc-bg); color: var(--tbc-ink); padding: .05em .35em; border-radius: 3px; white-space: nowrap; }
 button.copy { font: 500 .75rem/1 var(--font-mono); letter-spacing: .03em; color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: .4rem .7rem; cursor: pointer; white-space: nowrap; }
 button.copy:hover { border-color: var(--accent); }
@@ -101,7 +103,7 @@ MINIO_-_Noninventory_for_Sale.csv</p>
 </tr>
 <tr class="odd">
 <td><strong>Open</strong></td>
-<td>13 columns. Most are set per item group, below</td>
+<td>13 columns. Most are set per item group, under Values by group</td>
 </tr>
 <tr class="even">
 <td><strong>Status</strong></td>
@@ -110,82 +112,255 @@ MINIO_-_Noninventory_for_Sale.csv</p>
 </tbody>
 </table>
 </section>
-<section id="items" class="level1">
-<h1>Items</h1>
-<p>External ID and Item Name both use the item ID. [TBC: confirm the
-item ID as Item Name, with the descriptive name as Display
-Name/Code]</p>
+<section id="load-file" class="level1">
+<h1>Load file</h1>
+<p><code>MINIO_-_Noninventory_for_Sale.csv</code> as it stands: 11 rows,
+16 columns. Blank cells are still open. Scroll sideways to see every
+column.</p>
+<p>External ID and Item Name both use the item ID. [TBC: confirm Item
+Name format]</p>
+<div class="wide">
 <table>
 <colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th><strong>Item Name / External ID</strong></th>
+<th><strong>External ID</strong></th>
+<th><strong>Item Name</strong></th>
 <th><strong>Display Name/Code</strong></th>
-<th><strong>Group</strong></th>
+<th><strong>Department</strong></th>
+<th><strong>Class</strong></th>
+<th><strong>Subsidiary</strong></th>
+<th><strong>Include Children</strong></th>
+<th><strong>Sales Description</strong></th>
+<th><strong>Base Price</strong></th>
+<th><strong>Income account</strong></th>
+<th><strong>Deferred Revenue account</strong></th>
+<th><strong>Revenue Recogition Rule</strong></th>
+<th><strong>Rev Rec Forecast Rule</strong></th>
+<th><strong>Create Revenue Plans On</strong></th>
+<th><strong>Direct Revenue Posting</strong></th>
+<th><strong>Can be fulfilled/received</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td><strong>NS-SUPT-SLA-1H-UPB</strong></td>
+<td>NS-SUPT-SLA-1H-UPB</td>
 <td>1-Hour SLA / Unlimited Panic Buttons</td>
-<td>Support</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="even">
 <td><strong>NS-SUPT-SLA-4H-UPB</strong></td>
+<td>NS-SUPT-SLA-4H-UPB</td>
 <td>4-Hour SLA / Unlimited Panic Buttons</td>
-<td>Support</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="odd">
 <td><strong>NS-SUPT-SLA-24H-1PB</strong></td>
+<td>NS-SUPT-SLA-24H-1PB</td>
 <td>24-Hour SLA / 1 Panic Button</td>
-<td>Support</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="even">
 <td><strong>NS-SUPT-SLA-48H-1PB</strong></td>
+<td>NS-SUPT-SLA-48H-1PB</td>
 <td>48-Hour SLA / 1 Panic Button</td>
-<td>Support</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="odd">
 <td><strong>NS-SUPT-SLA-5D-0PB</strong></td>
+<td>NS-SUPT-SLA-5D-0PB</td>
 <td>5-day SLA / No Panic Buttons</td>
-<td>Support</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="even">
 <td><strong>NS-TRAIN-LV-3D</strong></td>
+<td>NS-TRAIN-LV-3D</td>
 <td>3-day Live Virtual Training</td>
-<td>Training</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="odd">
 <td><strong>NS-TRAIN-LV-4D</strong></td>
+<td>NS-TRAIN-LV-4D</td>
 <td>4-day Live Virtual Training</td>
-<td>Training</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="even">
 <td><strong>NS-TRAIN-PLATFORM</strong></td>
+<td>NS-TRAIN-PLATFORM</td>
 <td>Single Training Subscription to Platform</td>
-<td>Training</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="odd">
 <td><strong>NS-LIC-AISTOR</strong></td>
+<td>NS-LIC-AISTOR</td>
 <td>AIStor License</td>
-<td>License</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="even">
 <td><strong>NS-OEM-LIC-AISTOR</strong></td>
+<td>NS-OEM-LIC-AISTOR</td>
 <td>AIStor OEM License</td>
-<td>License</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 <tr class="odd">
 <td><strong>NS-LIC-MEMKV</strong></td>
+<td>NS-LIC-MEMKV</td>
 <td>MemKV License</td>
-<td>License</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
+</div>
 </section>
 <section id="values-by-group" class="level1">
 <h1>Values by group</h1>

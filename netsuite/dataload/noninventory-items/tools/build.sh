@@ -9,6 +9,7 @@ cd "$(dirname "$0")/.."
 TITLE="Untitled document"; SUBTITLE=""; SLUG="document"
 [ -f doc.env ] && source doc.env
 mkdir -p output
+python3 tools/csv_to_section.py MINIO_-_Noninventory_for_Sale.csv sections/02-LOAD-FILE.md
 sections=(sections/*.md)
 
 pandoc "${sections[@]}" \
