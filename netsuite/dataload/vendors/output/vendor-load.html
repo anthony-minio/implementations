@@ -392,8 +392,9 @@ Botts LLP, Oracle America and Navan.</p>
 </section>
 <section id="load-plan" class="level1">
 <h1>Load plan</h1>
-<p>Agreed 2026-10-26: every active Sage vendor ends up in NetSuite, with
-Ramp syncing its vendors.</p>
+<p>Agreed 2026-10-26: Ramp syncs first, then NetSuite is enriched with
+what Ramp does not push. Every active Sage vendor ends up in
+NetSuite.</p>
 <ol type="1">
 <li><strong>Ramp sync.</strong> Ramp syncs its 578 vendors to NetSuite,
 including the 27 Ramp vendors not in Sage (added in Ramp from 2025-08
@@ -402,8 +403,13 @@ on, 23 with no spend yet).</li>
 active Sage vendors that are not in Ramp, mapped as above.</li>
 <li><strong>Enrichment.</strong> The 551 vendors in both systems get
 Sage values Ramp does not hold: Sage Vendor ID, Vendor Category, default
-expense account, 1099 flag, tax ID where Ramp has none, and bank details
-where Ramp has none.</li>
+expense account, 1099 flag, tax ID where Ramp has none. Ramp-created
+NetSuite vendors carry no Sage ID, so after the sync the enrichment file
+is matched to them by Ramp vendor name and Ramp Vendor ID, then re-keyed
+to the NetSuite internal ID before import.</li>
+<li><strong>Bank details.</strong> Ramp does not push bank details to
+NetSuite, so every vendor’s bank details are imported separately: Ramp’s
+where Ramp has them (Ramp is primary), else Sage’s.</li>
 </ol>
 <section id="bank-details" class="level2">
 <h2>Bank details</h2>
@@ -437,10 +443,10 @@ where Ramp has none.</li>
 </tr>
 </tbody>
 </table>
-<p>Ramp’s details are the more recent where both exist. The vendor
-template has no bank fields, so bank details need their own NetSuite
-import (vendor bank details record), from Sage for the 94 and from Ramp
-for the rest if Ramp does not sync them.</p>
+<p>Ramp is primary where both exist, including the 5 that differ. The
+vendor template has no bank fields, so bank details need their own
+NetSuite import (vendor bank details record): 268 vendors, Ramp’s
+details for 174 and Sage’s for 94.</p>
 </section>
 <section id="vendor-types-against-ramp" class="level2">
 <h2>Vendor types against Ramp</h2>
@@ -492,28 +498,24 @@ home</td>
 <section id="open-questions" class="level1">
 <h1>Open questions</h1>
 <ol type="1">
-<li><strong>Order of Ramp sync and load.</strong> Ramp’s NetSuite sync
-works both ways: it can import existing NetSuite vendors and link Ramp
-merchants to them. Loading all 1,770 Sage vendors first and then
-connecting Ramp avoids two problems with syncing first: Ramp-created
-vendors carry no Sage ID, so the enrichment step has to match by name,
-and Ramp names that already exist in NetSuite raise duplicate-name
-errors. Which order does SOA recommend?</li>
-<li><strong>Subsidiary for INR and SGD vendors.</strong> Ramp supports
-several entities mapped to NetSuite subsidiaries, but Ramp’s export
-shows only MinIO, Inc. as a default entity (79 vendors, the rest blank).
-Vendors to look up: INR: V-01301 TDS Tax Payable, V-01311 Universal
-Actuaries and Benefit Consultants, V-01352 and V-01353 Zoho Corporation
-Private Limited, V-01354 91 Springboard Business Hub Private Limited,
-V-01380 Resurgent India Limited, V-01381 National Securities Depository
-Limited, V-01412 S P Nagarajan, V-01459 Vishnu Daya &amp; Co LLP. SGD:
-V-00628 Cloud Expo Asia Pte. Ltd. Also GBP: V-00629 Reed Exhibitions
-Ltd. Several INR vendors have United States as their Sage country.</li>
+<li><strong>Subsidiary for INR and SGD vendors.</strong> None of these
+has activity in Ramp or bills in Sage. The INR vendors look like MinIO
+Pvt. Ltd. vendors (India tax, the India office, Indian accountants):
+V-01301 TDS Tax Payable, V-01311 Universal Actuaries and Benefit
+Consultants, V-01352 and V-01353 Zoho Corporation Private Limited,
+V-01354 91 Springboard Business Hub Private Limited, V-01380 Resurgent
+India Limited, V-01381 National Securities Depository Limited, V-01412 S
+P Nagarajan, V-01459 Vishnu Daya &amp; Co LLP. SGD: V-00628 Cloud Expo
+Asia Pte. Ltd. Load them to MinIO Pvt. Ltd. and MinIO Singapore Pte.
+Ltd., or to MinIO, Inc.? Several INR vendors have United States as their
+Sage country.</li>
 <li><strong>Bank details import.</strong> SOA to provide the template
-for vendor bank details, and confirm whether Ramp syncs bank details to
-NetSuite.</li>
-<li><strong>Five bank accounts differ</strong> between Sage and Ramp.
-Ramp is assumed current; confirm.</li>
+for vendor bank details.</li>
+<li><strong>Enrichment matching.</strong> After the Ramp sync, SOA to
+export NetSuite vendors (internal ID, name) so the enrichment and bank
+files can be keyed to the Ramp-created records. Can Ramp’s External ID
+field carry the Sage vendor ID into NetSuite, which would make the match
+exact?</li>
 </ol>
 </section>
 </main>
