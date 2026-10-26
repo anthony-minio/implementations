@@ -42,9 +42,21 @@ for i, name in enumerate(ADDED):
         c.fill = added_fill
     ws.column_dimensions[openpyxl.utils.get_column_letter(col)].width = 28
 
+# Review-only columns after the added ones: what reviewers need to answer the questions. Not NetSuite fields.
+review_fill = PatternFill("solid", fgColor="E7E6E6")
+REVIEW_COLS = review + ["Flags"]
+for i, name in enumerate(REVIEW_COLS):
+    col = len(cols) + 1 + i
+    for r, v in ((1, ""), (2, name), (3, "Review only. Not for import.")):
+        c = ws.cell(row=r, column=col, value=v)
+        src = ws.cell(row=r, column=TEMPLATE_N)
+        c.font = copy.copy(src.font); c.alignment = copy.copy(src.alignment); c.border = copy.copy(src.border)
+        c.fill = review_fill
+    ws.column_dimensions[openpyxl.utils.get_column_letter(col)].width = 60 if name == "Flags" else 22
+
 load = [r for r in data["rows"] if not r["cells"][cols.index("Duplicate Action")][0].startswith("Merge into")]
 for i, r in enumerate(load):
-    for j, (v, _) in enumerate(r["cells"]):
+    for j, v in enumerate([c[0] for c in r["cells"]] + r["review"] + ["; ".join(r["flags"])]):
         c = ws.cell(row=7 + i, column=j + 1, value=v if v != "" else None)
         c.number_format = "@"
 ws.freeze_panes = "E7"
@@ -60,7 +72,8 @@ notes = json.loads(subprocess.run(["node", "-e", js, os.path.abspath("data/custo
 ns = wb.create_sheet("Notes", 0)
 ns.column_dimensions["A"].width = 6; ns.column_dimensions["B"].width = 120
 ns["A1"] = "MinIO customer load: notes for SOA"; ns["A1"].font = Font(bold=True, size=14)
-ns["A2"] = f"{len(load)} customers on the CustomerTemplate tab. Columns after Exemption Certificate No. (shaded) are added by MinIO. All fields marked in red on the template are mandatory."
+ns["A2"] = (f"{len(load)} customers on the CustomerTemplate tab. Columns after Exemption Certificate No. shaded yellow are added by MinIO; "
+            "columns shaded grey at the far right are for review only and are removed before import. All fields marked in red on the template are mandatory.")
 row = 4
 for sec in (x for x in notes if not (len(x["items"]) == 1 and x["items"][0].startswith("None"))):
     ns.cell(row=row, column=1, value=sec["h"]).font = Font(bold=True, size=12); row += 1
