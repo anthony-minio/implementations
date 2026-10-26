@@ -118,7 +118,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
     <h2>Open decisions</h2>
     <ol>
       <li><b>Duplicate customers.</b> Some companies appear more than once in Sage, under the same or a similar name, or matched to the same Salesforce account. Proposed: load one customer per company, the one invoiced most recently (if none was invoiced, the one with more complete data). The others are not loaded; their Sage IDs are kept on the surviving customer so Sage history can be traced. Exceptions, kept as separate customers: records that were both invoiced from different countries, and records of a company that has several Subnet accounts (see next item). See Duplicate Action, <span id="d-dup"></span> groups to merge.</li>
-      <li><b>Subnet IDs to assign.</b> Subnet IDs are a key identifier, so each Subnet account is its own NetSuite customer and records with different Subnet IDs are never merged. <span id="d-subnet"></span> Sage records belong to companies with several Subnet accounts in Salesforce (<span id="d-subnet-co"></span>). Sage has no Subnet ID and the Salesforce accounts share a name and address, so which Sage record is which Subnet account cannot be read from the data. They are marked "Subnet ID to assign" in Question Categories, with the candidates in Possible Subnet accounts. Who can assign them, for example from Subnet or the PO numbers in the Subnet account names?</li>
+      <li><b>L3Harris Subnet IDs.</b> L3Harris has three Sage records and five Subnet accounts in Salesforce (695, 716, 720, 784, 1026). Proposed by date: C-00333 L3 Technologies (last invoiced Apr 2024) to 695, C-00385 (Apr 2025) to 784, C-00562 (Jul 2026) to 1026. Subnet accounts 716 and 720 were created alongside 695 (their PO numbers run in sequence with 695's) and have no Sage record of their own. Confirm the three, and say whether 716 and 720 become their own customers. Marked "Subnet ID to assign" in Question Categories.</li>
     </ol>
   </section>
 
@@ -139,7 +139,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>Salesforce matching.</b> Customers are matched to Salesforce accounts by name. 37 names were close but not identical; each was reviewed on 2026-10-26 against city, country and email domain. 35 were confirmed. Two were left unmatched as different companies: Ministry of Defence (Singapore, not the UK ministry) and Bae Systems (kept separate from Salesforce's BAE Systems US).</li>
       <li><b>Sage data corrections.</b> Corrected in the load only; Sage itself is unchanged. Proctor &amp; Gamble: the billing address is in Lodz, Poland (street, postal code and VAT number are Polish), so the city "Cincinnati" is corrected to Lodz. Orange Côte d'Ivoire: country France corrected to Cote d'Ivoire, city Abidjan. NSN Brasil: the Sage city field held an attention note; city corrected to Sao Jose dos Pinhais, postal code 83085-058, and the note moved to Attention. Three addresses with garbled accents (for example "MontrÃ©al") are repaired to the correct characters. Five US postal codes that lost their leading zero in Sage (for example 7936) are restored to five digits (07936).</li>
       <li><b>Address parsing.</b> Sage prints each address as text, so it was split into fields for the load. "Attn" and contact names in the Sage address go to Attention. VAT, RFC and GSTIN numbers written into the Sage street line go to VAT ID when Sage's Tax ID field is empty. Phone extensions are written as " x123" to fit NetSuite's 21-character phone field. Every value in the load was checked back against the raw Sage and Salesforce exports with no differences left.</li>
-      <li><b>Subnet ID.</b> Subnet IDs are a key identifier: each Subnet account is its own NetSuite customer, and customers with different Subnet IDs are never merged. Salesforce holds one account per Subnet account, so a company with several Subnet accounts (for example L3Harris, with five) appears in Salesforce several times. Where Salesforce has a Subnet account with no matching Sage customer, it is not in this load.</li>
+      <li><b>Subnet ID.</b> Subnet IDs are a key identifier: each Subnet account is its own NetSuite customer, and customers with different Subnet IDs are never merged. Salesforce holds one account per Subnet account, so a company with several Subnet accounts (for example L3Harris, with five) appears in Salesforce several times. Where a company has several Sage records and several Subnet accounts, they are paired by date: the earlier Sage record with the earlier Subnet account (Applied Materials C-00103 to 348 and C-00462 to 879, Davidson C-00371 to 755 and C-00592 to 1067, Saudi Telecom C-00241 to 537 and C-00542 to 998). Where Salesforce has a Subnet account with no matching Sage customer, it is not in this load.</li>
       <li><b>Added columns.</b> Question Categories, Sage Customer ID, Salesforce Account ID, Additional Emails and the reseller columns are not standard template columns. Sage Customer ID, Salesforce Account ID and Subnet ID are kept as their own fields so the source of each customer is explicit.</li>
     </ol>
   </section>
@@ -164,11 +164,7 @@ function init() {
   $("#n-inv").textContent = cnt((r) => r.cells[QC][0].split("; ").includes("Investor"));
   $("#n-pardrop").textContent = DATA.parents_dropped;
   $("#d-dup").textContent = DATA.dup_groups;
-  const sub = DATA.rows.filter((r) => r.cells[QC][0].includes("Subnet ID to assign"));
-  $("#d-subnet").textContent = sub.length;
-  const PS = DATA.review.indexOf("Possible Subnet accounts");
-  const fams = [...new Set(sub.map((r) => r.review[PS]))];
-  $("#d-subnet-co").textContent = `${fams.length} companies: ` + fams.map((f) => sub.find((r) => r.review[PS] === f).cells[COL("Company Name")][0]).join(", ");
+
   $("#d-blank").textContent = cnt((r) => !r.review[TI]);
   $("#n-newterms").textContent = DATA.new_terms.map(([t, n]) => `${t} (${n})`).join(", ") || "none";
   $("#n-research").textContent = DATA.research_terms.map(([t, n]) => `${t} (${n})`).join(", ") || "none";

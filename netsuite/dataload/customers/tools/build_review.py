@@ -308,6 +308,24 @@ for x in out:
         x["flags"] = [f for f in x["flags"] if not f.startswith("Same Salesforce account")]
         x["cells"][len(COLS) + ADDED.index("Duplicate Action")] = ["Keep: separate Subnet accounts, Subnet ID to assign", "rule"]
     x["review"].append(x.get("subnet_choices", ""))
+# Subnet assignments, chronological: the earlier Sage record goes with the earlier Subnet account (Anthony, 2026-10-26).
+# L3Harris has three Sage records and five Subnet accounts; its assignment is proposed, not confirmed.
+SUBNET_ASSIGN = {"C-00103": ("348", "rule"), "C-00462": ("879", "rule"), "C-00371": ("755", "rule"),
+                 "C-00592": ("1067", "rule"), "C-00241": ("537", "rule"), "C-00542": ("998", "rule"),
+                 "C-00333": ("695", "prop"), "C-00385": ("784", "prop"), "C-00562": ("1026", "prop")}
+by_subnet = {a["Subnet Account Id"]: a for a in accounts if a["Subnet Account Id"]}
+for x in out:
+    sid = x["cells"][len(COLS) + ADDED.index("Sage Customer ID")][0]
+    if sid in SUBNET_ASSIGN:
+        sn, how2 = SUBNET_ASSIGN[sid]
+        x["cells"][SNI] = [sn, how2]
+        x["cells"][SAI] = [id18(by_subnet[sn]["Account ID"]), how2]
+        if how2 == "rule":
+            q = [p for p in x["cells"][QI0][0].split("; ") if p and p != "Subnet ID to assign"]
+            x["cells"][QI0] = ["; ".join(q), "rule" if q else ""]
+            x["cells"][len(COLS) + ADDED.index("Duplicate Action")] = ["Keep: separate Subnet account", "rule"]
+        else:
+            x["flags"].append("Subnet ID proposed by date, confirm")
 for x in out:
     if len(x["review"]) < len(REVIEW) + 1:
         x["review"].append("")
@@ -360,6 +378,10 @@ for g in (g for g in groups.values() if len(g) > 1):
     if any("Subnet ID to assign" in x["cells"][QI][0] for x in xs):
         for x in xs:
             x["cells"][DA] = ["Keep: separate Subnet accounts, Subnet ID to assign", "rule"]
+        continue
+    if len({x["cells"][SNI][0] for x in xs if x["cells"][SNI][0]}) > 1:
+        for x in xs:
+            x["cells"][DA] = ["Keep: separate Subnet account", "rule"]
         continue
     if all(x["review"][LI] for x in xs) and len({x["cells"][CN][0] for x in xs}) > 1:
         for x in xs:

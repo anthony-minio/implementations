@@ -74,6 +74,7 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 - 2026-10-26: Sage corrections in the load: C-00387 Proctor & Gamble city Lodz (address is in Poland; replaces the earlier United States correction), C-00253 Orange Cote d'Ivoire (Abidjan, Cote d'Ivoire), C-00108 NSN Brasil (city, postal code and attention), garbled accents repaired, five US postal codes with a lost leading zero restored.
 - 2026-10-26: Leidos C-00489 (Chargebee, never invoiced, same email) merges into Leidos Holdings C-00516; Reston address is primary.
 - 2026-10-26: Subnet IDs are a key identifier: one NetSuite customer per Subnet account; records with different Subnet IDs are never merged. Applied Materials, Davidson, L3Harris (incl. C-00333 L3 Technologies) and Saudi Telecom have several Subnet accounts; their 9 Sage records are kept separate and marked "Subnet ID to assign".
+- 2026-10-26: Subnet IDs paired by date (earlier Sage record with earlier Subnet account): C-00103 348, C-00462 879, C-00371 755, C-00592 1067, C-00241 537, C-00542 998. Records with different Subnet IDs are never merged. L3Harris proposed: C-00333 695, C-00385 784, C-00562 1026; 716 and 720 have no Sage record.
 - Pending: duplicates. Proposed one customer per company, keeping the most recently invoiced, shown in the Duplicate Action column.
 
 ## Template lists
