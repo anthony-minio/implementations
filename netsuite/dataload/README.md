@@ -1,11 +1,28 @@
 # NetSuite data loads
 
-Working folder for configuring NetSuite data uploads.
+Working folder for configuring NetSuite data uploads. One subfolder per load, each with its load file, a review page built from `sections/`, and a load log.
 
-Planned layout, one subfolder per record type as each load is worked on (for example `customers/`, `vendors/`, `items/`):
+| Folder | Load | Status |
+|---|---|---|
+| `noninventory-items/` | Non-inventory Item for Sale, 11 items | Waiting on accounts and revenue recognition |
 
-- Import template and field mapping for the record type
-- Notes on the saved import map, if one is used
-- Load log: date, file, record count, errors, outcome
+## Reference values
 
-Load order and open questions go in this file once defined.
+Shared by the loads. Names as given by Anthony on 2026-10-26; they must match NetSuite exactly.
+
+Subsidiaries:
+
+- MinIO, Inc.
+- MinIO Pvt. Ltd.
+- MinIO Singapore Pte. Ltd.
+
+Classes for load to production:
+
+- License
+- Support
+- Training
+- Professional Services
+
+## Load order
+
+Classes and subsidiaries must exist in the target account before any load that references them.

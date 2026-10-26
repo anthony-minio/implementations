@@ -10,7 +10,7 @@ lines = [
     "",
     f"`{src}` as it stands: {len(body)} rows, {len(hdr)} columns. Blank cells are still open. Scroll sideways to see every column.",
     "",
-    "External ID and Item Name both use the item ID. [TBC: confirm Item Name format]",
+    "External ID and Item Name both use the item ID. Item Name is the code; Display Name/Code is the name sales and customers read.",
     "",
     "::: {.wide}",
     "| " + " | ".join(f"**{cell(h)}**" for h in hdr) + " |",

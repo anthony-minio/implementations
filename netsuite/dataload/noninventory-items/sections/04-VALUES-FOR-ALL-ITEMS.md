@@ -2,8 +2,8 @@
 
 | | |
 |---|---|
-| **Subsidiary** | [TBC: which MinIO entity sells these items] |
-| **Include Children** | [TBC: Yes if child subsidiaries also sell them] |
+| **Subsidiary** | MinIO, Inc. [TBC: confirm it is the parent of MinIO Pvt. Ltd. and MinIO Singapore Pte. Ltd.] |
+| **Include Children** | Yes, so all three subsidiaries can sell the items |
 | **Sales Description** | [TBC: repeat the Display Name/Code, or other text] |
 | **Base Price** | [TBC: list price per item, or blank and priced on each order] |
 | **Create Revenue Plans On** | [TBC] |

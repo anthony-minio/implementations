@@ -99,11 +99,12 @@ MINIO_-_Noninventory_for_Sale.csv</p>
 </tr>
 <tr class="even">
 <td><strong>Filled</strong></td>
-<td>External ID, Item Name, Display Name/Code</td>
+<td>External ID, Item Name, Display Name/Code, Class, Subsidiary,
+Include Children</td>
 </tr>
 <tr class="odd">
 <td><strong>Open</strong></td>
-<td>13 columns. Most are set per item group, under Values by group</td>
+<td>10 columns. Most are set per item group, under Values by group</td>
 </tr>
 <tr class="even">
 <td><strong>Status</strong></td>
@@ -117,8 +118,8 @@ MINIO_-_Noninventory_for_Sale.csv</p>
 <p><code>MINIO_-_Noninventory_for_Sale.csv</code> as it stands: 11 rows,
 16 columns. Blank cells are still open. Scroll sideways to see every
 column.</p>
-<p>External ID and Item Name both use the item ID. [TBC: confirm Item
-Name format]</p>
+<p>External ID and Item Name both use the item ID. Item Name is the
+code; Display Name/Code is the name sales and customers read.</p>
 <div class="wide">
 <table>
 <colgroup>
@@ -165,9 +166,9 @@ Name format]</p>
 <td>NS-SUPT-SLA-1H-UPB</td>
 <td>1-Hour SLA / Unlimited Panic Buttons</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>Support</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -183,9 +184,9 @@ Name format]</p>
 <td>NS-SUPT-SLA-4H-UPB</td>
 <td>4-Hour SLA / Unlimited Panic Buttons</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>Support</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -201,9 +202,9 @@ Name format]</p>
 <td>NS-SUPT-SLA-24H-1PB</td>
 <td>24-Hour SLA / 1 Panic Button</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>Support</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -219,9 +220,9 @@ Name format]</p>
 <td>NS-SUPT-SLA-48H-1PB</td>
 <td>48-Hour SLA / 1 Panic Button</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>Support</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -237,9 +238,9 @@ Name format]</p>
 <td>NS-SUPT-SLA-5D-0PB</td>
 <td>5-day SLA / No Panic Buttons</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>Support</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -255,9 +256,9 @@ Name format]</p>
 <td>NS-TRAIN-LV-3D</td>
 <td>3-day Live Virtual Training</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>Training</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -273,9 +274,9 @@ Name format]</p>
 <td>NS-TRAIN-LV-4D</td>
 <td>4-day Live Virtual Training</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>Training</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -291,9 +292,9 @@ Name format]</p>
 <td>NS-TRAIN-PLATFORM</td>
 <td>Single Training Subscription to Platform</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>Training</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -309,9 +310,9 @@ Name format]</p>
 <td>NS-LIC-AISTOR</td>
 <td>AIStor License</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>License</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -327,9 +328,9 @@ Name format]</p>
 <td>NS-OEM-LIC-AISTOR</td>
 <td>AIStor OEM License</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>License</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -345,9 +346,9 @@ Name format]</p>
 <td>NS-LIC-MEMKV</td>
 <td>MemKV License</td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>License</td>
+<td>MinIO, Inc.</td>
+<td>Yes</td>
 <td></td>
 <td></td>
 <td></td>
@@ -383,9 +384,9 @@ Name format]</p>
 </tr>
 <tr class="even">
 <td><strong>Class</strong></td>
-<td>[TBC]</td>
-<td>[TBC]</td>
-<td>[TBC]</td>
+<td>Support</td>
+<td>Training</td>
+<td>License</td>
 </tr>
 <tr class="odd">
 <td><strong>Income account</strong></td>
@@ -426,11 +427,12 @@ records, spelled as NetSuite shows them.</p>
 <tbody>
 <tr class="odd">
 <td><strong>Subsidiary</strong></td>
-<td>[TBC: which MinIO entity sells these items]</td>
+<td>MinIO, Inc. [TBC: confirm it is the parent of MinIO Pvt. Ltd. and
+MinIO Singapore Pte. Ltd.]</td>
 </tr>
 <tr class="even">
 <td><strong>Include Children</strong></td>
-<td>[TBC: Yes if child subsidiaries also sell them]</td>
+<td>Yes, so all three subsidiaries can sell the items</td>
 </tr>
 <tr class="odd">
 <td><strong>Sales Description</strong></td>
@@ -463,6 +465,11 @@ accounts and rule as the direct licenses?</li>
 <li><strong>Platform training subscription.</strong> Is it recognized
 like the live trainings or like a subscription?</li>
 <li><strong>Base Price.</strong> Do these items have list prices?</li>
+<li><strong>Classes in production.</strong> License, Support, Training
+and Professional Services must exist in production before this
+load.</li>
+<li><strong>Professional Services.</strong> It is a class, but no item
+uses it. Are professional services items missing from this load?</li>
 <li><strong>Template header.</strong> The template spells
 <code>Revenue Recogition Rule</code>. Kept as is; it only needs to match
 when mapping the import.</li>

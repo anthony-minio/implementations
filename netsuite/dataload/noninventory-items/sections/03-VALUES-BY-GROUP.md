@@ -5,7 +5,7 @@ Every item in a group gets the same values.
 | **Column** | **Support** | **Training** | **License** |
 |---|---|---|---|
 | **Department** | [TBC] | [TBC] | [TBC] |
-| **Class** | [TBC] | [TBC] | [TBC] |
+| **Class** | Support | Training | License |
 | **Income account** | [TBC] | [TBC] | [TBC] |
 | **Deferred Revenue account** | [TBC] | [TBC] | [TBC] |
 | **Revenue Recogition Rule** | [TBC] | [TBC] | [TBC] |
