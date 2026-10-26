@@ -309,6 +309,10 @@ for name, xs in dups.items():
         x["review"][REVIEW.index("Differs from other records")] = ", ".join(diff)
     used = [x for x in xs if x["_used"]]
     label = xs[0]["cells"][FIELDS.index("companyName")][0]
+    tag = "Duplicate, one record used" if len(used) == 1 else "Duplicate, decision needed"
+    for x in xs:
+        q = [p for p in x["cells"][QI][0].split("; ") if p and p != "Duplicate to review"]
+        x["cells"][QI] = ["; ".join([tag] + q), "rule"]
     if len(used) == 1:
         keep = used[0]
         dup_clear.append(label)
@@ -325,9 +329,9 @@ GROUP = {"Ramp only": 0, "Ramp matched": 1, "Sage only": 2}
 EXTRA = {"Subsidiary to confirm": 0}
 def order(x):
     q = x["cells"][QI][0].split("; ")
-    if x.get("_name") in dups:  # duplicate names first, grouped by name, the record to keep first
-        return (0, 0, x["_name"], 0 if x["cells"][DA][0].startswith("Keep") else 1, x["cells"][VI][0])
-    return (1, GROUP.get(q[0], 3), "", min([EXTRA.get(p, 9) for p in q[1:]] or [9]), x["cells"][FIELDS.index("companyName")][0].lower())
+    if x.get("_name") in dups:  # decision-needed names first, then names with one record used; grouped by name, keeper first
+        return (0 if q[0] == "Duplicate, decision needed" else 1, 0, x["_name"], 0 if x["cells"][DA][0].startswith("Keep") else 1, x["cells"][VI][0])
+    return (2, GROUP.get(q[0], 3), "", min([EXTRA.get(p, 9) for p in q[1:]] or [9]), x["cells"][FIELDS.index("companyName")][0].lower())
 out.sort(key=order)
 for x in out:
     for k in [k for k in x if k.startswith("_")]:
@@ -336,11 +340,11 @@ for x in out:
 export = list(csv.reader(open(EXPORT, encoding="utf-8-sig")))
 rep = [x for x in csv.reader(open(REPORT, encoding="utf-8-sig")) if re.match(r"(V-?\d+|RMP_\d+)$", x[0].strip())]
 bridge = {"export": len(export) - 1, "onetime": [(x[0], x[1]) for x in export[1:] if x[7] == "True"],
-          "report": len(rep), "inactive": sum(1 for x in rep if x[8] != "Active"), "active": sum(1 for x in out if not x["cells"][QI][0].startswith("Ramp only")),
-          "in_ramp": sum(1 for x in out if x["cells"][QI][0].startswith("Ramp matched")), "ramp_total": len(ramp_rows),
-          "sage_only": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only")),
-          "sage_only_recent": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only") and x["active"]),
-          "sage_only_none": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only") and not x["review"][REVIEW.index("Last activity")]),
+          "report": len(rep), "inactive": sum(1 for x in rep if x[8] != "Active"), "active": sum(1 for x in out if not "Ramp only" in x["cells"][QI][0].split("; ")),
+          "in_ramp": sum(1 for x in out if "Ramp matched" in x["cells"][QI][0].split("; ")), "ramp_total": len(ramp_rows),
+          "sage_only": sum(1 for x in out if "Sage only" in x["cells"][QI][0].split("; ")),
+          "sage_only_recent": sum(1 for x in out if "Sage only" in x["cells"][QI][0].split("; ") and x["active"]),
+          "sage_only_none": sum(1 for x in out if "Sage only" in x["cells"][QI][0].split("; ") and not x["review"][REVIEW.index("Last activity")]),
           "dups": {"names": len(dups), "records": sum(len(v) for v in dups.values()), "clear": sorted(dup_clear),
                    "multi": sorted(dup_multi), "none": sorted(dup_none)},
           "bank": {"ramp": sum(1 for b in bank_file if b[3] == "Ramp"), "sage": sum(1 for b in bank_file if b[3] == "Sage")},
