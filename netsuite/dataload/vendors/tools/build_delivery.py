@@ -15,7 +15,7 @@ cols, review, required = data["cols"], data["review"], set(data["required"])
 FILL = {"ramp": "E3EDF9", "rule": "DCEFEF", "prop": "FFF2CF", "miss": "FCE5E2"}
 INK = {"ramp": "2B64A8", "rule": "0D6B70", "prop": "8A5D00", "miss": "A8261F"}
 GROUPS = [("Identity", 9), ("Contact and delivery", 8), ("Address 1", 12), ("Address 2", 12), ("Financial", 18),
-          ("Source", 2), ("Added columns", 5), ("Bank details", 5), ("Review (not loaded)", len(review) + 1)]
+          ("Source", 2), ("Added columns", 6), ("Bank details", 5), ("Review (not loaded)", len(review) + 1)]
 thin = Side(style="thin", color="D6DEE3")
 grid = Border(left=thin, right=thin, top=thin, bottom=thin)
 head_fill = PatternFill("solid", fgColor="E8EEF1")

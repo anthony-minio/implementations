@@ -54,9 +54,10 @@ COLS = [c.value for c in openpyxl.load_workbook("MINIO_Vendor_Template_10192026.
 FIELDS = [c.value for c in openpyxl.load_workbook("MINIO_Vendor_Template_10192026.xlsx")["Vendor Template"][1] if c.value]
 assert len(COLS) == len(FIELDS) == 61
 REQUIRED = {"companyName"}
-ADDED = ["Question Categories", "Sage Vendor ID", "Ramp Vendor ID", "In Ramp", "Bank Details",
+ADDED = ["Question Categories", "Duplicate Action", "Sage Vendor ID", "Ramp Vendor ID", "In Ramp", "Bank Details",
          "Bank Source", "Bank Name", "Bank Account Type", "Bank Routing Number", "Bank Account Number"]
-REVIEW = ["Sage type", "Ramp created", "Last activity", "Ramp 365-day spend", "Ramp category", "Ramp owner", "Ramp department"]
+REVIEW = ["Sage type", "Ramp created", "Last activity", "Sage last bill", "Sage last payment", "Sage balance", "Ramp last spend",
+          "Ramp 365-day spend", "Ramp category", "Ramp owner", "Ramp department", "Differs from other records"]
 
 # Vendor ID: keep V-#####; older V##### and Ramp-created RMP_# get the next numbers after the highest V-#####.
 std = [int(G(r, "Vendor ID")[2:]) for r in sage if re.match(r"V-\d{5}$", G(r, "Vendor ID"))]
@@ -82,6 +83,11 @@ def mask(v):
         if x in v:
             v = v.replace(x, "•••" + re.sub(r"\W", "", x)[-4:])
     return v
+
+BAL = {}
+for x in csv.reader(open(REPORT, encoding="utf-8-sig")):
+    if re.match(r"(V-?\d+|RMP_\d+)$", x[0].strip()) and x[7].strip():
+        BAL[x[0].strip()] = float(x[7].replace(",", ""))
 
 names = {}
 for r in sage:
@@ -220,13 +226,18 @@ for r in sage:
         flags.append("No email")
     if not last:
         flags.append("No activity recorded")
-    added = [["; ".join(qc), "rule" if qc else ""], [sid, "sage"], [rp["Vendor ID"] if rp else "", "ramp" if rp else ""],
+    added = [["; ".join(qc), "rule" if qc else ""], ["", ""], [sid, "sage"], [rp["Vendor ID"] if rp else "", "ramp" if rp else ""],
              ["Yes" if rp else "No", "rule"], [bank, "rule" if bank else ""],
              [bk[0], "rule" if bk[0] else ""], [bk[1], ("ramp" if bk[0] == "Ramp" else "sage") if bk[1] else ""],
              [bk[2], "sage" if bk[2] else ""], [bk[3], ("ramp" if bk[0] == "Ramp" else "sage") if bk[3] else ""],
              [bk[4], ("ramp" if bk[0] == "Ramp" else "sage") if bk[4] else ""]]
-    review = [t, rp["Creation date"][:10] if rp else "", last.isoformat() if last else "", f"{float(rp['Total 365 day spend'] or 0):,.2f}" if rp else "",
-              rp["Ramp category"] if rp else "", rp["Owner name"] if rp else "", rp["Department"] if rp else ""]
+    bal = BAL.get(sid, 0.0)
+    review = [t, rp["Creation date"][:10] if rp else "", last.isoformat() if last else "",
+              (date(G(r, "Last bill created on")) or "") and date(G(r, "Last bill created on")).isoformat(),
+              (date(G(r, "Last payment made on")) or "") and date(G(r, "Last payment made on")).isoformat(),
+              f"{bal:,.2f}" if bal else "", rp["Last spend date"] if rp else "",
+              f"{float(rp['Total 365 day spend'] or 0):,.2f}" if rp else "",
+              rp["Ramp category"] if rp else "", rp["Owner name"] if rp else "", rp["Department"] if rp else "", ""]
     cells = [c[f] for f in FIELDS] + added
     load_rows.append(cells)
     page = [[v if FULL else mask(v), src] for v, src in cells]
@@ -238,7 +249,13 @@ for r in sage:
     if page[ti][0] and not FULL:
         page[ti][0] = "•••" + re.sub(r"\W", "", cells[ti][0])[-4:]
     flags = flags if FULL else [mask(f) for f in flags]
-    out.append({"cells": page, "review": review, "flags": flags, "active": bool(last and last >= ACTIVE_FROM)})
+    attrs = {"address": (G(r, "Address line 1").lower(), G(r, "City").lower(), G(r, "ZIP or postal code")),
+             "email": G(r, "Email address").lower(), "phone": re.sub(r"\D", "", G(r, "Phone number")),
+             "tax ID": re.sub(r"\W", "", G(r, "Tax ID")), "bank account": G(r, "ACH account number")[-4:],
+             "terms": G(r, "Term"), "vendor type": t, "currency": cur, "1099": G(r, "Form 1099 type")}
+    used = bool(G(r, "Last bill created on") or G(r, "Last payment made on") or bal or rp)
+    out.append({"cells": page, "review": review, "flags": flags, "active": bool(last and last >= ACTIVE_FROM),
+                "_name": re.sub(r"[^a-z0-9]", "", G(r, "Vendor name").lower()), "_attrs": attrs, "_used": used, "_last": last.isoformat() if last else "", "_bal": bal})
 
 # Ramp-only vendors: in Ramp with no Sage vendor. The Ramp sync creates them in NetSuite; shown for completeness.
 for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
@@ -263,7 +280,7 @@ for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
     bk = ["Ramp", rp["Default bank name"].strip(), "", rp["Default ACH routing number"].strip(), rp["Default ACH account number"].strip()] if rb else ["", "", "", "", ""]
     if rb:
         bank_file.append(["", "", rp["Vendor name"]] + bk)
-    added = [["Ramp only", "rule"], ["", ""], [rp["Vendor ID"], "ramp"], ["Yes", "rule"], ["Ramp" if rb else "", "rule" if rb else ""],
+    added = [["Ramp only", "rule"], ["", ""], ["", ""], [rp["Vendor ID"], "ramp"], ["Yes", "rule"], ["Ramp" if rb else "", "rule" if rb else ""],
              [bk[0], "rule" if bk[0] else ""], [bk[1], "ramp" if bk[1] else ""], ["", ""],
              [bk[3], "ramp" if bk[3] else ""], [bk[4], "ramp" if bk[4] else ""]]
     cells = [c[f] for f in FIELDS] + added
@@ -273,16 +290,48 @@ for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
             if cells[j][0]:
                 page[j][0] = "•••" + re.sub(r"\W", "", cells[j][0])[-4:]
     last = date(rp["Last spend date"])
-    review = ["", rp["Creation date"][:10], last.isoformat() if last else "", f"{float(rp['Total 365 day spend'] or 0):,.2f}", rp["Ramp category"], rp["Owner name"], rp["Department"]]
+    review = ["", rp["Creation date"][:10], last.isoformat() if last else "", "", "", "", rp["Last spend date"],
+              f"{float(rp['Total 365 day spend'] or 0):,.2f}", rp["Ramp category"], rp["Owner name"], rp["Department"], ""]
     out.append({"cells": page, "review": review, "flags": ["Created by the Ramp sync; no Sage vendor"], "active": bool(last and last >= ACTIVE_FROM)})
 
 QI = len(FIELDS)
+DA = QI + ADDED.index("Duplicate Action")
+VI = FIELDS.index("vendorId")
+# Duplicate vendor names: what each record shows, and a proposal where exactly one record has been used.
+dups = {}
+for x in out:
+    if x.get("_name") and "Duplicate to review" in x["cells"][QI][0]:
+        dups.setdefault(x["_name"], []).append(x)
+dup_clear, dup_multi, dup_none = [], [], []
+for name, xs in dups.items():
+    for x in xs:
+        diff = [a for a in x["_attrs"] if len({y["_attrs"][a] for y in xs if y["_attrs"][a] not in ("", ("", "", ""))}) > 1]
+        x["review"][REVIEW.index("Differs from other records")] = ", ".join(diff)
+    used = [x for x in xs if x["_used"]]
+    label = xs[0]["cells"][FIELDS.index("companyName")][0]
+    if len(used) == 1:
+        keep = used[0]
+        dup_clear.append(label)
+        keep["cells"][DA] = ["Keep: only record used (proposed)", "prop"]
+        for x in xs:
+            if x is not keep:
+                x["cells"][DA] = [f"Merge into {keep['cells'][VI][0]} (proposed)", "prop"]
+    else:
+        (dup_multi if used else dup_none).append(label)
+        for x in xs:
+            x["cells"][DA] = ["Decide: more than one record used" if used else "Decide: no record used", "prop"]
+
 GROUP = {"Ramp only": 0, "Ramp matched": 1, "Sage only": 2}
-EXTRA = {"Subsidiary to confirm": 0, "Duplicate to review": 1}
+EXTRA = {"Subsidiary to confirm": 0}
 def order(x):
     q = x["cells"][QI][0].split("; ")
-    return (GROUP.get(q[0], 3), min([EXTRA.get(p, 9) for p in q[1:]] or [9]), x["cells"][FIELDS.index("companyName")][0].lower())
+    if x.get("_name") in dups:  # duplicate names first, grouped by name, the record to keep first
+        return (0, 0, x["_name"], 0 if x["cells"][DA][0].startswith("Keep") else 1, x["cells"][VI][0])
+    return (1, GROUP.get(q[0], 3), "", min([EXTRA.get(p, 9) for p in q[1:]] or [9]), x["cells"][FIELDS.index("companyName")][0].lower())
 out.sort(key=order)
+for x in out:
+    for k in [k for k in x if k.startswith("_")]:
+        del x[k]
 
 export = list(csv.reader(open(EXPORT, encoding="utf-8-sig")))
 rep = [x for x in csv.reader(open(REPORT, encoding="utf-8-sig")) if re.match(r"(V-?\d+|RMP_\d+)$", x[0].strip())]
@@ -292,6 +341,8 @@ bridge = {"export": len(export) - 1, "onetime": [(x[0], x[1]) for x in export[1:
           "sage_only": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only")),
           "sage_only_recent": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only") and x["active"]),
           "sage_only_none": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only") and not x["review"][REVIEW.index("Last activity")]),
+          "dups": {"names": len(dups), "records": sum(len(v) for v in dups.values()), "clear": sorted(dup_clear),
+                   "multi": sorted(dup_multi), "none": sorted(dup_none)},
           "bank": {"ramp": sum(1 for b in bank_file if b[3] == "Ramp"), "sage": sum(1 for b in bank_file if b[3] == "Sage")},
           "ramp_only": [r["Vendor name"] for r in ramp_rows if not r["Sage Intacct ID"].strip()]}
 data = {"cols": COLS + ADDED, "fields": FIELDS + ADDED, "required": ["Company Name"], "review": REVIEW, "rows": out,
@@ -320,7 +371,7 @@ with open("data/vendor-load.csv", "w", newline="", encoding="utf-8-sig") as o:
     w.writerow((FIELDS + ADDED)[:NB])
     w.writerow((COLS + ADDED)[:NB])
     for cells in load_rows:
-        if cells[QI + 3][0] == "No":
+        if cells[QI + ADDED.index("In Ramp")][0] == "No":
             w.writerow([x[0] for x in cells[:NB]])
 print(f"{len(out)} rows ({len(out) - len(bridge['ramp_only'])} active Sage vendors + {len(bridge['ramp_only'])} Ramp only); {bridge['in_ramp']} Ramp matched; {bridge['sage_only']} Sage only -> data/vendor-load.csv")
 print(f"bank details for {len(bank_file)} vendors -> data/vendor-bank-details.csv (local only)")

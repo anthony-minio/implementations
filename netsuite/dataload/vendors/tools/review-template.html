@@ -101,6 +101,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <span class="seg-label" id="scope-label">Source</span>
       <div class="seg" role="group" aria-labelledby="scope-label" id="scope">
         <button type="button" data-v="all" aria-pressed="true">All</button>
+        <button type="button" data-v="dup" aria-pressed="false">Duplicate names</button>
         <button type="button" data-v="Ramp only" aria-pressed="false">Ramp only</button>
         <button type="button" data-v="Ramp matched" aria-pressed="false">Ramp matched</button>
         <button type="button" data-v="Sage only" aria-pressed="false">Sage only</button>
@@ -122,13 +123,14 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>NetSuite load plan.</b> (1) Ramp syncs its vendors to NetSuite: the Ramp only and Ramp matched vendors. (2) Sage values Ramp does not push are added to the Ramp matched vendors: Sage Vendor ID, category, default expense account, 1099 flag, tax ID where Ramp has none. Ramp-created vendors carry no Sage ID, so this file is matched to them by Ramp vendor name and Ramp Vendor ID and re-keyed to the NetSuite internal ID after the sync. (3) Bank details are imported for every vendor, as above. (4) Sage only vendors are loaded from Sage, if wanted (next item).</li>
       <li><b>Open question: load any Sage only vendors?</b> <span id="n-sageonly"></span> Marked "Sage only" in Question Categories and listed last.</li>
       <li><b>Open question: subsidiary.</b> Every vendor is assumed to do business mainly with MinIO, Inc. Are any vendors used mainly by MinIO Pvt. Ltd. (India) or MinIO Singapore Pte. Ltd.? Candidates marked "Subsidiary to confirm": the vendors with INR or SGD currency in Sage, for example TDS Tax Payable, 91 Springboard Business Hub, Zoho Corporation Private Limited, S P Nagarajan and Vishnu Daya &amp; Co LLP (India) and Cloud Expo Asia (Singapore). None has activity in Ramp or bills in Sage.</li>
+      <li><b>Open question: duplicate vendor names.</b> <span id="n-dups"></span></li>
       <li><b>Vendor ID.</b> Sage IDs in the V-##### format are kept. The <span id="n-renum"></span> older V##### and Ramp-created RMP_# IDs get the next numbers after <span id="n-last"></span>: <span id="n-range"></span>. External ID is the same as Vendor ID. After the load, NetSuite should auto-generate vendor numbers V-##### starting at <b id="n-next"></b>. The Sage ID stays in Legacy Vendor ID and Sage Vendor ID; Ramp Vendor ID is kept as its own field. Ramp only vendors get their ID from the Ramp sync.</li>
       <li><b>Category.</b> Sage vendor types mapped to the template's Vendor Category list: AR reseller to AR Reseller, MinIO employee to MinIO Employee, Tax to Tax agency, the rest unchanged.</li>
       <li><b>Addresses.</b> Address 1 is the Sage main address (label Main), else Ramp's check mailing address. Address 2 is the Sage pay-to address where different (label Remit-to, default billing).</li>
       <li><b>Terms.</b> Sage terms, else Ramp net terms, mapped to the NetSuite list: Sage "15 days" becomes Net 15.</li>
       <li><b>Accounts.</b> Default Expense Account from the Sage default expense account, translated through the Sage# column of COA Draft v1. Default Payables Account 20100 Accounts Payable - Trade for every vendor.</li>
       <li><b>Tax ID and 1099.</b> Tax ID from Sage, else Ramp's TIN; full in the load file, last 4 digits here. 1099 Eligible is TRUE where Sage has a Form 1099 type or the vendor type is 1099 Vendor.</li>
-      <li><b>Duplicates.</b> Vendors with the same name are marked "Duplicate to review". No merges yet.</li>
+      <li><b>Duplicate vendor names.</b> A name counts as the same when it differs only in capitals, spaces or punctuation (for example T3 EXPO and T3Expo). Records sharing a name are marked "Duplicate to review" and listed at the top of the table, grouped by name. A record counts as used when Sage shows a bill, a payment or an open balance, or the record is in Ramp. Sage last bill, Sage last payment, Sage balance and Ramp last spend show the evidence; Differs from other records lists the details (address, email, phone, tax ID, bank account, terms, type, currency, 1099) that differ between records with the same name. Nothing is merged yet.</li>
     </ol>
   </section>
 </div>
@@ -137,7 +139,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
 const DATA = /*DATA*/null;
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const GROUPS = [["Identity", 9], ["Contact and delivery", 8], ["Address 1", 12], ["Address 2", 12], ["Financial", 18], ["Source", 2], ["Added columns", 5], ["Bank details (masked)", 5]];
+const GROUPS = [["Identity", 9], ["Contact and delivery", 8], ["Address 1", 12], ["Address 2", 12], ["Financial", 18], ["Source", 2], ["Added columns", 6], ["Bank details (masked)", 5]];
 const flagKey = (f) => f.replace(/:.*/, "");
 const COL = (n) => DATA.cols.indexOf(n);
 const WARN = new Set(["Duplicate name", "Bank account differs between Sage and Ramp", "Vendor type not on the category list", "Individual without first and last name", "Tax ID longer than 15 characters"]);
@@ -156,6 +158,8 @@ function init() {
     .map(([n, l]) => `<div class="stat"><b>${n.toLocaleString()}</b><span>${l}</span></div>`).join("");
   const B = DATA.bridge;
   $("#n-break").textContent = `Ramp has ${B.ramp_total} vendors. Sage has ${B.active.toLocaleString()} active vendors. ${B.in_ramp} vendors are in both (Ramp matched), linked by the Sage vendor ID held in Ramp. Ramp has ${B.ramp_only.length} vendors that are not in Sage (Ramp only), mostly added in Ramp since 2025-08. Sage has ${B.sage_only.toLocaleString()} active vendors that are not in Ramp (Sage only). For reference: Sage's export of active vendors lists ${B.export.toLocaleString()}; the ${B.onetime.length} not counted here are flagged One-time use (${B.onetime.map(([i, n]) => i + " " + n).join(", ")}). Sage also has ${B.inactive} inactive vendors, not included.`;
+  const D = B.dups;
+  $("#n-dups").textContent = `${D.names} vendor names appear more than once in Sage (${D.records} records), listed at the top of the table. For ${D.clear.length} names exactly one record has been used: proposed to keep it and merge the others into it (Duplicate Action). ${D.multi.length + D.none.length} names need a decision. ${D.multi.length} have more than one record used: ${D.multi.join(", ")}. ${D.none.length} have no record used: ${D.none.join(", ")}. For these, keep the most recently used record, keep records as separate vendors where their details differ, or leave unused records out?`;
   $("#n-bank").textContent = `Bank details to import: ${B.bank.ramp + B.bank.sage} vendors, ${B.bank.ramp} from Ramp and ${B.bank.sage} from Sage.`;
   $("#n-sageonly").textContent = `${B.sage_only.toLocaleString()} active Sage vendors are not in Ramp. ${B.sage_only_recent} have activity since 2024-10-26, ${B.sage_only - B.sage_only_recent - B.sage_only_none} have older activity only, and ${B.sage_only_none} have no activity recorded. Load all of them, only those with recent activity, or none?`;
   const old = Object.keys(DATA.renumber), neu = Object.values(DATA.renumber);
@@ -182,7 +186,7 @@ function render() {
   document.querySelectorAll("#scope button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === state.scope)));
   const q = state.q.trim().toLowerCase(), QC = COL("Question Categories");
   const rows = DATA.rows.filter((r) =>
-    (state.scope === "all" || r.cells[COL("Question Categories")][0].split("; ")[0] === state.scope) &&
+    (state.scope === "all" || (state.scope === "dup" ? !!r.cells[COL("Duplicate Action")][0] : r.cells[COL("Question Categories")][0].split("; ")[0] === state.scope)) &&
     (!state.type || (r.review[0] || "(blank)") === state.type) &&
     (!state.flag || (state.flag === "__none" ? !r.flags.length : r.flags.some((f) => flagKey(f) === state.flag) || r.cells[QC][0].split("; ").includes(state.flag))) &&
     (!q || r.cells.some((c) => c[0].toLowerCase().includes(q)) || r.review.some((v) => v.toLowerCase().includes(q))));
