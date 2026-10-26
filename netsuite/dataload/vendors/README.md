@@ -55,6 +55,10 @@ Activity of the 1,770 active Sage vendors, using the latest of Sage last bill, S
 
 `tools/build_review.py` maps the 1,770 active Sage vendors to the template, links Ramp by Sage vendor ID, and writes `data/vendor-review.html` (from `tools/review-template.html`, published privately at https://claude.ai/artifact/43aBdfBgsyuiGNHAtGPSsw) and `data/vendor-load.csv` (the 1,219 not in Ramp, full tax IDs). Bank numbers and tax IDs are masked wherever they appear on the page; two Sage "Number" fields that hold bank account numbers are not loaded. `data/coa-sage-map.json` maps Sage accounts to COA Draft v1.
 
+## Validation
+
+`tools/validate_load.py` checks every row of the review workbook against the raw Sage detail export, the Sage vendor list report and the Ramp export, independently of the build: row set (every active Sage vendor once, every Ramp-only vendor once), unique Vendor IDs, and each value traced to its own source record (name, IDs, category, phone, email, comments, fax, address, legal name, terms, expense account, tax ID, 1099, currency, Ramp link, bank details, last bill, last payment, balance, Ramp created, Ramp last spend, Ramp category and owner). It also checks the masked page matches the workbook row for row. 2026-10-26: no issues; a test with deliberately swapped values was caught.
+
 ## Load log
 
 | Date | File | Records | Errors | Outcome |
