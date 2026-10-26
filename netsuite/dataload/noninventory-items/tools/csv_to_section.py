@@ -10,7 +10,7 @@ lines = [
     "",
     f"`{src}` as it stands: {len(body)} rows, {len(hdr)} columns. Blank cells are still open. Scroll sideways to see every column.",
     "",
-    "External ID and Item Name both use the item ID. Item Name is the code; Display Name/Code is the name sales and customers read.",
+    "External ID and Item Name both use the item ID. Item Name/Number is the code and the import key. Display Name/Code is the readable name; NetSuite prints it on forms instead of the code when it is set. Sales Description is the longer line text on quotes and invoices.",
     "",
     "::: {.wide}",
     "| " + " | ".join(f"**{cell(h)}**" for h in hdr) + " |",

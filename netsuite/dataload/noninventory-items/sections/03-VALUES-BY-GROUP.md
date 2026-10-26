@@ -7,7 +7,7 @@ Every item in a group gets the same values.
 | **Department** | None for now | None for now | None for now |
 | **Class** | Support | Training | License |
 | **Income account** | 41200 Support Revenue | 42200 Training Revenue | 41100 License Revenue |
-| **Deferred Revenue account** | [TBC: 23100 Deferred Revenue - ST proposed] | [TBC] | [TBC] |
+| **Deferred Revenue account** | 23100 Deferred Revenue - ST | 23100 Deferred Revenue - ST | 23100 Deferred Revenue - ST |
 | **Revenue Recogition Rule** | [TBC] | [TBC] | [TBC] |
 | **Rev Rec Forecast Rule** | [TBC] | [TBC] | [TBC] |
 

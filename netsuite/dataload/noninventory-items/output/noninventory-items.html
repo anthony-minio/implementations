@@ -105,11 +105,11 @@ Draft v1, Departments Draft v1 and Items</td>
 <tr class="odd">
 <td><strong>Filled</strong></td>
 <td>External ID, Item Name, Display Name/Code, Class, Subsidiary,
-Include Children, Income account</td>
+Include Children, Income account, Deferred Revenue account</td>
 </tr>
 <tr class="even">
 <td><strong>Open</strong></td>
-<td>8 columns. Department stays blank for now. Most are set per item
+<td>7 columns. Department stays blank for now. Most are set per item
 group, under Values by group</td>
 </tr>
 <tr class="odd">
@@ -124,8 +124,10 @@ group, under Values by group</td>
 <p><code>MINIO_-_Noninventory_for_Sale.csv</code> as it stands: 11 rows,
 16 columns. Blank cells are still open. Scroll sideways to see every
 column.</p>
-<p>External ID and Item Name both use the item ID. Item Name is the
-code; Display Name/Code is the name sales and customers read.</p>
+<p>External ID and Item Name both use the item ID. Item Name/Number is
+the code and the import key. Display Name/Code is the readable name;
+NetSuite prints it on forms instead of the code when it is set. Sales
+Description is the longer line text on quotes and invoices.</p>
 <div class="wide">
 <table>
 <colgroup>
@@ -178,7 +180,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>41200 Support Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -196,7 +198,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>41200 Support Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -214,7 +216,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>41200 Support Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -232,7 +234,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>41200 Support Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -250,7 +252,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>41200 Support Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -268,7 +270,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>42200 Training Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -286,7 +288,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>42200 Training Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -304,7 +306,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>42200 Training Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -322,7 +324,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>41100 License Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -340,7 +342,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>41100 License Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -358,7 +360,7 @@ code; Display Name/Code is the name sales and customers read.</p>
 <td></td>
 <td></td>
 <td>41100 License Revenue</td>
-<td></td>
+<td>23100 Deferred Revenue - ST</td>
 <td></td>
 <td></td>
 <td></td>
@@ -408,9 +410,9 @@ code; Display Name/Code is the name sales and customers read.</p>
 </tr>
 <tr class="even">
 <td><strong>Deferred Revenue account</strong></td>
-<td>[TBC: 23100 Deferred Revenue - ST proposed]</td>
-<td>[TBC]</td>
-<td>[TBC]</td>
+<td>23100 Deferred Revenue - ST</td>
+<td>23100 Deferred Revenue - ST</td>
+<td>23100 Deferred Revenue - ST</td>
 </tr>
 <tr class="odd">
 <td><strong>Revenue Recogition Rule</strong></td>
@@ -472,15 +474,6 @@ Ltd.</td>
 <section id="open-questions" class="level1">
 <h1>Open questions</h1>
 <ol type="1">
-<li><strong>Deferred Revenue account.</strong> COA Draft v1 has 23100
-Deferred Revenue - ST, 23200 Deferred Revenue - LT, and under 23200:
-23210 Deferred Revenue Unbilled, 23220 Deferred Revenue Billed, 23230
-Deferred Revenue Paid. Which one do the items post to? An item takes one
-account, so NetSuite does not split short and long term on the
-transaction. Proposed: post to 23100 and reclass the part beyond 12
-months to 23200 with a period-end journal entry. Unbilled, Billed and
-Paid look carried over from Sage’s contract revenue setup; confirm
-whether they are still needed.</li>
 <li><strong>Account format.</strong> The CSV uses number and name, such
 as <code>41100 License Revenue</code>. Confirm on a test import that
 NetSuite matches it; child accounts may need the full path.</li>
@@ -499,6 +492,16 @@ ready when there are.</li>
 <li><strong>Template header.</strong> The template spells
 <code>Revenue Recogition Rule</code>. Kept as is; it only needs to match
 when mapping the import.</li>
+<li><strong>Long-term deferred revenue.</strong> Items post to 23100
+Deferred Revenue - ST. The part earned more than 12 months out is
+reclassed to 23200 Deferred Revenue - LT by a period-end journal entry.
+Confirm the Unbilled, Billed and Paid accounts under 23200 are still
+needed.</li>
+<li><strong>Show Display Name with Item Codes.</strong> Setup &gt;
+Company &gt; General Preferences. Shows code and name together in item
+fields. If turned on, later CSV imports that reference items need the
+display name too, or fail with Invalid Parent Reference Key. Decide
+before the sales order and invoice loads.</li>
 </ol>
 </section>
 </main>
