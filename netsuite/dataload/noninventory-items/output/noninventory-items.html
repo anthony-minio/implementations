@@ -514,6 +514,16 @@ Company &gt; General Preferences. Shows code and name together in item
 fields. If turned on, later CSV imports that reference items need the
 display name too, or fail with Invalid Parent Reference Key. Decide
 before the sales order and invoice loads.</li>
+<li><strong>License delivery trigger.</strong> License keys are issued
+manually; the issue date (available in BigQuery operating data) should
+drive invoicing and the revenue start. Options: (a) Can be
+fulfilled/received = Yes on license items and a fulfillment posted when
+the key is issued, with revenue plans created on fulfillment; (b) a
+custom revenue recognition event, created by script or integration; (c)
+no fulfillment, with the revenue start date set on the order line from
+the key issue date. Decide before the load: whether Can be
+fulfilled/received can change after items are used on transactions is
+unclear.</li>
 </ol>
 </section>
 </main>
