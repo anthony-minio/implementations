@@ -105,11 +105,12 @@ Draft v1, Departments Draft v1 and Items</td>
 <tr class="odd">
 <td><strong>Filled</strong></td>
 <td>External ID, Item Name, Display Name/Code, Class, Subsidiary,
-Include Children, Income account, Deferred Revenue account</td>
+Include Children, Sales Description, Income account, Deferred Revenue
+account</td>
 </tr>
 <tr class="even">
 <td><strong>Open</strong></td>
-<td>7 columns. Department stays blank for now. Most are set per item
+<td>6 columns. Department stays blank for now. Most are set per item
 group, under Values by group</td>
 </tr>
 <tr class="odd">
@@ -177,7 +178,8 @@ Description is the longer line text on quotes and invoices.</p>
 <td>Support</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO support: direct-to-engineer support through SUBNET with a
+1-hour response SLA and unlimited Panic Buttons.</td>
 <td></td>
 <td>41200 Support Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -195,7 +197,8 @@ Description is the longer line text on quotes and invoices.</p>
 <td>Support</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO support: direct-to-engineer support through SUBNET with a
+4-hour response SLA and unlimited Panic Buttons.</td>
 <td></td>
 <td>41200 Support Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -213,7 +216,8 @@ Description is the longer line text on quotes and invoices.</p>
 <td>Support</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO support: direct-to-engineer support through SUBNET with a
+24-hour response SLA and 1 Panic Button per year.</td>
 <td></td>
 <td>41200 Support Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -231,7 +235,8 @@ Description is the longer line text on quotes and invoices.</p>
 <td>Support</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO support: direct-to-engineer support through SUBNET with a
+48-hour response SLA and 1 Panic Button per year.</td>
 <td></td>
 <td>41200 Support Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -249,7 +254,8 @@ Description is the longer line text on quotes and invoices.</p>
 <td>Support</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO support: direct-to-engineer support through SUBNET with a
+5-business-day response SLA. No Panic Buttons.</td>
 <td></td>
 <td>41200 Support Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -267,7 +273,7 @@ Description is the longer line text on quotes and invoices.</p>
 <td>Training</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO training: 3-day live virtual class.</td>
 <td></td>
 <td>42200 Training Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -285,7 +291,7 @@ Description is the longer line text on quotes and invoices.</p>
 <td>Training</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO training: 4-day live virtual class.</td>
 <td></td>
 <td>42200 Training Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -303,7 +309,8 @@ Description is the longer line text on quotes and invoices.</p>
 <td>Training</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO Learning Subscription for one learner: on-demand courses and
+hands-on labs on the MinIO Academy platform.</td>
 <td></td>
 <td>42200 Training Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -321,7 +328,7 @@ Description is the longer line text on quotes and invoices.</p>
 <td>License</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO AIStor software license.</td>
 <td></td>
 <td>41100 License Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -339,7 +346,8 @@ Description is the longer line text on quotes and invoices.</p>
 <td>License</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO AIStor software license for OEM partners, for resale to their
+customers.</td>
 <td></td>
 <td>41100 License Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -357,7 +365,8 @@ Description is the longer line text on quotes and invoices.</p>
 <td>License</td>
 <td>MinIO, Inc.</td>
 <td>Yes</td>
-<td></td>
+<td>MinIO MemKV software license: distributed context memory store for
+AI inference.</td>
 <td></td>
 <td>41100 License Revenue</td>
 <td>23100 Deferred Revenue - ST</td>
@@ -450,7 +459,7 @@ Ltd.</td>
 </tr>
 <tr class="odd">
 <td><strong>Sales Description</strong></td>
-<td>[TBC: repeat the Display Name/Code, or other text]</td>
+<td>Set per item, in the load file. No terms, dates or prices</td>
 </tr>
 <tr class="even">
 <td><strong>Base Price</strong></td>
@@ -481,7 +490,10 @@ NetSuite matches it; child accounts may need the full path.</li>
 accounts and rule as the direct licenses?</li>
 <li><strong>Platform training subscription.</strong> Is it recognized
 like the live trainings or like a subscription?</li>
-<li><strong>Base Price.</strong> Do these items have list prices?</li>
+<li><strong>Base Price.</strong> Do these items have list prices? How
+AIStor and MemKV licenses are measured (for example per TiB) is not
+known or may not be standard; the license descriptions leave the unit
+out for now.</li>
 <li><strong>Classes in production.</strong> License, Support, Training
 and Professional Services must exist in production before this
 load.</li>
