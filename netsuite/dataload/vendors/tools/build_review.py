@@ -92,7 +92,7 @@ for r in sage:
     sid = G(r, "Vendor ID")
     rp = ramp.get(sid)
     c = {f: ["", ""] for f in FIELDS}
-    flags, qc = [], []
+    flags, qc = [], ["Ramp matched" if rp else "Sage only"]
     def S(f, v, src="sage"):
         v = (v or "").strip()
         c[f] = [v, src if v else ""]
@@ -240,15 +240,59 @@ for r in sage:
     flags = flags if FULL else [mask(f) for f in flags]
     out.append({"cells": page, "review": review, "flags": flags, "active": bool(last and last >= ACTIVE_FROM)})
 
+# Ramp-only vendors: in Ramp with no Sage vendor. The Ramp sync creates them in NetSuite; shown for completeness.
+for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
+    c = {f: ["", ""] for f in FIELDS}
+    def R(f, v):
+        v = (v or "").strip().lstrip("'")
+        c[f] = [v, "ramp" if v else ""]
+    R("companyName", rp["Display name"] or rp["Vendor name"])
+    R("legalName", rp["Vendor legal name"])
+    R("email", rp["Contact email"]); R("phone", rp["Contact phone number"])
+    if rp["Check mailing address line 1"].strip():
+        R("address1_line1", rp["Check mailing address line 1"]); R("address1_line2", rp["Check mailing address line 2"])
+        R("address1_city", rp["Check mailing city"].strip(" ,")); R("address1_state", rp["Check mailing state/province/region"])
+        R("address1_zipCode", rp["Check mailing zip/postal code"])
+        c["address1_country"] = [code_to_country.get(rp["Check mailing country code"].strip(), rp["Check mailing country code"].strip()), "ramp"]
+    if rp["Net payment terms (days)"].strip():
+        c["terms"] = [term(rp["Net payment terms (days)"]), "ramp"]
+    R("taxIdNum", rp["Taxpayer identification number (TIN)"])
+    c["subsidiary"] = ["MinIO, Inc.", "rule"]
+    c["Source System"] = ["Ramp", "rule"]
+    rb = bool(rp["Default ACH account number"].strip())
+    bk = ["Ramp", rp["Default bank name"].strip(), "", rp["Default ACH routing number"].strip(), rp["Default ACH account number"].strip()] if rb else ["", "", "", "", ""]
+    if rb:
+        bank_file.append(["", "", rp["Vendor name"]] + bk)
+    added = [["Ramp only", "rule"], ["", ""], [rp["Vendor ID"], "ramp"], ["Yes", "rule"], ["Ramp" if rb else "", "rule" if rb else ""],
+             [bk[0], "rule" if bk[0] else ""], [bk[1], "ramp" if bk[1] else ""], ["", ""],
+             [bk[3], "ramp" if bk[3] else ""], [bk[4], "ramp" if bk[4] else ""]]
+    cells = [c[f] for f in FIELDS] + added
+    page = [[v if FULL else mask(v), src] for v, src in cells]
+    if not FULL:
+        for j in (FIELDS.index("taxIdNum"), len(FIELDS) + ADDED.index("Bank Routing Number"), len(FIELDS) + ADDED.index("Bank Account Number")):
+            if cells[j][0]:
+                page[j][0] = "•••" + re.sub(r"\W", "", cells[j][0])[-4:]
+    last = date(rp["Last spend date"])
+    review = ["", last.isoformat() if last else "", f"{float(rp['Total 365 day spend'] or 0):,.2f}", rp["Ramp category"], rp["Owner name"], rp["Department"]]
+    out.append({"cells": page, "review": review, "flags": ["Created by the Ramp sync; no Sage vendor"], "active": bool(last and last >= ACTIVE_FROM)})
+
 QI = len(FIELDS)
-rank = {"Subsidiary to confirm": 0, "Duplicate to review": 1}
-out.sort(key=lambda x: (min([rank.get(q, 9) for q in x["cells"][QI][0].split("; ") if q] or [9]), x["cells"][1][0]))
+GROUP = {"Ramp only": 0, "Ramp matched": 1, "Sage only": 2}
+EXTRA = {"Subsidiary to confirm": 0, "Duplicate to review": 1}
+def order(x):
+    q = x["cells"][QI][0].split("; ")
+    return (GROUP.get(q[0], 3), min([EXTRA.get(p, 9) for p in q[1:]] or [9]), x["cells"][FIELDS.index("companyName")][0].lower())
+out.sort(key=order)
 
 export = list(csv.reader(open(EXPORT, encoding="utf-8-sig")))
 rep = [x for x in csv.reader(open(REPORT, encoding="utf-8-sig")) if re.match(r"(V-?\d+|RMP_\d+)$", x[0].strip())]
 bridge = {"export": len(export) - 1, "onetime": [(x[0], x[1]) for x in export[1:] if x[7] == "True"],
-          "report": len(rep), "inactive": sum(1 for x in rep if x[8] != "Active"), "active": len(out),
-          "in_ramp": sum(1 for x in out if x["cells"][QI + 3][0] == "Yes"), "ramp_total": len(ramp_rows),
+          "report": len(rep), "inactive": sum(1 for x in rep if x[8] != "Active"), "active": sum(1 for x in out if not x["cells"][QI][0].startswith("Ramp only")),
+          "in_ramp": sum(1 for x in out if x["cells"][QI][0].startswith("Ramp matched")), "ramp_total": len(ramp_rows),
+          "sage_only": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only")),
+          "sage_only_recent": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only") and x["active"]),
+          "sage_only_none": sum(1 for x in out if x["cells"][QI][0].startswith("Sage only") and not x["review"][1]),
+          "bank": {"ramp": sum(1 for b in bank_file if b[3] == "Ramp"), "sage": sum(1 for b in bank_file if b[3] == "Sage")},
           "ramp_only": [r["Vendor name"] for r in ramp_rows if not r["Sage Intacct ID"].strip()]}
 data = {"cols": COLS + ADDED, "fields": FIELDS + ADDED, "required": ["Company Name"], "review": REVIEW, "rows": out,
         "renumber": renumber, "last_std": f"V-{max(std):05d}", "next_id": f"V-{nxt:05d}", "bridge": bridge}
@@ -260,7 +304,10 @@ if FULL:
               .replace("Bank details (masked)", "Bank details").replace("The masked bank columns", "The bank columns")
               .replace("Routing and account numbers show the last 4 digits only; the full values are in a separate bank file that is not circulated.",
                        "Routing and account numbers are shown in full in this version.")
-              .replace("full in the load file, last 4 digits here.", "shown in full in this version."))
+              .replace("full in the load file, last 4 digits here.", "shown in full in this version.")
+              .replace("routing and account numbers show the last 4 digits only; the full values are in a separate bank file that is not circulated.",
+                       "routing and account numbers are shown in full in this version.")
+              .replace("<title>NetSuite Vendor Load</title>", "<title>NetSuite Vendor Load (Full)</title>"))
 open("data/vendor-review-full.html" if FULL else "data/vendor-review.html", "w", encoding="utf-8").write(
     tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
 with open("data/vendor-bank-details.csv", "w", newline="", encoding="utf-8-sig") as o:
@@ -275,6 +322,6 @@ with open("data/vendor-load.csv", "w", newline="", encoding="utf-8-sig") as o:
     for cells in load_rows:
         if cells[QI + 3][0] == "No":
             w.writerow([x[0] for x in cells[:NB]])
-print(f"{len(out)} active Sage vendors; {bridge['in_ramp']} in Ramp; {len(out) - bridge['in_ramp']} to load -> data/vendor-load.csv")
+print(f"{len(out)} rows ({len(out) - len(bridge['ramp_only'])} active Sage vendors + {len(bridge['ramp_only'])} Ramp only); {bridge['in_ramp']} Ramp matched; {bridge['sage_only']} Sage only -> data/vendor-load.csv")
 print(f"bank details for {len(bank_file)} vendors -> data/vendor-bank-details.csv (local only)")
 print(f"renumbered {len(renumber)} ({min(renumber.values())} to {max(renumber.values())}); next {data['next_id']}")

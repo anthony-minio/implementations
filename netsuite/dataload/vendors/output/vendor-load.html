@@ -1,4 +1,4 @@
-<title>NetSuite vendor load</title>
+<title>NetSuite vendor column mapping</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
@@ -66,7 +66,7 @@ button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2p
 
 <main class="doc">
   <header class="doc-head">
-    <h1 class="doc-title">NetSuite vendor load</h1>
+    <h1 class="doc-title">NetSuite vendor column mapping</h1>
     <p class="doc-sub">Vendor import:
 MINIO_Vendor_Template_10192026.xlsx</p>
     <div class="doc-meta">
@@ -94,27 +94,21 @@ columns, tabs Field Restrictions, Vendor Template, Vendor Category</td>
 when the vendor is an individual</td>
 </tr>
 <tr class="odd">
-<td><strong>Source of truth</strong></td>
-<td>Sage Intacct vendor detail export, 1,770 active vendors</td>
+<td><strong>Sources</strong></td>
+<td>Ramp vendor export, 578 vendors, synced to NetSuite by Ramp. Sage
+Intacct vendor detail export, 1,770 active vendors. 551 Ramp vendors
+carry the Sage vendor ID, so the link is exact</td>
 </tr>
 <tr class="even">
-<td><strong>Enrichment</strong></td>
-<td>Ramp vendor export, 578 vendors. 551 carry the Sage vendor ID, so
-the link is exact</td>
+<td><strong>Bank details</strong></td>
+<td>Not in the template: a separate import, Ramp’s details first, else
+Sage’s</td>
 </tr>
 <tr class="odd">
-<td><strong>Not loaded</strong></td>
-<td>Bank details (ACH and wire). The template has no bank fields</td>
-</tr>
-<tr class="even">
-<td><strong>Review table</strong></td>
-<td>Every active Sage vendor mapped to the template, with Ramp coverage
-and flags: https://claude.ai/artifact/43aBdfBgsyuiGNHAtGPSsw</td>
-</tr>
-<tr class="odd">
-<td><strong>Status</strong></td>
-<td>Scope and rules agreed 2026-10-26. Load plan and remaining questions
-below</td>
+<td><strong>Vendor load document</strong></td>
+<td>The table of every vendor, with the breakdown, load plan, bank
+details and open questions in its Notes:
+https://claude.ai/artifact/43aBdfBgsyuiGNHAtGPSsw</td>
 </tr>
 </tbody>
 </table>
@@ -296,227 +290,6 @@ Duplicate Action, Ramp Category, Owner, Department, Last activity
 (latest of Sage last bill, Sage last payment, Ramp last spend), Ramp
 365-day spend, Flags.</p>
 </section>
-</section>
-<section id="scope" class="level1">
-<h1>Scope</h1>
-<p>Sage has 1,770 active vendors, but most have no recorded activity.
-Activity is the latest of Sage last bill, Sage last payment and Ramp
-last spend.</p>
-<table>
-<thead>
-<tr class="header">
-<th><strong>Activity</strong></th>
-<th><strong>In Ramp</strong></th>
-<th><strong>Not in Ramp</strong></th>
-<th><strong>Total</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Since 2024-10-26</strong></td>
-<td>478</td>
-<td>85</td>
-<td>563</td>
-</tr>
-<tr class="even">
-<td><strong>Before 2024-10-26</strong></td>
-<td>8</td>
-<td>292</td>
-<td>300</td>
-</tr>
-<tr class="odd">
-<td><strong>None recorded</strong></td>
-<td>65</td>
-<td>842</td>
-<td>907</td>
-</tr>
-<tr class="even">
-<td><strong>Total</strong></td>
-<td>551</td>
-<td>1,219</td>
-<td>1,770</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr class="header">
-<th><strong>Sage vendor type</strong></th>
-<th><strong>Vendors</strong></th>
-<th><strong>Never billed in Sage</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Blank</strong></td>
-<td>922</td>
-<td>565</td>
-</tr>
-<tr class="even">
-<td><strong>Credit Cards</strong></td>
-<td>427</td>
-<td>418</td>
-</tr>
-<tr class="odd">
-<td><strong>MinIO employee</strong></td>
-<td>136</td>
-<td>62</td>
-</tr>
-<tr class="even">
-<td><strong>AR reseller</strong></td>
-<td>127</td>
-<td>125</td>
-</tr>
-<tr class="odd">
-<td><strong>1099 Vendor</strong></td>
-<td>88</td>
-<td>17</td>
-</tr>
-<tr class="even">
-<td><strong>Tax</strong></td>
-<td>28</td>
-<td>15</td>
-</tr>
-<tr class="odd">
-<td><strong>Other types</strong></td>
-<td>42</td>
-<td>18</td>
-</tr>
-</tbody>
-</table>
-<p>The export of all active vendors lists 1,775. The 5 not in the detail
-export are flagged One-time use in Sage. The Sage vendor list report has
-1,788: the 1,775 plus 13 inactive.</p>
-<p>27 Ramp vendors have no Sage vendor, for example KPMG LLP, Baker
-Botts LLP, Oracle America and Navan.</p>
-</section>
-<section id="load-plan" class="level1">
-<h1>Load plan</h1>
-<p>Agreed 2026-10-26: Ramp syncs first, then NetSuite is enriched with
-what Ramp does not push. Every active Sage vendor ends up in
-NetSuite.</p>
-<ol type="1">
-<li><strong>Ramp sync.</strong> Ramp syncs its 578 vendors to NetSuite,
-including the 27 Ramp vendors not in Sage (added in Ramp from 2025-08
-on, 23 with no spend yet).</li>
-<li><strong>Sage vendors not in Ramp.</strong> This load: the 1,219
-active Sage vendors that are not in Ramp, mapped as above.</li>
-<li><strong>Enrichment.</strong> The 551 vendors in both systems get
-Sage values Ramp does not hold: Sage Vendor ID, Vendor Category, default
-expense account, 1099 flag, tax ID where Ramp has none. Ramp-created
-NetSuite vendors carry no Sage ID, so after the sync the enrichment file
-is matched to them by Ramp vendor name and Ramp Vendor ID, then re-keyed
-to the NetSuite internal ID before import.</li>
-<li><strong>Bank details.</strong> Ramp does not push bank details to
-NetSuite, so every vendor’s bank details are imported separately: Ramp’s
-where Ramp has them (Ramp is primary), else Sage’s.</li>
-</ol>
-<section id="bank-details" class="level2">
-<h2>Bank details</h2>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th><strong>Vendors</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>ACH details in Sage</strong></td>
-<td>164</td>
-</tr>
-<tr class="even">
-<td><strong>ACH details in Ramp (vendors with a Sage ID)</strong></td>
-<td>174</td>
-</tr>
-<tr class="odd">
-<td><strong>In both</strong></td>
-<td>70 (last 4 digits agree on 65, differ on 5)</td>
-</tr>
-<tr class="even">
-<td><strong>Sage only</strong></td>
-<td>94 (13 in Ramp without bank details, 81 not in Ramp)</td>
-</tr>
-<tr class="odd">
-<td><strong>Ramp only</strong></td>
-<td>104</td>
-</tr>
-</tbody>
-</table>
-<p>Ramp is primary where both exist, including the 5 that differ. The
-vendor template has no bank fields, so bank details need their own
-NetSuite import (vendor bank details record): 268 vendors, Ramp’s
-details for 174 and Sage’s for 94.</p>
-</section>
-<section id="vendor-types-against-ramp" class="level2">
-<h2>Vendor types against Ramp</h2>
-<table>
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th><strong>Sage vendor type</strong></th>
-<th><strong>Vendors</strong></th>
-<th><strong>In Ramp</strong></th>
-<th><strong>Note</strong></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>Credit Cards</strong></td>
-<td>427</td>
-<td>123</td>
-<td>“Never billed” means no AP bill in Sage: card purchases are booked
-from the card feed, not as bills. 122 of the 123 in Ramp have Ramp
-spend. The other 304 are card merchants from before Ramp, plus the card
-accounts themselves (for example Mastercard - 3584, CHASE CC - ALL
-CREDIT CARDS)</td>
-</tr>
-<tr class="even">
-<td><strong>MinIO employee</strong></td>
-<td>136</td>
-<td>1</td>
-<td>74 were reimbursed through Sage bills. Ramp reimbursements sync to
-NetSuite as vendor bills with the employee as the vendor (or one default
-reimbursement vendor), so employee vendor records are the right
-home</td>
-</tr>
-<tr class="odd">
-<td><strong>AR reseller</strong></td>
-<td>127</td>
-<td>9</td>
-<td>2 billed in Sage</td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="open-questions" class="level1">
-<h1>Open questions</h1>
-<ol type="1">
-<li><strong>Subsidiary for INR and SGD vendors.</strong> None of these
-has activity in Ramp or bills in Sage. The INR vendors look like MinIO
-Pvt. Ltd. vendors (India tax, the India office, Indian accountants):
-V-01301 TDS Tax Payable, V-01311 Universal Actuaries and Benefit
-Consultants, V-01352 and V-01353 Zoho Corporation Private Limited,
-V-01354 91 Springboard Business Hub Private Limited, V-01380 Resurgent
-India Limited, V-01381 National Securities Depository Limited, V-01412 S
-P Nagarajan, V-01459 Vishnu Daya &amp; Co LLP. SGD: V-00628 Cloud Expo
-Asia Pte. Ltd. Load them to MinIO Pvt. Ltd. and MinIO Singapore Pte.
-Ltd., or to MinIO, Inc.? Several INR vendors have United States as their
-Sage country.</li>
-<li><strong>Bank details import.</strong> SOA to provide the template
-for vendor bank details.</li>
-<li><strong>Enrichment matching.</strong> After the Ramp sync, SOA to
-export NetSuite vendors (internal ID, name) so the enrichment and bank
-files can be keyed to the Ramp-created records. Can Ramp’s External ID
-field carry the Sage vendor ID into NetSuite, which would make the match
-exact?</li>
-</ol>
 </section>
 </main>
 

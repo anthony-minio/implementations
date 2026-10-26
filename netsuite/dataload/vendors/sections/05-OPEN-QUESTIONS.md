@@ -1,5 +1,0 @@
-# Open questions
-
-1. **Subsidiary for INR and SGD vendors.** None of these has activity in Ramp or bills in Sage. The INR vendors look like MinIO Pvt. Ltd. vendors (India tax, the India office, Indian accountants): V-01301 TDS Tax Payable, V-01311 Universal Actuaries and Benefit Consultants, V-01352 and V-01353 Zoho Corporation Private Limited, V-01354 91 Springboard Business Hub Private Limited, V-01380 Resurgent India Limited, V-01381 National Securities Depository Limited, V-01412 S P Nagarajan, V-01459 Vishnu Daya & Co LLP. SGD: V-00628 Cloud Expo Asia Pte. Ltd. Load them to MinIO Pvt. Ltd. and MinIO Singapore Pte. Ltd., or to MinIO, Inc.? Several INR vendors have United States as their Sage country.
-2. **Bank details import.** SOA to provide the template for vendor bank details.
-3. **Enrichment matching.** After the Ramp sync, SOA to export NetSuite vendors (internal ID, name) so the enrichment and bank files can be keyed to the Ramp-created records. Can Ramp's External ID field carry the Sage vendor ID into NetSuite, which would make the match exact?
