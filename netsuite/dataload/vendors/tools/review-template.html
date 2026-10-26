@@ -125,7 +125,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
       <li><b>Terms.</b> Sage terms, else Ramp net terms, mapped to the NetSuite list: Sage "15 days" becomes Net 15.</li>
       <li><b>Accounts.</b> Default Expense Account from the Sage default expense account, translated through the Sage# column of COA Draft v1. Default Payables Account 20100 Accounts Payable - Trade for every vendor.</li>
       <li><b>Tax ID and 1099.</b> Tax ID from Sage, else Ramp's TIN; full in the load file, last 4 digits here. 1099 Eligible is TRUE where Sage has a Form 1099 type or the vendor type is 1099 Vendor.</li>
-      <li><b>Bank details.</b> Not in the vendor template and not shown here. Bank Details says where they are held (Sage, Ramp, or both and whether the last 4 digits agree). They need their own NetSuite import.</li>
+      <li><b>Bank details.</b> Not in the vendor template, so they need their own NetSuite import. Bank Details says where they are held (Sage, Ramp, or both and whether the last 4 digits agree). The masked bank columns show the details to load: Ramp's where Ramp has them (more recent), else Sage's. Routing and account numbers show the last 4 digits only; the full values are in a separate bank file that is not circulated.</li>
       <li><b>Duplicates.</b> Vendors with the same name are marked "Duplicate to review". No merges yet.</li>
     </ol>
   </section>
@@ -135,7 +135,7 @@ td.flags { font-family: var(--font-ui); white-space: normal; min-width: 16rem; m
 const DATA = /*DATA*/null;
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const GROUPS = [["Identity", 9], ["Contact and delivery", 8], ["Address 1", 12], ["Address 2", 12], ["Financial", 18], ["Source", 2], ["Added columns", 5]];
+const GROUPS = [["Identity", 9], ["Contact and delivery", 8], ["Address 1", 12], ["Address 2", 12], ["Financial", 18], ["Source", 2], ["Added columns", 5], ["Bank details (masked)", 5]];
 const flagKey = (f) => f.replace(/:.*/, "");
 const COL = (n) => DATA.cols.indexOf(n);
 const WARN = new Set(["Duplicate name", "Bank account differs between Sage and Ramp", "Vendor type not on the category list", "Individual without first and last name", "Tax ID longer than 15 characters"]);

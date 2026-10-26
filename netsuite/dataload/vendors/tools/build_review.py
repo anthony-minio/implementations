@@ -2,9 +2,11 @@
 # Build the vendor review page and load files: active Sage vendors mapped to the SOA vendor template, enriched from Ramp.
 #   python3 tools/build_review.py   (run from the vendors folder; reads data/, writes data/)
 # Bank account details are never written to the page. Tax IDs are masked on the page and full in the load file.
-import csv, datetime as dt, json, re
+import csv, datetime as dt, json, re, sys
 import openpyxl
 
+# --full writes an unmasked copy (data/vendor-review-full.html) for the controller and AP. It is never published.
+FULL = "--full" in sys.argv
 TODAY = dt.date(2026, 10, 26)
 ACTIVE_FROM = dt.date(2024, 10, 26)
 SAGE = "data/sage-vendors-all-detail-20261025.csv"
@@ -52,7 +54,8 @@ COLS = [c.value for c in openpyxl.load_workbook("MINIO_Vendor_Template_10192026.
 FIELDS = [c.value for c in openpyxl.load_workbook("MINIO_Vendor_Template_10192026.xlsx")["Vendor Template"][1] if c.value]
 assert len(COLS) == len(FIELDS) == 61
 REQUIRED = {"companyName"}
-ADDED = ["Question Categories", "Sage Vendor ID", "Ramp Vendor ID", "In Ramp", "Bank Details"]
+ADDED = ["Question Categories", "Sage Vendor ID", "Ramp Vendor ID", "In Ramp", "Bank Details",
+         "Bank Source", "Bank Name", "Bank Account Type", "Bank Routing Number", "Bank Account Number"]
 REVIEW = ["Sage type", "Last activity", "Ramp 365-day spend", "Ramp category", "Ramp owner", "Ramp department"]
 
 # Vendor ID: keep V-#####; older V##### and Ramp-created RMP_# get the next numbers after the highest V-#####.
@@ -84,7 +87,7 @@ names = {}
 for r in sage:
     names.setdefault(re.sub(r"[^a-z0-9]", "", G(r, "Vendor name").lower()), []).append(G(r, "Vendor ID"))
 
-out, load_rows = [], []
+out, load_rows, bank_file = [], [], []
 for r in sage:
     sid = G(r, "Vendor ID")
     rp = ramp.get(sid)
@@ -198,6 +201,16 @@ for r in sage:
             flags.append("Bank account differs between Sage and Ramp")
     else:
         bank = "Sage" if sb else "Ramp" if rb else ""
+    # Bank details to load: Ramp where it has them (more recent), else Sage. Full values go to the bank file only.
+    if rb:
+        bk = ["Ramp", rp["Default bank name"].strip(), "", rp["Default ACH routing number"].strip(), rp["Default ACH account number"].strip()]
+    elif sb:
+        bk = ["Sage", G(r, "Name of bank"), G(r, "ACH account type") or G(r, "Account classification"),
+              G(r, "ACH bank routing number"), G(r, "ACH account number")]
+    else:
+        bk = ["", "", "", "", ""]
+    if any(bk[3:]):
+        bank_file.append([vid, sid, G(r, "Vendor name")] + bk)
     k = re.sub(r"[^a-z0-9]", "", G(r, "Vendor name").lower())
     dup = [x for x in names[k] if x != sid]
     if dup:
@@ -208,16 +221,23 @@ for r in sage:
     if not last:
         flags.append("No activity recorded")
     added = [["; ".join(qc), "rule" if qc else ""], [sid, "sage"], [rp["Vendor ID"] if rp else "", "ramp" if rp else ""],
-             ["Yes" if rp else "No", "rule"], [bank, "rule" if bank else ""]]
+             ["Yes" if rp else "No", "rule"], [bank, "rule" if bank else ""],
+             [bk[0], "rule" if bk[0] else ""], [bk[1], ("ramp" if bk[0] == "Ramp" else "sage") if bk[1] else ""],
+             [bk[2], "sage" if bk[2] else ""], [bk[3], ("ramp" if bk[0] == "Ramp" else "sage") if bk[3] else ""],
+             [bk[4], ("ramp" if bk[0] == "Ramp" else "sage") if bk[4] else ""]]
     review = [t, last.isoformat() if last else "", f"{float(rp['Total 365 day spend'] or 0):,.2f}" if rp else "",
               rp["Ramp category"] if rp else "", rp["Owner name"] if rp else "", rp["Department"] if rp else ""]
     cells = [c[f] for f in FIELDS] + added
     load_rows.append(cells)
-    page = [[mask(v), src] for v, src in cells]
+    page = [[v if FULL else mask(v), src] for v, src in cells]
+    for k in ("Bank Routing Number", "Bank Account Number"):
+        j = len(FIELDS) + ADDED.index(k)
+        if cells[j][0] and not FULL:
+            page[j][0] = "•••" + re.sub(r"\W", "", cells[j][0])[-4:]
     ti = FIELDS.index("taxIdNum")
-    if page[ti][0]:
+    if page[ti][0] and not FULL:
         page[ti][0] = "•••" + re.sub(r"\W", "", cells[ti][0])[-4:]
-    flags = [mask(f) for f in flags]
+    flags = flags if FULL else [mask(f) for f in flags]
     out.append({"cells": page, "review": review, "flags": flags, "active": bool(last and last >= ACTIVE_FROM)})
 
 QI = len(FIELDS)
@@ -233,14 +253,28 @@ bridge = {"export": len(export) - 1, "onetime": [(x[0], x[1]) for x in export[1:
 data = {"cols": COLS + ADDED, "fields": FIELDS + ADDED, "required": ["Company Name"], "review": REVIEW, "rows": out,
         "renumber": renumber, "last_std": f"V-{max(std):05d}", "next_id": f"V-{nxt:05d}", "bridge": bridge}
 tpl = open("tools/review-template.html", encoding="utf-8").read()
-open("data/vendor-review.html", "w", encoding="utf-8").write(
+if FULL:
+    tpl = (tpl.replace("Tax IDs show the last 4 digits only; bank account numbers are not shown.",
+                       "Full version for the controller and AP: tax IDs and bank details are shown in full. Do not circulate further.")
+              .replace("<title>Vendor Load Review</title>", "<title>Vendor Load Review (Full)</title>")
+              .replace("Bank details (masked)", "Bank details").replace("The masked bank columns", "The bank columns")
+              .replace("Routing and account numbers show the last 4 digits only; the full values are in a separate bank file that is not circulated.",
+                       "Routing and account numbers are shown in full in this version.")
+              .replace("full in the load file, last 4 digits here.", "shown in full in this version."))
+open("data/vendor-review-full.html" if FULL else "data/vendor-review.html", "w", encoding="utf-8").write(
     tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")))
+with open("data/vendor-bank-details.csv", "w", newline="", encoding="utf-8-sig") as o:
+    w = csv.writer(o)
+    w.writerow(["Vendor ID", "Sage Vendor ID", "Vendor name", "Bank Source", "Bank Name", "Bank Account Type", "Routing Number", "Account Number"])
+    w.writerows(bank_file)
 with open("data/vendor-load.csv", "w", newline="", encoding="utf-8-sig") as o:
     w = csv.writer(o)
-    w.writerow(FIELDS + ADDED)
-    w.writerow(COLS + ADDED)
+    NB = len(FIELDS) + ADDED.index("Bank Source")  # bank columns live in the bank file, not the load file
+    w.writerow((FIELDS + ADDED)[:NB])
+    w.writerow((COLS + ADDED)[:NB])
     for cells in load_rows:
         if cells[QI + 3][0] == "No":
-            w.writerow([x[0] for x in cells])
+            w.writerow([x[0] for x in cells[:NB]])
 print(f"{len(out)} active Sage vendors; {bridge['in_ramp']} in Ramp; {len(out) - bridge['in_ramp']} to load -> data/vendor-load.csv")
+print(f"bank details for {len(bank_file)} vendors -> data/vendor-bank-details.csv (local only)")
 print(f"renumbered {len(renumber)} ({min(renumber.values())} to {max(renumber.values())}); next {data['next_id']}")
