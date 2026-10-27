@@ -45,7 +45,7 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 
 ## Validation
 
-`tools/validate_load.py` checks every value in `data/customer-load-draft.csv` against the raw Sage report, the Sage customer list and the Salesforce accounts file, independently of the parser and build: row set, unique IDs, names, address text, city/state/postal code, country, emails, reseller emails, terms, currency, VAT ID, Salesforce ID, Subnet ID, parent, stray characters, label text, encoding and NetSuite field lengths. Run it after every rebuild. 2026-10-26: no issues.
+`tools/validate_load.py` checks every value in `data/customer-load-draft.csv` against the raw Sage report, the Sage customer list and the Salesforce accounts file, independently of the parser and build: row set, unique IDs, names, address text, city/state/postal code, country, emails, reseller emails, terms, currency, VAT ID, Salesforce ID, Subnet ID, parent, stray characters, label text, encoding and NetSuite field lengths. Run it after every rebuild. 2026-10-26: no issues. 2026-10-27: extended to the decisions below (row set without investors and StoreManager, one-time customers, L3Harris split rows, categories, Nisha's Subnet IDs), full country names, phone format and trace to source, and address text moved between fields (no word invented, none lost); no issues, and a test copy with 8 planted errors had all 8 caught.
 
 ## Review page
 
@@ -78,6 +78,12 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 - 2026-10-26: Duplicates merged, 14 groups, 16 records: keep the most recently invoiced record (else more data, then lower ID); merged records' Sage IDs, different addresses (Second and Third Address) and emails carried to the kept record. Added by email domain: Hollister into C-00640, Bank of Nova Scotia C-00039 and C-00049 into C-00405, SITE C-00465 into C-00204 (Subnet ID 478 carried), MoD C-00629 into C-00481. BMC Software and BMC Helix kept separate. `data/customer-load.csv` holds the 632 customers to load.
 - 2026-10-26: VAT ID holds VAT/GST registration numbers only, formatted with the country prefix; US EINs and company registration numbers moved to an added Other Tax ID column.
 - 2026-10-26: Count bridge: 650 active in the first Sage export, minus 2 one-time-use customers not in the customer list report (C-00012, C-00021; open question) = 648, minus 16 merged duplicates = 632 (616 without the 16 investor records).
+
+- 2026-10-27 (meeting with Ming, Nisha, Richard, Tory, Sheng; Nisha on Slack): investor records C00001 to C00016 not loaded, so no renumbering. New categories Chargebee, Marketplace and Other (Event Sponsor, Billing Vendor); MinIO Training Subscription is Direct Customer. AEG Worldwide End Customer, Subnet 779 (the Asana note says 77); Exness Direct Customer, Subnet 669; M S International Direct Customer, Subnet 754; StoreManager C-00036 not loaded. L3Harris: C-00333 695, new C-00642 716 (contract CN-SO0565), new C-00643 720 (CN-SO0603), C-00385 784, C-00562 1026; the new customers copy C-00333. Next number C-00644.
+- 2026-10-27: One-time-use customers C-00012 and C-00021 are active in Sage, so loaded (name only). Due per Contract terms left blank.
+- 2026-10-27: Phone: US numbers (999) 999-9999, others international (+44 20 7885 8888); Sage first, else Salesforce; numbers not valid in the source left out. Needs `pip install phonenumbers`.
+- 2026-10-27: Country names with a comma (Korea, Republic of) were cut to "Republic of" by the parser; fixed. Addresses with parts in the wrong field corrected by moving Sage's own text (`ADDRESS_FIX` in `tools/build_review.py`); country follows the address; no address means no country.
+- 2026-10-27: Workbook `data/MinIO_Customer_Load_to_NetSuite_20261027.xlsx` (tabs Notes, Customers-Draft): 635 rows, 619 to load. Notes give each decision as scenario, decision and change. Built by `tools/build_delivery.py`; the review page's notes are no longer maintained.
 
 ## Template lists
 

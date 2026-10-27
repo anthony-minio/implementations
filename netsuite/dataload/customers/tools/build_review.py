@@ -3,8 +3,9 @@
 #   python3 tools/build_review.py   (run from the customers folder; reads data/, writes data/customer-review.html)
 import csv, datetime as dt, difflib, json, re, unicodedata
 import openpyxl
+import phonenumbers as pn  # pip install phonenumbers
 
-TODAY = dt.date(2026, 10, 26)
+TODAY = dt.date(2026, 10, 27)
 FLAT = "data/sage-customers-flat-20261025.csv"
 LIST = "data/sage-customers-20261026.csv"
 SFDC = "data/sfdc-accounts-customers-20261025.xlsx"  # Lifecycle = Active or Customer, Classic report copy
@@ -32,7 +33,74 @@ def split_emails(*fields):
             if "@" in e and e.lower() not in [x.lower() for x in seen]:
                 seen.append(e)
     return seen
-CATEGORY = {"Direct Sales": "Direct Customer", "Direct Sales with Reseller": "End Customer", "Reseller": "Reseller"}
+# Customer Category from the Sage customer type. Chargebee, Marketplace and Other are new categories for SOA to create
+# (meeting with Ming, Nisha, Richard, Tory and Sheng, 2026-10-27).
+CATEGORY = {"Direct Sales": "Direct Customer", "Direct Sales with Reseller": "End Customer", "Reseller": "Reseller",
+            "Chargebee": "Chargebee", "Marketplace": "Marketplace", "MinIO Training Subscription": "Direct Customer",
+            "Event Sponsor": "Other", "Billing Vendor": "Other"}
+NEW_CATEGORIES = ["Chargebee", "Marketplace", "Other"]
+# Customers with no Sage type: category and Subnet ID confirmed by Nisha (Slack, 2026-10-27).
+NO_TYPE = {"C-00381": ("End Customer", "779"), "C-00313": ("Direct Customer", "669"), "C-00414": ("Direct Customer", "754")}
+# Not loaded (2026-10-27): the 16 investor records (C00001 to C00016) and StoreManager (no invoices or address).
+EXCLUDE = {"C-00036": "StoreManager: no invoices and no address in Sage"}
+
+# Phone: US numbers as (999) 999-9999, all others in international format (+44 20 7885 8888), as the template allows.
+# NetSuite phone fields hold 21 characters; extensions are written " x123".
+REGION = {"United States": "US", "USA": "US", "Canada": "CA", "Germany": "DE", "France": "FR", "Switzerland": "CH",
+          "Saudi Arabia": "SA", "United Kingdom": "GB", "India": "IN", "Netherlands": "NL", "Belgium": "BE",
+          "United Arab Emirates": "AE", "Turkey": "TR", "Italy": "IT", "Sweden": "SE", "Singapore": "SG", "China": "CN",
+          "Brazil": "BR", "Poland": "PL", "Finland": "FI", "Hungary": "HU", "Japan": "JP", "Indonesia": "ID",
+          "Luxembourg": "LU", "Georgia": "GE", "Czech Republic": "CZ", "Mexico": "MX", "Australia": "AU", "Spain": "ES",
+          "Armenia": "AM", "Oman": "OM", "Austria": "AT", "New Zealand": "NZ", "Norway": "NO", "Taiwan": "TW",
+          "Cyprus": "CY", "Slovakia": "SK", "Russian Federation": "RU", "Vietnam": "VN", "Côte d'Ivoire": "CI",
+          "Morocco": "MA", "Hong Kong": "HK", "Denmark": "DK", "Ireland": "IE", "Faroe Islands": "FO",
+          "Moldova, Republic of": "MD", "Korea, Republic of": "KR", "Congo, Democratic Republic": "CD", "Senegal": "SN",
+          "Ecuador": "EC", "South Africa": "ZA", "Argentina": "AR", "Iraq": "IQ", "Croatia": "HR",
+          "Palestinian Territory, Occupied": "PS", "Iceland": "IS", "Lithuania": "LT", "Zambia": "ZM", "Israel": "IL",
+          "Guatemala": "GT", "Liechtenstein": "LI", "Bangladesh": "BD", "Bosnia and Herzegovina": "BA", "Ethiopia": "ET",
+          "Portugal": "PT", "Estonia": "EE", "Cape Verde": "CV", "Uganda": "UG", "Nigeria": "NG", "Mozambique": "MZ",
+          "Mongolia": "MN", "Malaysia": "MY", "Isle of Man": "IM", "Curaçao": "CW", "Lebanon": "LB", "Pakistan": "PK",
+          "Kazakhstan": "KZ", "Qatar": "QA"}
+# Numbers that pass the format check but are broken in the source.
+PHONE_BROKEN = {"C-00451": "97156437 is too short: 971 is the UAE country code and 5 digits remain"}
+
+def phone(raw, country):
+    """Return (number, note). number is '' when the source value is not a valid phone number."""
+    s = raw.strip().lstrip("'").strip()
+    ext = ""
+    m = re.search(r"\s*(?:x|ext\.?|extension)\s*:?\s*(\d+)$", s, re.I)
+    if m:
+        ext, s = m.group(1), s[:m.start()]
+    s = re.sub(r"^\+\s+", "+", re.sub(r"\(0\)", "", s)).strip()
+    digits, reg = re.sub(r"\D", "", s), REGION.get(country)
+    def p(t, r=None):
+        try:
+            n = pn.parse(t, r)
+            return n if pn.is_valid_number(n) else None
+        except pn.NumberParseException:
+            return None
+    if s.startswith("+"):
+        n = p(s)
+    elif re.fullmatch(r"\(\d{3}\) \d{3}-\d{4}", s):
+        n = p(s, "US")  # Salesforce writes every 10-digit number this way, so these are US numbers
+    elif reg in ("US", "CA") and (len(digits) == 10 or len(digits) == 11 and digits[0] == "1"):
+        n = p(digits, reg)
+    elif s[:1] in "0(":
+        n = p(s, reg) if reg else None  # national format with a trunk prefix
+    else:
+        n = p("+" + digits) or (p(s, reg) if reg else None)  # digits that start with the country code
+    if not n:
+        return "", f"Phone left out: {raw!r} is not a valid phone number"
+    nreg = pn.region_code_for_number(n)
+    out = pn.format_number(n, pn.PhoneNumberFormat.NATIONAL if nreg == "US" else pn.PhoneNumberFormat.INTERNATIONAL)
+    if ext:
+        out += f" x{ext}"
+        if len(out) > 21:
+            out = pn.format_number(n, pn.PhoneNumberFormat.E164) + f" x{ext}"
+    note = ""
+    if reg and nreg != reg:
+        note = f"Phone is a {nreg} number (+{n.country_code}); the address is in {country}"
+    return out, note
 
 def norm(s):
     s = unicodedata.normalize("NFKD", s or "").encode("ascii", "ignore").decode()
@@ -116,10 +184,113 @@ NOT_MATCHED = {"C-00044": "Ministry of Defence (Singapore), not Ministry of Defe
                "C-00142": "Bae Systems, kept separate from BAE Systems US"}
 REVIEWED = "2026-10-26"
 # Sage data errors corrected in the load (confirmed by Anthony on 2026-10-26).
-CORRECT = {"C-00387": {"City": "Lodz"},
-           "C-00253": {"City": "Abidjan", "Country": "Cote d'Ivoire"},
+CORRECT = {"C-00387": {"City": "Lodz", "Address 1": "Ul. Nowy Jozefow 70"},
+           "C-00253": {"City": "Abidjan", "Country": "Côte d'Ivoire", "Address 2": "REPUBLIQUE"},
            "C-00108": {"Address 1": "Rodovia BR116 Contorno Leste 7000", "City": "Sao Jose dos Pinhais",
                        "Postal Code/Zip": "83085-058", "Attention": "5011207568/Recieri Netto"}}
+# Addresses Sage holds in the wrong fields (2026-10-27): city, postal code or country typed into the street lines,
+# a street in the city field, a city in the state field, or the country left at Sage's default (United States) for an
+# address abroad. Each value is moved from the Sage text into its own field; nothing is retyped. A tuple marks a value
+# taken from Salesforce ("sfdc") or filled by rule, such as a US state from the ZIP code ("rule").
+SG = {"City": "Singapore"}  # Singapore is a city-state
+ADDRESS_FIX = {
+    "C-00597": {"Address 1": "Herderstraße 70", "City": "Köln", "Postal Code/Zip": "50931", "Country": "Germany"},
+    "C-00598": {"Address 1": "1 Fusionopolis Way #20-10", "Address 2": "Connexis North Tower", "City": "Singapore",
+                "Postal Code/Zip": ("138632", "sfdc"), "Country": "Singapore"},
+    "C-00599": {"Address 1": "38 Armeneasca St", "City": "Chisinau", "Postal Code/Zip": "MD-2012", "Country": "Moldova, Republic of"},
+    "C-00630": {"Address 1": "Elias Sarkis Avenue, Achrafieh", "City": "Beirut", "Country": "Lebanon"},
+    "C-00601": {"Address 1": "10th Floor Lakson Square Building No. 3 Sarwar Shaheed Road", "City": "Karachi",
+                "Postal Code/Zip": "74200", "Country": "Pakistan"},
+    "C-00602": {"Address 1": "78 SW 7th St. Ste 500", "City": "Miami", "Province/State": "Florida", "Postal Code/Zip": "33130"},
+    "C-00603": {"Address 1": "4150 152nd Street Northeast", "City": "Marysville", "Province/State": "Washington", "Postal Code/Zip": "98271"},
+    "C-00604": {"Address 1": "UNALAN MAH. AYAZMA CAD CAMLYCA YÞ MERKEZI - B3 BLOK USKUDAR", "City": "Istanbul",
+                "Postal Code/Zip": "34700", "Country": "Turkey"},
+    "C-00605": {"Address 1": "36 Švitrigailos gatvė", "City": "Vilnius", "Postal Code/Zip": "03228", "Country": "Lithuania"},
+    "C-00606": {"Address 1": "Taşyoncası Sok. Maslak 1453 Sitesi No: 1G İç Kapı No: B12", "City": "Istanbul",
+                "Postal Code/Zip": "34398", "Country": "Turkey"},
+    "C-00607": {"Address 1": "Dieselstraße 22", "City": "Karben", "Postal Code/Zip": "61184", "Country": "Germany"},
+    "C-00608": {"Address 1": "3100 Southwest 145th Avenue", "City": "Miramar", "Province/State": "Florida", "Postal Code/Zip": "33027"},
+    "C-00609": {"Address 1": "57 Rue de la Convention", "City": "Paris", "Postal Code/Zip": "75015", "Country": "France"},
+    "C-00631": {"Address 1": "Via Giulio Pocobelli 6", "City": "Lugano", "Postal Code/Zip": "6900"},
+    "C-00632": {"Address 1": "Ataturk Havalimani Dis Hatlar Terminali Yesilkoy Mah", "Address 2": "Bakirkoy", "City": "Istanbul",
+                "Postal Code/Zip": "34149"},
+    "C-00633": {"Address 1": "6200 South Main Street", "City": "Aurora", "Province/State": "Colorado", "Postal Code/Zip": "80016"},
+    "C-00634": {"Address 1": "Gogol St 253/4", "City": "Almaty", "Postal Code/Zip": "050026", "Country": "Kazakhstan"},
+    "C-00635": {"City": "Singapore", "Postal Code/Zip": ("338729", "sfdc")},
+    "C-00636": {"Address 1": "Am Kaiserkai 69", "City": "Hamburg", "Postal Code/Zip": "20457"},
+    "C-00637": {"Address 1": "Plzenska 3351/19", "City": "Praha 5-Smichov", "Postal Code/Zip": "150 00"},
+    "C-00004": SG, "C-00044": SG, "C-00143": SG, "C-00252": SG, "C-00350": SG, "C-00378": SG, "C-00498": SG, "C-00641": SG,
+    "C-00144": {"Address 2": "", "City": "Singapore", "Postal Code/Zip": "048946"},
+    "C-00020": {"Country": "Kazakhstan"},
+    "C-00024": {"Address 1": "1111 Bagby St Suite 4500", "City": "Houston", "Province/State": "Texas"},
+    "C-00031": {"Address 1": "Rue de Spa 8", "City": "Brussel", "Province/State": "Brussels Hoofdstedtelijk Gewest"},
+    "C-00052": {"Address 1": "Europaallee 39", "City": "Zurich", "Postal Code/Zip": "8004"},
+    "C-00057": {"City": "Genève 73", "Postal Code/Zip": "1211"},
+    "C-00059": {"City": "Beijing"},
+    "C-00060": {"Address 1": "Valencia Cami Antic, 54", "City": "Barcelona"},
+    "C-00066": {"Address 1": "6-8 Házgyári út", "City": "Veszprém", "Province/State": "", "Postal Code/Zip": "8200"},
+    "C-00067": {"Address 1": "1000 Continental Drive", "City": "King of Prussia"},
+    "C-00079": {"Address 1": "Emi Bl O S 100", "Address 2": "", "City": "Brasilia", "Province/State": "Federal District"},
+    "C-00087": {"City": "London", "Province/State": ""},
+    "C-00090": {"Address 2": "Postfach", "City": "Zug", "Postal Code/Zip": "CH-6300"},
+    "C-00095": {"Address 1": "89d Rue Pafebruch", "City": "Capallen", "Province/State": "District de Luxembourg", "Postal Code/Zip": "L-8308"},
+    "C-00110": {"Province/State": ("VA", "rule")},
+    "C-00016": {"Province/State": ("NY", "rule")},
+    "C-00115": {"Address 1": ""},
+    "C-00116": {"Address 1": "Prince Abdulrahman Bin Abdulaziz St", "Address 2": "", "City": "Riyadh", "Province/State": ""},
+    "C-00118": {"Attention": "Ben Damery", "Address 1": "210Celebration Olace", "Province/State": ("FL", "rule")},
+    "C-00120": {"Province/State": ("VA", "rule")},
+    "C-00156": {"Province/State": ("AL", "rule")},
+    "C-00161": {"Province/State": ("GA", "rule")},
+    "C-00183": {"Province/State": ("CA", "rule")},
+    "C-00194": {"Address 1": "Almas Tower Office 40D, JLT"},
+    "C-00205": {"City": "Seoul", "Province/State": ""},
+    "C-00222": {"Province/State": ("IN", "rule")},
+    "C-00228": {"Address 2": "Yeongtong-gu", "City": "Suwon-si", "Province/State": "Gyeonggi-do"},
+    "C-00237": {"City": "Basel", "Postal Code/Zip": "4002"},
+    "C-00239": {"Address 1": "7 rue F. Roosevelt", "City": "Rabat"},
+    "C-00241": {"City": "Riyadh", "Province/State": ""},
+    "C-00243": {"City": ("Jakarta", "sfdc")},
+    "C-00245": {"City": "Brussels", "Postal Code/Zip": "1000"},
+    "C-00247": {"City": "London", "Province/State": ""},
+    "C-00254": {"Address 1": "Anikó u. 4.", "City": "Budapest", "Postal Code/Zip": "1031"},
+    "C-00272": {"City": "Jakarta", "Province/State": ""},
+    "C-00281": {"Address 2": "", "City": "Vestavia Hills"},
+    "C-00291": {"Province/State": ""},
+    "C-00293": {"Address 1": "Av.EmbaixadorMacedoSoares 10001", "Address 2": "Predio 19 Esp 3 e 4 133", "City": "Sao Paulo"},
+    "C-00296": {"City": "LUXEMBOURG", "Province/State": "", "Postal Code/Zip": "L-1150"},
+    "C-00299": {"Address 2": "PO Box 712", "City": "Amsterdam", "Postal Code/Zip": "1000 AS"},
+    "C-00300": {"City": "Hong Kong"},
+    "C-00310": {"City": ("Berlin", "rule")},
+    "C-00357": {"Address 1": "1701 East Mossy Oaks Road", "City": "Spring"},
+    "C-00374": {"City": "Taipei", "Postal Code/Zip": "114"},
+    "C-00382": {"Address 1": "Szechenyi Istvan ter 7-8. C. ep. 4. em", "City": "Budapest", "Postal Code/Zip": "1051"},
+    "C-00391": {"City": "Riyadh", "Province/State": ""},
+    "C-00392": {"Address 1": "2091 Gyeongchung-daero Bubal-eup", "City": "Icheon-si"},
+    "C-00403": {"Address 2": "", "City": "Arroyo Grande"},
+    "C-00404": {"Address 1": ("Werderstraße 36", "sfdc"), "Address 2": "ACHTUNG NEU: Zufahrt über Schloßstraße"},
+    "C-00407": {"Address 2": "", "City": "LYON CEDEX 09", "Postal Code/Zip": "69279"},
+    "C-00419": {"Address 1": "1 FREEDOM VALLEY DRIVE", "City": "OAKS"},
+    "C-00425": {"Address 2": "", "City": "NORDEA", "Postal Code/Zip": "00020"},
+    "C-00439": {"Address 1": "Al Thumama Road, Qurtubah"},
+    "C-00444": {"Attention": "PO200412", "Address 1": "G126, Cody Tech Park", "Address 2": "", "City": "Farnborough"},
+    "C-00447": {"City": "Staines", "Province/State": ""},
+    "C-00560": {"Attention": "Kevin Darby", "Address 1": "5770 MISSILE WAY", "Address 2": "", "City": "Roy"},
+}
+ADDRESS_WHY = {
+    "C-00115": "Sage street line was \"deilver digitally\", not an address",
+    "C-00404": "Sage street line was a delivery note (\"ACHTUNG NEU: Zufahrt über Schloßstraße\"); street from Salesforce, note kept in Address 2",
+    "C-00310": "State BE is Berlin; postal code 14195 is in Berlin",
+    "C-00444": "PO200412 is a purchase order number, moved from Address 1 to Attention",
+}
+ADDRESS_CHECK = {
+    "C-00020": "Postal code 55 0100000 is as Sage has it; Kazakhstan postal codes have 6 digits (Astana is 010000)",
+    "C-00153": "ZIP 110018 is as Sage has it; New York ZIPs have 5 digits (West 40th Street is 10018)",
+    "C-00326": "No ZIP code in Sage", "C-00566": "No ZIP code in Sage",
+    "C-00238": "Sage address mixes Electronics City (Bangalore) and Hinjawadi (Pune); city left blank",
+    "C-00604": "Sage address has garbled Turkish characters (CAMLYCA YÞ for ÇAMLICA İŞ), kept as Sage has them",
+    "C-00546": "Salesforce has Doha, Qatar for the same P.O. Box; Sage has Dubai, kept",
+}
 
 def match(name):
     k = norm(name)
@@ -139,7 +310,9 @@ for r in openpyxl.load_workbook(PARTNERS, read_only=True).active.iter_rows(value
 std = [int(x["Customer ID"][2:]) for x in sage if re.match(r"C-\d{5}$", x["Customer ID"])]
 nxt = max(std) + 1
 renumber = {}
-for x in sorted((x for x in sage if x["Status"] == "Active" and not re.match(r"C-\d{5}$", x["Customer ID"])), key=lambda x: x["Customer ID"]):
+INVESTOR = re.compile(r"C\d+$")  # C00001 to C00016: investors and note holders, not loaded
+for x in sorted((x for x in sage if x["Status"] == "Active" and not re.match(r"C-\d{5}$", x["Customer ID"])
+                 and not INVESTOR.match(x["Customer ID"])), key=lambda x: x["Customer ID"]):
     renumber[x["Customer ID"]] = f"C-{nxt:05d}"
     nxt += 1
 
@@ -158,11 +331,21 @@ ADDED = ["Question Categories", "Duplicate Action", "Merged Sage IDs", "Second A
          "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
 REVIEW = ["Sage type", "Sage terms", "Last invoice", "Balance", "Salesforce match"]
 
-out, new_terms, research, parents_dropped = [], {}, {}, {}
-for r in sage:
+# One-time-use customers are active in Sage but left out of the customer list report: only the list export has them.
+report_ids = {x["Customer ID"] for x in sage}
+ONETIME = [cid for cid in lst if cid not in report_ids]
+blank = {k: "" for k in sage[0]}
+onetime_rows = [dict(blank, **{"Customer ID": cid, "Customer name": lst[cid]["Customer name"], "Status": "Active",
+                               "Customer type": lst[cid]["Customer type ID"]}) for cid in ONETIME]
+
+out, new_terms, research, parents_dropped, excluded = [], {}, {}, {}, []
+for r in sage + onetime_rows:
     if r["Status"] != "Active":
         continue
     cid = r["Customer ID"]
+    if INVESTOR.match(cid) or cid in EXCLUDE:
+        excluded.append((cid, r["Customer name"]))
+        continue
     c = {k: ["", ""] for k in COLS}
     def S(k, v, src="sage"):
         fixed = unmangle(v)
@@ -170,7 +353,9 @@ for r in sage:
             flags.append(f"Garbled characters repaired: {k}")
         c[k] = [fixed, src if fixed else ""]
     flags = []
-    investor = bool(re.match(r"C\d+$", cid))
+    investor = False
+    if cid in ONETIME:
+        flags.append("One-time use in Sage: only the name is in the Sage exports, no address, contact or terms")
     last, bal = date(r["Last invoice date"]), float(r["Balance"] or 0)
     in_scope = True  # every customer not marked inactive in Sage
     m, how = match(r["Customer name"])
@@ -210,15 +395,12 @@ for r in sage:
     S("Status", "CUSTOMER-Closed Won", "rule")
     S("Individual (Type)", "FALSE", "rule")
     cat = CATEGORY.get(r["Customer type"], "")
-    S("Customer Category", cat, "prop")
-    if r["Customer type"] and not cat:
-        flags.append("Category to decide")
-    # NetSuite phone fields hold 21 characters: write extensions as " x123".
-    phone = re.sub(r"\s*ext\s*:?\s*(\d+)$", r" x\1", r["display_phone"], flags=re.I)
-    if phone:
-        S("Phone", phone)
-    elif m and m["Phone"]:
-        S("Phone", m["Phone"], "sfdc")
+    S("Customer Category", cat, "rule")
+    if cid in NO_TYPE:
+        cat = NO_TYPE[cid][0]
+        S("Customer Category", cat, "rule")
+        S("Subnet ID", NO_TYPE[cid][1], "rule")
+        flags.append("No Sage type: category and Subnet ID confirmed by Nisha, 2026-10-27")
     S("Attention", r["display_attention"])
     S("Addressee", r["display_company"])
     S("Address 1", r["display_line1"].rstrip(","))
@@ -247,6 +429,41 @@ for r in sage:
     for k, v in CORRECT.get(cid, {}).items():
         flags.append(f"Corrected from Sage: {k} was {c[k][0] or 'blank'}")
         S(k, v, "rule")
+    fix = ADDRESS_FIX.get(cid, {})
+    if fix:
+        moved = []
+        for k, v in fix.items():
+            v, how3 = v if isinstance(v, tuple) else (v, "sage")
+            if c[k][0] != v:
+                moved.append(f"{k} was {c[k][0]!r}" if c[k][0] else f"{k} was blank")
+                S(k, v, how3 if how3 != "sage" else "rule")
+        if moved:
+            flags.append("Address fields corrected from the Sage text: " + "; ".join(moved))
+        if cid in ADDRESS_WHY:
+            flags.append(ADDRESS_WHY[cid])
+        if not c["Address 1"][0]:
+            c["Default Billing"] = c["Default Shipping"] = ["", ""]
+    # Sage fills United States when no address is entered; with no address at all, that country is not data.
+    if c["Country"] == ["United States", "sage"] and not any(c[k][0] for k in ("Address 1", "Address 2", "City", "Province/State", "Postal Code/Zip")):
+        c["Country"] = ["", ""]
+        flags.append("Country left blank: no address in Sage, and Sage's United States is its default when none is entered")
+    if cid in ADDRESS_CHECK:
+        flags.append("Address to check: " + ADDRESS_CHECK[cid])
+    # Phone: Sage first, else Salesforce; a number that is not valid is left out and the source value kept in Flags.
+    for raw_ph, src_ph in ((r["display_phone"], "sage"), ((m or {}).get("Phone", ""), "sfdc")):
+        if not raw_ph:
+            continue
+        if cid in PHONE_BROKEN:
+            flags.append(f"Phone left out: {raw_ph!r}, {PHONE_BROKEN[cid]}")
+            continue
+        num, note = phone(raw_ph, c["Country"][0])
+        if note:
+            flags.append(note + ("" if num else f" ({'Sage' if src_ph == 'sage' else 'Salesforce'})"))
+        if num:
+            S("Phone", num, src_ph)
+            if num != raw_ph:
+                flags.append(f"Phone formatted from {raw_ph!r}")
+            break
     if m and m["Billing Country"] and c["Country"][0] and m["Billing Country"].lower() != c["Country"][0].lower():
         flags.append(f"Country differs in Salesforce: {m['Billing Country']}")
     if r["Term"]:
@@ -257,9 +474,8 @@ for r in sage:
                 new_terms[t] = new_terms.get(t, 0) + 1
                 flags.append(f"New NetSuite term: {t}")
         else:
-            S("Terms", r["Term"])
-            research[r["Term"]] = research.get(r["Term"], 0) + 1
-            flags.append(f"Terms to research: {r['Term']}")
+            research[r["Term"]] = research.get(r["Term"], 0) + 1  # Due per Contract: left blank (2026-10-27)
+            flags.append(f"Terms left blank: Sage has {r['Term']}")
     raw_tax = r["Tax ID"] or (r["display_taxid"].split(": ", 1)[1] if r["display_taxid"] else "")
     other_tax = ""
     if raw_tax:
@@ -276,26 +492,27 @@ for r in sage:
 
     if investor:
         flags.append("Investor or non-sales")
-    dup = [x for x in names[r["Customer name"].strip().lower()] if x != cid]
+    dup = [x for x in names.get(r["Customer name"].strip().lower(), []) if x != cid]
     if dup:
         flags.append("Duplicate name: " + ", ".join(dup))
     else:
-        nd = [x for x in near[norm(r["Customer name"])] if x != cid]
+        nd = [x for x in near.get(norm(r["Customer name"]), []) if x != cid]
         if nd:
             flags.append("Similar name: " + ", ".join(nd))
     if not m:
         flags.append("No Salesforce match")
     elif how == "confirmed":
         flags.append("Salesforce match confirmed by name review")
-    if not r["Customer type"] and not investor:
-        flags.append("No customer type")
+    if not cat:
+        flags.append("No customer type in Sage: Customer Category missing")
     if not last:
         flags.append("No invoice in Sage")
 
     a = {k: ["", ""] for k in ADDED}
     A = lambda k, v, src="sage": a.__setitem__(k, [v, src if v else ""])
-    qc = (["Investor"] if investor else []) + (["Salesforce match"] if how == "likely" else []) + \
-         (["SOA Category Unknown"] if not investor and not cat else [])
+    # Open items left after the 2026-10-27 decisions.
+    qc = (["Category missing"] if not cat else []) + \
+         (["New NetSuite term"] if c["Terms"][0] and c["Terms"][0] not in TERMS_LIST else [])
     A("Question Categories", "; ".join(qc), "rule")
     A("Sage Customer ID", cid)
     if m:
@@ -349,9 +566,13 @@ for x in out:
     x["review"].append(x.get("subnet_choices", ""))
 # Subnet assignments, chronological: the earlier Sage record goes with the earlier Subnet account (Anthony, 2026-10-26).
 # L3Harris has three Sage records and five Subnet accounts; its assignment is proposed, not confirmed.
+# L3Harris confirmed by Nisha from the Sage contracts (Slack, 2026-10-27): C-00333 holds three contracts, one per Subnet
+# account, so it is split into three NetSuite customers to keep one Subnet ID per customer.
 SUBNET_ASSIGN = {"C-00103": ("348", "rule"), "C-00462": ("879", "rule"), "C-00371": ("755", "rule"),
                  "C-00592": ("1067", "rule"), "C-00241": ("537", "rule"), "C-00542": ("998", "rule"),
-                 "C-00333": ("695", "prop"), "C-00385": ("784", "prop"), "C-00562": ("1026", "prop")}
+                 "C-00333": ("695", "rule"), "C-00385": ("784", "rule"), "C-00562": ("1026", "rule")}
+L3_CONTRACT = {"695": "CN-SO0548", "716": "CN-SO0565", "720": "CN-SO0603", "784": "CN-000160", "1026": "CN-000350"}
+L3_SPLIT = [("716", "CN-SO0565"), ("720", "CN-SO0603")]  # new customers split from C-00333
 by_subnet = {a["Subnet Account Id"]: a for a in accounts if a["Subnet Account Id"]}
 for x in out:
     sid = x["cells"][len(COLS) + ADDED.index("Sage Customer ID")][0]
@@ -363,16 +584,41 @@ for x in out:
             q = [p for p in x["cells"][QI0][0].split("; ") if p and p != "Subnet ID to assign"]
             x["cells"][QI0] = ["; ".join(q), "rule" if q else ""]
             x["cells"][len(COLS) + ADDED.index("Duplicate Action")] = ["Keep: separate Subnet account", "rule"]
+            x.pop("subnet_choices", None)
+            if len(x["review"]) > len(REVIEW):
+                x["review"][len(REVIEW)] = ""
         else:
             x["flags"].append("Subnet ID proposed by date, confirm")
+        if sn in L3_CONTRACT:
+            x["flags"].append(f"Subnet ID {sn} confirmed by Nisha from Sage contract {L3_CONTRACT[sn]}, 2026-10-27")
 for x in out:
     if len(x["review"]) < len(REVIEW) + 1:
         x["review"].append("")
 REVIEW.append("Possible Subnet accounts")
 
-# Order: investors, then Salesforce matches to review, then SOA Category Unknown (each by name), then everyone else by Customer ID.
+# L3Harris split: two new customers for the Subnet accounts billed on C-00333, with the same bill-to (TVAR Solutions),
+# numbered after the highest Sage C-#####. Their contracts sit under C-00333 in Sage and move to them on load.
+SCI0 = len(COLS) + ADDED.index("Sage Customer ID")
+src333 = next(x for x in out if x["cells"][SCI0][0] == "C-00333")
+for sn, contract in L3_SPLIT:
+    x = json.loads(json.dumps(src333))
+    new_id = f"C-{nxt:05d}"
+    nxt += 1
+    x["cells"][COLS.index("Customer ID")] = [new_id, "rule"]
+    x["cells"][COLS.index("External ID")] = [new_id, "rule"]
+    x["cells"][SNI] = [sn, "rule"]
+    x["cells"][SAI] = [id18(by_subnet[sn]["Account ID"]), "rule"]
+    x["cells"][COLS.index("Company Name")][1] = "prop"
+    x["cells"][SCI0] = ["", ""]
+    x["cells"][len(COLS) + ADDED.index("Duplicate Action")] = [f"New: split from Sage C-00333 for Subnet {sn}", "rule"]
+    x["review"] = [x["review"][0], x["review"][1], "", "", by_subnet[sn]["Account Name"]] + [""] * (len(x["review"]) - 5)
+    x["flags"] = [f"New customer split from Sage C-00333 (Nisha, 2026-10-27): Subnet account {sn}, Sage contract {contract} "
+                  f"to be assigned to this customer on load", "Company Name copied from C-00333"]
+    out.append(x)
+
+# Order: open items (each by name), then everyone else by Customer ID.
 QI = len(COLS)
-RANK = ["Investor", "Salesforce match", "Subnet ID to assign", "SOA Category Unknown"]
+RANK = ["Category missing", "New NetSuite term"]
 def order(x):
     q = x["cells"][QI][0]
     r = min((RANK.index(p) for p in q.split("; ") if p in RANK), default=len(RANK))
@@ -477,13 +723,12 @@ for g in (g for g in groups.values() if len(g) > 1):
             x["cells"][DA] = ["Merge into " + kid, "rule"]
 
 # Bridge from the first Sage export (active customers) to the customers in the load.
-report_ids = {x["Customer ID"] for x in sage}
-onetime = [(i, r["Customer name"]) for i, r in lst.items() if i not in report_ids]
+onetime = [(i, lst[i]["Customer name"]) for i in ONETIME]
 inactive = [(x["Customer ID"], x["Customer name"]) for x in sage if x["Status"] != "Active"]
 merged_n = sum(1 for x in out if x["cells"][DA][0].startswith("Merge into"))
-investors_n = sum(1 for x in out if "Investor" in x["cells"][QI][0] and not x["cells"][DA][0].startswith("Merge into"))
-bridge = {"first": len(lst), "onetime": onetime, "report": len(sage), "inactive": inactive, "active": len(out),
-          "merged": merged_n, "kept": dup_groups, "load": len(out) - merged_n, "investors": investors_n}
+split_n = sum(1 for x in out if x["cells"][DA][0].startswith("New: split"))
+bridge = {"first": len(lst), "onetime": onetime, "report": len(sage), "inactive": inactive, "excluded": excluded,
+          "rows": len(out), "merged": merged_n, "kept": dup_groups, "split": split_n, "load": len(out) - merged_n}
 
 data = {"cols": COLS + ADDED, "required": sorted(REQUIRED), "review": REVIEW, "rows": out, "built": TODAY.isoformat(),
         "renumber": renumber, "new_terms": sorted(new_terms.items(), key=lambda kv: int(kv[0].split()[1])),

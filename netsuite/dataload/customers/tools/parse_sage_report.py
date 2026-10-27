@@ -25,6 +25,9 @@ LABEL = re.compile(r"(Phone|Email|Fax|Mobile phone|URL):\s*(.*)", re.I)
 ATTN = re.compile(r"(attention to|attention|attn|atn|att|poc)\s*:\s*(.*)", re.I)
 TAX = re.compile(r"(?:^|\s*-\s*|\s+)(VAT(?: ID| Number)?|RFC|GSTIN|Head Office GSTIN)\s*:\s*([A-Z0-9][A-Z0-9 -]*[A-Z0-9])\s*;?,?\s*", re.I)
 EMAIL = re.compile(r"[\w.+'-]+@[\w-]+(?:\.[\w-]+)+")
+COMMA_COUNTRY_TAILS = {"Republic of", "Democratic Republic", "Democratic Republic of", "Democratic Republic of the",
+                       "Islamic Republic of", "United Republic of", "Province of China", "Occupied", "Bolivarian Republic of",
+                       "Plurinational State of", "Federated States of", "U.S.", "British"}
 
 def contact(c):
     raw = c.get("name", "")
@@ -48,7 +51,9 @@ def contact(c):
             addr.append(l)
     if addr:
         d["citystatezip_country"] = addr[-1].strip()
-        d["country"] = addr[-1].split(",")[-1].strip()
+        parts = [p.strip() for p in addr[-1].split(",")]
+        # Country names that contain a comma ("Korea, Republic of") take the last two pieces.
+        d["country"] = ", ".join(parts[-2:]) if len(parts) > 1 and parts[-1] in COMMA_COUNTRY_TAILS else parts[-1]
     if len(addr) >= 2:
         street = " ".join(addr[:-1])
         if ",, " in street + " ":
