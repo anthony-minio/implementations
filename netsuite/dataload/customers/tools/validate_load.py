@@ -71,7 +71,7 @@ def bad(check, cid, detail):
     issues[check].append(f"{cid}: {detail}")
 
 active = {k for k, v in raw.items() if v["head"][head.index("Status")] == "Active" and not NOT_LOADED.match(k) and k not in EXCLUDED}
-active |= {k for k in lst if k not in raw}  # one-time-use customers: active, but not in the report
+# one-time-use customers (active, but not in the report) are left out: no category and no invoices
 loaded = {d["Sage Customer ID"] for d, _ in draft if d["Sage Customer ID"]}
 if loaded != active:
     bad("Row set", "-", f"missing {sorted(active - loaded)[:10]}, extra {sorted(loaded - active)[:10]}")
@@ -80,7 +80,9 @@ if {d["Subnet ID"] for d in new_rows} != L3_NEW or len(new_rows) != 2:
     bad("Row set", "-", f"new rows {[(d['Customer ID'], d['Subnet ID']) for d in new_rows]}")
 c333 = next(d for d, _ in draft if d["Sage Customer ID"] == "C-00333")
 for d in new_rows:
-    same = {k for k in cols if k not in ("External ID", "Customer ID", "Subnet ID", "Salesforce Account ID", "Sage Customer ID", "Duplicate Action", "Merged Sage IDs")}
+    same = {k for k in cols if k not in ("External ID", "Customer ID", "Subnet ID", "Salesforce Account ID", "Sage Customer ID", "Duplicate Action", "Merged Sage IDs", "Company Name")}
+    if not re.fullmatch(re.escape(c333["Company Name"]) + r" -0[12]", d["Company Name"]):
+        bad("L3Harris split rows", d["Customer ID"], f"name {d['Company Name']!r}")
     diff = [k for k in same if d[k] != c333[k]]
     if diff or d["External ID"] != d["Customer ID"] or not re.fullmatch(r"C-006\d\d", d["Customer ID"]):
         bad("L3Harris split rows", d["Customer ID"], f"differs from C-00333 in {diff}")
@@ -108,8 +110,8 @@ for d, src in draft:
             ok = pn.is_valid_number(num)
         except pn.NumberParseException:
             ok = False
-        if not ok or (base.startswith("(") and pn.region_code_for_number(num) != "US") or \
-                (not base.startswith("(") and (not base.startswith("+") or pn.region_code_for_number(num) == "US")):
+        us = ok and pn.region_code_for_number(num) == "US" and d["Country"] in ("United States", "")
+        if not ok or (base.startswith("(") and not us) or (not base.startswith("(") and (us or not base.startswith("+"))):
             bad("Phone format", sid or d["Customer ID"], ph)
         elif sid in raw or sid == "":
             srcs = [l for l in (raw[sid]["blocks"].get("Display contact:", []) if sid else []) if re.match(r"\s*(Phone|Mobile phone):", l)]

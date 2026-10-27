@@ -121,16 +121,16 @@ DECISIONS = [
      "Nisha confirmed from the Sage contracts (Slack, 2026-10-27): C-00333 holds three 3-year contracts running at the same "
      "time, one per Subnet account (CN-SO0548, CN-SO0565, CN-SO0603). Split C-00333 into three customers to keep one Subnet "
      "ID per customer.",
-     f"C-00333 is Subnet 695. New customers {ids(split)} are Subnets 716 and 720, copied from C-00333 (name, address, terms, "
-     "TVAR Solutions bill-to). C-00385 is Subnet 784 and C-00562 is Subnet 1026. For SOA: contracts CN-SO0565 and "
+     f"C-00333 is Subnet 695. New customers {ids(split)} are Subnets 716 and 720, copied from C-00333 (address, terms, "
+     "TVAR Solutions bill-to), named L3 Technologies Inc. -01 and -02 (Anthony, 2026-10-27). C-00385 is Subnet 784 and C-00562 is Subnet 1026. For SOA: contracts CN-SO0565 and "
      "CN-SO0603 sit under C-00333 in Sage and must be assigned to the new customers on load."),
     ("One-time-use customers",
      "C-00012 TDA GROUP and C-00021 SPMB are flagged One-time use in Sage and were not in the customer list report the load "
      "is built from.",
-     "Load them if they are active in Sage (2026-10-27). They are: Sage's active customer list includes them and leaves out "
-     "the 4 inactive customers.",
-     "Both added. Sage has only their name and ID (no address, contact, type or terms) and Salesforce has no account for "
-     "them, so their Customer Category is missing (open item below)."),
+     "Leave them off: they have no customer category and no invoices (Anthony, 2026-10-27). They are active in Sage, but "
+     "Sage has only their name and ID (no address, contact, type or terms), Salesforce has no account for them, and no "
+     "invoice for them is in the Sage exports.",
+     "Not loaded."),
     ("Due per Contract terms",
      f"{len(due)} customers have the Sage term Due per Contract, which is not a NetSuite term.",
      "Leave their terms blank (2026-10-27).",
@@ -139,8 +139,8 @@ DECISIONS = [
      f"Phone numbers were in mixed formats: dashes, dots, spaces, \"(0)\" trunk digits, a leading apostrophe on {apostrophe} Sage "
      f"numbers, and country codes without a \"+\". Salesforce writes every 10-digit number as (999) 999-9999, so some "
      "non-US customers carry a US head-office number.",
-     "US numbers as (999) 999-9999, so accountants can keep entering them that way; every other number in international "
-     "format (+44 20 7885 8888), as the template allows. Numbers that are broken in the source are left out (2026-10-27).",
+     "US numbers of US customers as (999) 999-9999, so accountants can keep entering them that way; every other number, "
+     "Canada included, in international format (+44 20 7885 8888, +1 604-709-0008), as the template allows. Numbers that are broken in the source are left out (2026-10-27).",
      f"{len(phones)} numbers written in the standard format, Sage first and Salesforce where Sage has none; the source value "
      f"is in Flags (\"Phone formatted from\"). {len(ph_out)} broken numbers left out: {ids(ph_out)} (each in Flags with the "
      f"reason). {len(ph_other)} numbers belong to a different country than the address, mostly a head office's number in "
@@ -170,11 +170,15 @@ DECISIONS = [
 
 NOTES = [
     ("Customer count",
-     f"Sage's active customer list has {B['first']} customers. Left out: the 16 investor records and StoreManager "
-     f"({B['first']} - 17 = {B['first'] - 17}). Added: the two new L3Harris customers ({B['first'] - 17} + 2 = {B['rows']}, the "
-     f"rows on the Customers-Draft tab). {B['merged']} of those are duplicates merged into {B['kept']} other customers, "
-     f"leaving {B['load']} customers to load ({B['rows']} - {B['merged']} = {B['load']}). Sage's customer list report also "
-     f"has 4 inactive customers, not loaded: {', '.join(i for i, _ in B['inactive'])}."),
+     f"Sage has {B['first']} active customers (Sage's active customer list; its customer list report has {B['report']} "
+     f"customers, the same {B['first'] - len(B['onetime'])} plus 4 inactive ones that are not loaded "
+     f"({', '.join(i for i, _ in B['inactive'])}), and leaves out the {len(B['onetime'])} one-time-use customers). "
+     f"Not loaded: 16 investor records (C00001 to C00016), StoreManager (C-00036), and the {len(B['onetime'])} one-time-use "
+     f"customers ({', '.join(f'{i} {n}' for i, n in B['onetime'])}): {B['first']} - {len(B['excluded'])} = "
+     f"{B['first'] - len(B['excluded'])}. Added: the {B['split']} new L3Harris customers split from C-00333 ({ids(split)}): "
+     f"{B['first'] - len(B['excluded'])} + {B['split']} = {B['rows']}, the rows on the Customers-Draft tab. Of these, "
+     f"{B['merged']} are duplicates marked \"Merge into\" and merged into {B['kept']} other customers: {B['rows']} - "
+     f"{B['merged']} = {B['load']} customers to load."),
     ("Customer ID and External ID",
      "Customer ID is the Sage C-##### number. External ID is the same value, so later loads and updates can find each "
      "customer by it. The two new L3Harris customers take the next numbers after the highest Sage number (C-00641)."),
@@ -220,7 +224,8 @@ NOTES = [
      "Garbled accents repaired (MontrÃ©al to Montréal). US postal codes that lost their leading zero restored (7936 to 07936). "
      "Address and country corrections of 2026-10-27 are in the decisions above."),
     ("Country names",
-     "Countries are written as Sage writes them (Korea, Republic of; Moldova, Republic of; Congo, Democratic Republic; "
+     "NetSuite's CSV import needs the country's full name exactly as NetSuite lists it; it rejects ISO codes (\"Invalid "
+     "country reference key US\"). Countries are written as Sage writes them (Korea, Republic of; Moldova, Republic of; Congo, Democratic Republic; "
      "Côte d'Ivoire; Palestinian Territory, Occupied). NetSuite's CSV import needs its own country names, so these should "
      "be checked against NetSuite's list when the import is mapped."),
 ]
@@ -234,8 +239,6 @@ OPEN = [
     "registration numbers) should be loaded anywhere.",
     "L3Harris: assign contracts CN-SO0565 and CN-SO0603 to the new customers C-00642 (Subnet 716) and C-00643 (Subnet 720) "
     "when contracts are loaded.",
-    f"Customer Category for {', '.join(V(r, 'Customer ID') + ' ' + V(r, 'Company Name') for r in cat_missing)}: Sage has only their names, so there is no type to set it "
-    "from. They are marked \"Category missing\" in Question Categories.",
 ]
 
 ns.column_dimensions["A"].width = 5

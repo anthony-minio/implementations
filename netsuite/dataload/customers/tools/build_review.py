@@ -92,7 +92,8 @@ def phone(raw, country):
     if not n:
         return "", f"Phone left out: {raw!r} is not a valid phone number"
     nreg = pn.region_code_for_number(n)
-    out = pn.format_number(n, pn.PhoneNumberFormat.NATIONAL if nreg == "US" else pn.PhoneNumberFormat.INTERNATIONAL)
+    us = nreg == "US" and reg in ("US", None)  # a US number for a customer outside the US is written internationally
+    out = pn.format_number(n, pn.PhoneNumberFormat.NATIONAL if us else pn.PhoneNumberFormat.INTERNATIONAL)
     if ext:
         out += f" x{ext}"
         if len(out) > 21:
@@ -343,7 +344,8 @@ for r in sage + onetime_rows:
     if r["Status"] != "Active":
         continue
     cid = r["Customer ID"]
-    if INVESTOR.match(cid) or cid in EXCLUDE:
+    # One-time-use customers have no category and no invoices in the exports: left out (Anthony, 2026-10-27).
+    if INVESTOR.match(cid) or cid in EXCLUDE or cid in ONETIME:
         excluded.append((cid, r["Customer name"]))
         continue
     c = {k: ["", ""] for k in COLS}
@@ -441,8 +443,9 @@ for r in sage + onetime_rows:
             flags.append("Address fields corrected from the Sage text: " + "; ".join(moved))
         if cid in ADDRESS_WHY:
             flags.append(ADDRESS_WHY[cid])
-        if not c["Address 1"][0]:
-            c["Default Billing"] = c["Default Shipping"] = ["", ""]
+        # an address moved into Address 1 becomes the default billing and shipping address, as Sage addresses do
+        c["Default Billing"] = ["TRUE", "rule"] if c["Address 1"][0] else ["", ""]
+        c["Default Shipping"] = list(c["Default Billing"])
     # Sage fills United States when no address is entered; with no address at all, that country is not data.
     if c["Country"] == ["United States", "sage"] and not any(c[k][0] for k in ("Address 1", "Address 2", "City", "Province/State", "Postal Code/Zip")):
         c["Country"] = ["", ""]
@@ -600,7 +603,7 @@ REVIEW.append("Possible Subnet accounts")
 # numbered after the highest Sage C-#####. Their contracts sit under C-00333 in Sage and move to them on load.
 SCI0 = len(COLS) + ADDED.index("Sage Customer ID")
 src333 = next(x for x in out if x["cells"][SCI0][0] == "C-00333")
-for sn, contract in L3_SPLIT:
+for n_split, (sn, contract) in enumerate(L3_SPLIT, 1):
     x = json.loads(json.dumps(src333))
     new_id = f"C-{nxt:05d}"
     nxt += 1
@@ -608,12 +611,12 @@ for sn, contract in L3_SPLIT:
     x["cells"][COLS.index("External ID")] = [new_id, "rule"]
     x["cells"][SNI] = [sn, "rule"]
     x["cells"][SAI] = [id18(by_subnet[sn]["Account ID"]), "rule"]
-    x["cells"][COLS.index("Company Name")][1] = "prop"
+    x["cells"][COLS.index("Company Name")] = [f"{src333['cells'][COLS.index('Company Name')][0]} -{n_split:02d}", "rule"]
     x["cells"][SCI0] = ["", ""]
     x["cells"][len(COLS) + ADDED.index("Duplicate Action")] = [f"New: split from Sage C-00333 for Subnet {sn}", "rule"]
     x["review"] = [x["review"][0], x["review"][1], "", "", by_subnet[sn]["Account Name"]] + [""] * (len(x["review"]) - 5)
     x["flags"] = [f"New customer split from Sage C-00333 (Nisha, 2026-10-27): Subnet account {sn}, Sage contract {contract} "
-                  f"to be assigned to this customer on load", "Company Name copied from C-00333"]
+                  f"to be assigned to this customer on load", "Company Name is C-00333's with a -01 or -02 suffix (Anthony, 2026-10-27)"]
     out.append(x)
 
 # Order: open items (each by name), then everyone else by Customer ID.
