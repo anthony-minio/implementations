@@ -113,3 +113,13 @@ ws.freeze_panes = "C3"
 ws.auto_filter.ref = f"A2:N{len(out) + 2}"
 wb.save(OUT)
 print(len(out), "candidate rows for", len({x[0] for x in out}), "customers:", collections.Counter(x[11] for x in out), "->", OUT)
+
+# The same rows as an interactive review page (data/, not committed): decisions save to the page's database.
+import json
+REC_KEY = {"Same company: accept": "accept", "Same group: decide": "group", "Decide": "decide", "Reject": "reject"}
+data = [dict(zip(["cid", "cname", "ccity", "ccountry", "domain", "sfname", "sfid", "subnet", "sfcity", "sfcountry", "used", "rec", "why"],
+                 row[:13]), rec=REC_KEY[row[11]]) for row in out]
+tpl = open("tools/sf-review-template.html", encoding="utf-8").read()
+open("data/sf-match-review.html", "w", encoding="utf-8").write(
+    tpl.replace("/*DATA*/null", json.dumps(data, ensure_ascii=False).replace("</", "<\\/")))
+print("review page -> data/sf-match-review.html")
