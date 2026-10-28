@@ -180,7 +180,9 @@ def extra(cid, kind, q, sf, effect, rec, conf, why, key):
 extra("C-00097", "merge", "Is C-00097 Aegon Emeklilik the same company as C-00208 Aegon_Viennalife?",
       "C-00208 Aegon_Viennalife \u00b7 last invoiced 2026-08-17 \u00b7 Salesforce Viennalife (formerly Aegon), Subnet 329",
       "C-00097 is merged into C-00208 and not loaded (617 becomes 616).", "accept", "high",
-      "Aegon Emeklilik is the company's name before it became Viennalife; same address. C-00097 was never invoiced and has no contact.",
+      "Sage's own name for C-00208, Aegon_Viennalife, links the two: Aegon Emeklilik is the company's name before it became Viennalife. "
+      "C-00097 has nothing else in Sage: no address, contact, email or invoice. (The address it shows in the load was copied from "
+      "Salesforce's Viennalife account on 2026-10-28, so it is not separate evidence.)",
       "C-00097__merge__C-00208")
 extra("C-00120", "merge", "Is C-00120 Federal Home Loan Mortgage Corporation the same company as C-00219 Freddie Mac?",
       "C-00219 Freddie Mac - Federal Home Loan Mortgage Corporation \u00b7 last invoiced 2026-09-28, 120,000.00 open",
