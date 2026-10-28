@@ -4,6 +4,8 @@
 # Bank account details are never written to the page. Tax IDs are masked on the page and full in the load file.
 import csv, datetime as dt, json, re, sys
 import openpyxl
+sys.path.insert(0, "tools")
+from vendor_clean import clean
 
 # --full writes an unmasked copy (data/vendor-review-full.html) for the controller and AP. It is never published.
 FULL = "--full" in sys.argv
@@ -228,6 +230,7 @@ for r in sage:
     if G(r, "Form 1099 type") or t == "1099 Vendor":
         S("is1099Eligible", "TRUE", "sage" if G(r, "Form 1099 type") else "rule")
     S("currency", cur or "USD", "sage" if cur else "rule")
+    clean(c, flags, sid)  # phones, countries, states, postal codes and address fixes, as for the customer load
     S("Legacy Vendor ID", sid)
     S("Source System", "Synced from Ramp" if rp else "Sage Intacct", "rule")
     c["companyName"][1] = c["companyName"][1] or "miss"
@@ -306,6 +309,8 @@ for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
         c["terms"] = [term(rp["Net payment terms (days)"]), "ramp"]
     R("taxIdNum", rp["Taxpayer identification number (TIN)"])
     c["subsidiary"] = ["MinIO, Inc.", "rule"]
+    ro_flags = ["Created by the Ramp sync; no Sage vendor"]
+    clean(c, ro_flags, rp["Vendor ID"])
     c["Source System"] = ["Synced from Ramp", "rule"]
     c["vendorId"] = [RAMP_ID, "rule"]
     c["externalId"] = [RAMP_ID, "rule"]
@@ -325,7 +330,7 @@ for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
     last = date(rp["Last spend date"])
     review = ["", rp["Creation date"][:10], last.isoformat() if last else "", "", "", "", rp["Last spend date"],
               f"{float(rp['Total 365 day spend'] or 0):,.2f}", rp["Ramp category"], rp["Owner name"], rp["Department"], ""]
-    out.append({"cells": page, "review": review, "flags": ["Created by the Ramp sync; no Sage vendor"], "active": bool(last and last >= ACTIVE_FROM),
+    out.append({"cells": page, "review": review, "flags": ro_flags, "active": bool(last and last >= ACTIVE_FROM),
                 "_key": rp["Vendor ID"], "_full": cells, "_name": re.sub(r"[^a-z0-9]", "", (rp["Display name"] or rp["Vendor name"]).lower()), "_last": last.isoformat() if last else "",
                 "_attrs": {"email": rp["Contact email"].strip().lower(), "address": (rp["Check mailing address line 1"].strip().lower(), "",
                            rp["Check mailing zip/postal code"].strip()) if rp["Check mailing address line 1"].strip() else ("", "", "")}})

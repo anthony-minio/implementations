@@ -91,6 +91,15 @@ assert len(synced_id) == len(by_sync)
 n = lambda x: f"{x:,}"
 assert len(nsv) == len(by_sync) + len(from_file) and len(rows) == B["active"] - B["out_of_scope"] - B["employees_out"] + len(B["ramp_only"])
 
+ph_fmt = [r for r in nsv if has_flag(r, "Phone formatted from") or has_flag(r, "Fax formatted from")]
+ph_out = [r for r in nsv if has_flag(r, "Phone left out")]
+ph_abroad = [r for r in nsv if any(" number (+" in f for f in r["flags"])]
+no_ctry = [r for r in nsv if has_flag(r, "Country left blank")]
+hand = [r for r in nsv if has_flag(r, "Address fields corrected")]
+fx = {f: k for k, f in enumerate(data["fields"])}  # template columns repeat names across the two addresses
+VF = lambda r, f: r["cells"][fx[f]][0]
+us_no_zip = [r for r in nsv if any(VF(r, f"address{k}_country") == "United States" and VF(r, f"address{k}_line1")
+                                   and not VF(r, f"address{k}_zipCode") for k in (1, 2))]
 DECISIONS = [
     ("Sage only vendors",
      f"{n(B['sage_only'])} active Sage vendors are not in Ramp. {B['recent']} have activity since 2024-10-26, "
@@ -159,6 +168,31 @@ DECISIONS = [
      f"\"Synced from Ramp\". The {len(from_file)} Sage only vendors keep their Sage ID, with Source System \"Sage Intacct\". "
      "Every row keeps its original IDs: Legacy Vendor ID and Sage Vendor ID hold the Sage ID, Ramp Vendor ID holds Ramp's "
      "ID."),
+    ("Phone numbers",
+     "Sage and Ramp hold phone and fax numbers in about 20 formats: 415-723-9709, 4157239709, '+18477225269 (Ramp's "
+     "leading apostrophe), 44 (0) 121 780 2329 and so on.",
+     "As for the customer load: US numbers as (999) 999-9999, all others in international format (+44 121 780 2329); "
+     "extensions as x123 (2026-10-27).",
+     f"{len(ph_fmt)} vendors' numbers reformatted, each flagged \"Phone formatted from\" with the original. "
+     + (f"{len(ph_out)} left out as not a valid number. " if ph_out else "")
+     + f"{len(ph_abroad)} have a number from another country than their address ({ids(ph_abroad)}), flagged."),
+    ("Countries, states and postal codes",
+     f"Sage sets the country to United States on vendors with no address at all ({len(no_ctry)} in the load). Some "
+     "country names are not NetSuite's (Korea, Republic of; Turkey; Taiwan; Vietnam), and postal codes carry country "
+     "prefixes (D-80807) or lost their hyphen (282040031).",
+     "As for the customer load: NetSuite's country names; US states as two-letter codes, Canadian provinces in full; "
+     "postal code prefixes removed and ZIP+4 hyphenated; country left blank where there is no address (2026-10-27).",
+     f"Country blank on the {len(no_ctry)} vendors with no address, flagged \"Country left blank\". Countries written as "
+     "NetSuite lists them: Korea (the Republic of), Türkiye, Taiwan (Province of China), Viet Nam. Every country is "
+     "checked against NetSuite's list."),
+    ("Addresses corrected by hand",
+     "Some Sage addresses had parts in the wrong field (the city in Address 2, the state in City), a wrong state or "
+     "country, or a tax or registration number written into the address.",
+     "Correct each from the Sage address itself, as for the customer load; move tax numbers to Tax ID where it is blank; "
+     "leave a missing postal code blank rather than guess it.",
+     f"{len(hand)} vendors corrected, each flagged \"Address fields corrected\" with what changed: {ids(hand)}. Stray "
+     f"commas and spaces removed everywhere. {len(us_no_zip)} US addresses have no ZIP code in Sage and are left blank "
+     f"({ids(us_no_zip)})."),
     ("Individuals without first and last name",
      "NetSuite needs First Name and Last Name for a vendor that is an individual. Sage has neither for some individuals.",
      "Where the vendor name is a plain first and last name, split it; otherwise leave it for review. Vishnu Daya & Co LLP "

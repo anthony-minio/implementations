@@ -66,6 +66,8 @@ Activity of the 1,770 active Sage vendors, using the latest of Sage last bill, S
 - 2026-10-28: Kar Lu Caroline Harreld (V-01200, former FP&A contractor) and Neil Martin (V-01355) marked Inactive in Ramp before the sync (`RAMP_RETIRE`; Ramp does not add Inactive vendors to the NetSuite sync). Load tabs hold only rows loaded to NetSuite (Anthony); records left out are on a Not Loaded tab.
 - `tools/build_delivery.py` writes `data/MinIO_Vendor_Load_to_NetSuite_20261028.xlsx` (tabs Notes, Vendors-Draft, Not Loaded): 625 vendors in NetSuite on Vendors-Draft (572 by the Ramp sync, 53 from the file); Not Loaded has 7 (1 merged, 4 duplicates in Ramp, 2 no longer used, all to mark Inactive in Ramp). `tools/validate_load.py` checks it: no issues; planted errors (subsidiary, Vendor ID on an archived record, a loaded record in Merged Sage IDs, a duplicate name) all caught.
 
+- 2026-10-28: formatting as for the customer load (`tools/vendor_clean.py`): US phones (999) 999-9999, others international; NetSuite country names; US state codes, Canadian provinces in full; postal prefixes removed, ZIP+4 hyphenated; country blank where Sage has no address (its United States default); 19 addresses corrected by hand from the Sage address (`ADDRESS_FIX`), tax numbers in addresses moved to Tax ID. `tools/validate_load.py` checks the same rules independently (phone format and digits traced to source, NetSuite country list, state and ZIP formats, hand corrections use only Sage's words); 8 planted errors all caught.
+
 ## Load log
 
 | Date | File | Records | Errors | Outcome |
