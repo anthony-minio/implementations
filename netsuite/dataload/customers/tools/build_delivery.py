@@ -6,7 +6,7 @@ import openpyxl
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-OUT = "data/MinIO_Customer_Load_to_NetSuite_20261027.xlsx"
+OUT = "data/MinIO_Customer_Load_to_NetSuite_20261028.xlsx"
 s = open("data/customer-review.html", encoding="utf-8").read()
 data = json.loads(s[s.index("const DATA = ") + 13:s.index(";\nconst $")])
 cols, review, required = data["cols"], list(data["review"]), set(data["required"])
@@ -90,6 +90,11 @@ TERMS_LIST = {"Due on Receipt", "Net 10", "Net 15", "Net 30", "Net 45", "Net 60"
 nt = collections.Counter(V(r, "Terms") for r in load if V(r, "Terms") and V(r, "Terms") not in TERMS_LIST)
 new_terms = ", ".join(f"{t} ({nt[t]})" for t in sorted(nt, key=lambda t: int(t.split()[1])))
 split = [r for r in load if V(r, "Duplicate Action").startswith("New: split")]
+moved_mail = [r for r in load if has_flag(r, "Reseller's email moved")]
+suffixed = [r for r in load if re.search(r" -0\d$", V(r, "Company Name"))]
+second_pass = [r for r in load if any("Address fields corrected" in f for f in r["flags"])]
+prefix = [r for r in load if has_flag(r, "Postal code country prefix removed")]
+filled = [r for r in load if any(f.startswith("No address in Sage; ") for f in r["flags"])]
 no_terms = sum(1 for r in load if not V(r, "Terms") and not has_flag(r, "Terms left blank"))
 apostrophe = sum(1 for r in load if any(f.startswith("Phone formatted from \"'") for f in r["flags"]))
 
@@ -161,11 +166,59 @@ DECISIONS = [
      f"{len(country_moved)}: {ids(country_moved)}. US state added from the ZIP code for {len(state_zip)}; City set to "
      "Singapore for Singapore addresses. Two Singapore postal codes and one German street (Duravit, whose Sage street line "
      f"was a delivery note) come from Salesforce. {len(addr_check)} addresses to check are flagged \"Address to check\"."),
-    ("Country with no address",
-     f"{len(no_country)} customers have no address at all in Sage, and Sage shows United States, its default when no address "
-     "is entered. Several are not US companies (for example Aegon Emeklilik, National Bank of Cambodia, Nais Sp. z o.o.).",
-     "The country is where the address is; with no address there is no country to load.",
-     f"Country left blank for {ids(no_country)}, flagged \"Country left blank\"."),
+    ("Customers with no address",
+     f"{len(no_country) + len(filled)} customers have no address at all in Sage, and Sage shows United States, its default when no "
+     "address is entered. Several are not US companies (for example Aegon Emeklilik, National Bank of Cambodia, Nais Sp. z o.o.). "
+     "Addresses were looked up in Salesforce (under other account names) and public sources, each with a confidence rating.",
+     "Use the high-confidence addresses; for the rest leave the address blank and the country blank, since the country is where "
+     "the address is (2026-10-28).",
+     f"Address and country added for {ids(filled)} (Salesforce or the head office address; source in Flags). Country left blank "
+     f"for {ids(no_country)}, flagged \"Country left blank\": their addresses could not be confirmed."),
+    ("VAT ID and International VAT ID",
+     "The template has both a VAT ID and an International VAT ID column. In practice they hold the same number (the VAT "
+     "number with its country prefix).",
+     "Put the same number in both; SOA will keep the column they use (2026-10-28).",
+     "International VAT ID now equals VAT ID on every row."),
+    ("Country names in NetSuite's spelling",
+     "NetSuite's CSV import needs each country's name exactly as NetSuite lists it, and some differ from Sage's.",
+     "Use NetSuite's names (Oracle's NetSuite country list, 2026-10-28).",
+     "Korea, Republic of to Korea (the Republic of); Moldova, Republic of to Moldova (the Republic of); Congo, Democratic "
+     "Republic to Congo (the Democratic Republic of the); Czech Republic to Czechia; Turkey to Türkiye; Vietnam to Viet Nam; "
+     "Taiwan to Taiwan (Province of China); Cape Verde to Cabo Verde; Curaçao to Curacao; Palestinian Territory, Occupied to "
+     "Palestine (State of). Monte-Carlo moved from France to Monaco and two Hong Kong customers from China to Hong Kong, where "
+     "their addresses are."),
+    ("Parent Company",
+     "Parent Company named the parent as Salesforce spells it, which does not always match the parent customer's name in this "
+     "load (BC \"Moldindconbank\" SA is written with different quote marks), so NetSuite could not link them.",
+     "Name the parent exactly as in this load and add the parent's Customer ID in its own column. Keep the USAF parent links; "
+     "C-00333 and the new L3Harris customers have no parent (2026-10-28).",
+     "Parent Company is the parent's name in this load; the added Parent Customer ID column gives its Customer ID."),
+    ("Reseller name and contact",
+     "Sage writes the bill-to as \"Contact, Company\" (for example \"Corey Sutton, SHI International Corp\"), so Billed To "
+     "(Reseller) held a person and a company.",
+     "Split them: the company in Billed To (Reseller), the person in a new Reseller Contact column, to start tracking contacts "
+     "for a later contacts load (2026-10-28).",
+     "Billed To (Reseller) holds the company only; Reseller Contact holds the person where Sage has one."),
+    ("Invoices billed to the reseller",
+     "For customers billed through a reseller, Sage often holds the reseller's accounts payable address on the customer (for "
+     "example VendorInvoices@SHI.com on Baker Hughes).",
+     "Invoices go to the reseller, so its addresses belong with the reseller (2026-10-28).",
+     f"For {len(moved_mail)} customers the reseller's addresses moved from Customer Invoice Email and Additional Emails to Reseller "
+     "Invoice Email (listed in Flags). Customers billed to their own billing entity (for example Kayak Software Corporation) "
+     "are unchanged."),
+    ("Address review, second pass",
+     "A column-by-column review found contacts typed into the street line, a state, county or district in the city field, "
+     "Sage typos (San Francsico, Moscoa, Weisbaden), postal codes with a country prefix or a lost leading zero, and US states "
+     "written both ways.",
+     "Contacts move to Attention; a city fix is made only when the street and postal code confirm the place; typos are fixed "
+     "the same way; postal code prefixes are removed and leading zeros restored; a postal code that cannot be worked out is "
+     "removed. US states as two-letter codes, Canadian provinces by full name (2026-10-28).",
+     f"Corrected addresses are listed in Flags (\"Address fields corrected\"); {len(prefix)} more postal codes lost a country "
+     "prefix (\"Postal code country prefix removed\"). Addresses that could not be settled are flagged \"Address to check\"."),
+    ("Customers with the same name",
+     "Some customers share a name but are separate Subnet accounts, so they would look identical in NetSuite.",
+     "Add -01, -02 to the name, as for the new L3Harris customers (2026-10-28).",
+     f"{len(suffixed)} customers carry a suffix: {', '.join(V(r, 'Customer ID') + ' ' + V(r, 'Company Name') for r in suffixed)}."),
 ]
 
 NOTES = [
@@ -178,7 +231,11 @@ NOTES = [
      f"{B['first'] - len(B['excluded'])}. Added: the {B['split']} new L3Harris customers split from C-00333 ({ids(split)}): "
      f"{B['first'] - len(B['excluded'])} + {B['split']} = {B['rows']}, the rows on the Customers-Draft tab. Of these, "
      f"{B['merged']} are duplicates marked \"Merge into\" and merged into {B['kept']} other customers: {B['rows']} - "
-     f"{B['merged']} = {B['load']} customers to load."),
+     f"{B['merged']} = {B['load']} customers to load. The merged duplicates are already merged: their Sage IDs, addresses and "
+     f"emails are on the customer they merge into. They stay on the tab only so the merge can be checked, and must be filtered "
+     f"out (Duplicate Action \"Merge into\") before the import. {B['merged']} duplicates merge into {B['kept']} customers because "
+     f"two customers each had two duplicates: Scotia BNS Canadian Banking (C-00405) merges C-00039 and C-00049, and "
+     f"Ministry of Defence UK (C-00481) merges C-00497 and C-00629."),
     ("Customer ID and External ID",
      "Customer ID is the Sage C-##### number. External ID is the same value, so later loads and updates can find each "
      "customer by it. The two new L3Harris customers take the next numbers after the highest Sage number (C-00641)."),
@@ -208,9 +265,9 @@ NOTES = [
      "\"30 Days\" becomes Net 30, and so on. Day counts with no match on the list become new terms of the same length, to "
      f"create in NetSuite before the load: {new_terms}. Sage \"5 years\" becomes Net 1825. {no_terms} customers have no terms in Sage."),
     ("VAT ID",
-     "VAT ID holds VAT or GST registration numbers only, with the country prefix (Sage \"813089973\" for a German customer "
+     "VAT ID and International VAT ID hold VAT or GST registration numbers only, with the country prefix (Sage \"813089973\" for a German customer "
      "becomes DE813089973). India GSTINs, Mexico RFCs and Saudi and UAE VAT numbers are kept as Sage has them. Other tax IDs "
-     "in Sage (US EINs, company registration numbers) are in the added Other Tax ID column. International VAT ID is blank."),
+     "in Sage (US EINs, company registration numbers) are in the added Other Tax ID column."),
     ("Parent Company",
      f"Salesforce links some accounts to a parent. For {data['parents_dropped']} customers the parent is not a Sage customer "
      "(no billing history), so it is not loaded and Parent Company is blank. Parent links are kept where the parent is "
@@ -225,9 +282,7 @@ NOTES = [
      "Address and country corrections of 2026-10-27 are in the decisions above."),
     ("Country names",
      "NetSuite's CSV import needs the country's full name exactly as NetSuite lists it; it rejects ISO codes (\"Invalid "
-     "country reference key US\"). Countries are written as Sage writes them (Korea, Republic of; Moldova, Republic of; Congo, Democratic Republic; "
-     "Côte d'Ivoire; Palestinian Territory, Occupied). NetSuite's CSV import needs its own country names, so these should "
-     "be checked against NetSuite's list when the import is mapped."),
+     "country reference key US\"). Every country in the file is checked against NetSuite's list."),
 ]
 
 OPEN = [
@@ -235,8 +290,10 @@ OPEN = [
     "Accounting Lists > New > Customer Category).",
     f"Terms not on SOA's list: {new_terms}. Create them in NetSuite, or say which existing term each should use. The "
     f"{sum(nt.values())} customers concerned are marked \"New NetSuite term\" in Question Categories.",
-    "VAT ID and International VAT ID: SOA to confirm what each field is for, and whether Other Tax ID (US EINs and company "
-    "registration numbers) should be loaded anywhere.",
+    "VAT ID and International VAT ID carry the same number; SOA to keep the column they use, and say whether Other Tax ID "
+    "(US EINs and company registration numbers) should be loaded anywhere.",
+    "Salesforce matches by email domain: about 100 customers without a Salesforce match have a likely Salesforce account "
+    "(and Subnet ID) under another name. A review list is with Anthony; accepted matches will be added.",
     "L3Harris: assign contracts CN-SO0565 and CN-SO0603 to the new customers C-00642 (Subnet 716) and C-00643 (Subnet 720) "
     "when contracts are loaded.",
 ]

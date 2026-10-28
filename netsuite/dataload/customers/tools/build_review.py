@@ -287,11 +287,116 @@ ADDRESS_WHY = {
 ADDRESS_CHECK = {
     "C-00020": "Postal code 55 0100000 is as Sage has it; Kazakhstan postal codes have 6 digits (Astana is 010000)",
     "C-00153": "ZIP 110018 is as Sage has it; New York ZIPs have 5 digits (West 40th Street is 10018)",
-    "C-00326": "No ZIP code in Sage", "C-00566": "No ZIP code in Sage",
+    "C-00326": "No ZIP code in Sage",
     "C-00238": "Sage address mixes Electronics City (Bangalore) and Hinjawadi (Pune); city left blank",
     "C-00604": "Sage address has garbled Turkish characters (CAMLYCA YÞ for ÇAMLICA İŞ), kept as Sage has them",
     "C-00546": "Salesforce has Doha, Qatar for the same P.O. Box; Sage has Dubai, kept",
 }
+
+# Second pass of address corrections (Anthony, 2026-10-28): contacts typed into the street line moved to Attention; city
+# fields holding a state, county or district split into city and state, using the street and postal code to be sure of
+# the city; Sage typos fixed only where the full address confirms the place; country prefixes stripped from postal codes
+# and lost leading zeros restored; postal codes that cannot be worked out from the address removed. A ("value", "rule")
+# tuple is a value not in the Sage text (a corrected spelling or a postal code read from the address).
+ADDRESS_FIX2 = {
+    "C-00291": {"Attention": "Cheick Diakite", "Address 1": "01 BP 3865, Abidjan 01", "Address 2": ""},
+    "C-00312": {"Attention": "Sophia Choi", "Address 1": "425 West 6th Avenue, Unit 400", "Address 2": ""},
+    "C-00413": {"Attention": "PHILIP HANKINS, Customer PO Number H86203", "Address 1": "7 Murray Rose Avenue", "Address 2": "",
+                "City": "SYDNEY OLYMPIC PARK", "Province/State": "NSW"},
+    "C-00125": {"Attention": "Johannes Weidacher", "Address 1": "Mühldorfstrasse 15", "Address 2": ""},
+    "C-00129": {"Attention": "Maxi Schaefer", "Address 1": "Robert-Bosch-Straße 200", "Address 2": ""},
+    "C-00150": {"Attention": "ASHISH MAHAJAN", "Address 1": "415 MISSION ST", "Address 2": ""},
+    "C-00188": {"Attention": "Frau Brüner", "Address 1": "DVO Team IT-Einkauf", "Address 2": ""},
+    "C-00227": {"Attention": "Jaap Albers (06-29677174)", "Address 1": "Prins Willem-Alexanderhof 20", "Address 2": "",
+                "Province/State": "", "Postal Code/Zip": "2595 BE"},
+    "C-00311": {"Attention": "Fabio Colombo", "Address 1": "Viale Restelli 1/A", "Address 2": "", "Postal Code/Zip": "20124"},
+    "C-00320": {"Address 1": "Auf dem Steinbüchel 22", "Address 2": ""},
+    "C-00386": {"Address 1": "Rue de la Fusée 96", "Address 2": ""},  # Luc Mortier is Atos's contact: Reseller Contact
+    "C-00540": {"Attention": "Shil Bhattacharyya", "Address 1": "1003 W FM 193", "Address 2": ""},
+    "C-00565": {"Attention": "Ms Jenny Parrish - Finance Department (L)", "Address 1": "PO Box 8000", "Address 2": ""},
+    "C-00058": {"Address 1": "Rudolf-Breitscheid-Str 1-5", "Postal Code/Zip": "35037"},
+    "C-00623": {"Address 2": "Clieveragh Road", "City": "Listowel", "Province/State": "Kerry"},
+    "C-00051": {"Address 1": "Rakuten Crimson House, 1-14-1 Tamagawa", "City": "Setagaya-ku"},
+    "C-00069": {"Address 1": "Eighty Eight Kasabkanka Lt 18 Jl., Casablanca Raya Kav. 88", "City": ("Jakarta Selatan", "rule")},
+    "C-00075": {"City": ("Pittsburgh", "rule")},
+    "C-00135": {"Country": "Russian Federation"},
+    "C-00136": {"Address 1": "Miklukho-Maklaya ul, dom 40", "Address 2": "Podval Pomeshchenie I Kom 25", "City": ("Moscow", "rule"),
+                "Postal Code/Zip": "117342"},
+    "C-00139": {"City": ("Hangzhou", "rule"), "Province/State": "Zhejiang"},
+    "C-00140": {"Address 2": "", "City": "Porto Velho", "Province/State": ("Rondônia", "rule"), "Postal Code/Zip": "76801-330"},
+    "C-00148": {"City": ("San Francisco", "rule")},
+    "C-00170": {"City": "Rende", "Province/State": "CS"},
+    "C-00200": {"Address 2": "Enseada do Suá", "City": "Vitória"},
+    "C-00212": {"City": "Milano", "Province/State": "MI"},
+    "C-00213": {"City": ("Navi Mumbai", "rule"), "Province/State": "Maharashtra"},
+    "C-00223": {"Address 2": "INFORMATION SYSTEMS CENTRE PLOT NO. 40 , HI- TECH CITY PHASE-II, MADHAPUR", "City": "HYDERABAD"},
+    "C-00226": {"Address 2": "P.O. Box", "City": "Zürich"},
+    "C-00233": {"City": "CASALECCHIO DI RENO", "Province/State": "BO"},
+    "C-00257": {"Address 2": "", "City": "Cheltenham", "Province/State": "Gloucestershire"},
+    "C-00276": {"Address 2": "NGALIEMA", "City": "KINSHASA"},
+    "C-00288": {"City": ("Redwood City", "rule")},
+    "C-00306": {"Address 2": "", "City": "Newbury", "Province/State": "Berkshire"},
+    "C-00325": {"City": "Suzhou", "Province/State": "Jiangsu"},
+    "C-00335": {"Address 1": "Av Cidade de Lisboa", "Address 2": "Várzea, CP.620", "City": "Praia", "Postal Code/Zip": ""},
+    "C-00355": {"Address 2": "Marcigliana", "City": ("Roma", "rule")},
+    "C-00361": {"Address 2": "", "City": "Ouro Preto do Oeste", "Province/State": ("Rondônia", "rule")},
+    "C-00369": {"City": "New York"}, "C-00543": {"City": "New York"},
+    "C-00376": {"City": ("Wiesbaden", "rule")},
+    "C-00400": {"Address 1": "Rua Caetes, 13 – Piedade", "City": "Itaúna", "Province/State": "Minas Gerais"},
+    "C-00401": {"Address 2": "", "City": "Koblenz", "Province/State": "Rheinland-Pfalz"},
+    "C-00420": {"Address 2": "Wenyi West Road, Wuchang Street,Yuhang District", "City": "Hangzhou", "Province/State": "Zhejiang"},
+    "C-00437": {"City": ("San Jose", "rule")},
+    "C-00481": {"Address 2": "Westwells Rd", "City": "Corsham", "Province/State": ("Wiltshire", "rule")},
+    "C-00569": {"City": ("Tbilisi", "rule")},
+    "C-00588": {"Address 1": "HFM 4911; Channel Way", "City": "Preston", "Province/State": "Lancashire"},
+    "C-00594": {"Address 2": "High-Tech Zone", "City": "Hefei", "Province/State": "Anhui", "Postal Code/Zip": ""},
+    "C-00048": {"Postal Code/Zip": "EC2V 5DD"}, "C-00056": {"Postal Code/Zip": "1170"}, "C-00090": {"Postal Code/Zip": "6300"},
+    "C-00095": {"Postal Code/Zip": "8308"}, "C-00111": {"Postal Code/Zip": ("600081", "rule")},
+    "C-00117": {"Postal Code/Zip": "164 80"}, "C-00153": {"Postal Code/Zip": ("10018", "rule")},
+    "C-00155": {"Postal Code/Zip": ("K1A 0Y7", "rule")}, "C-00198": {"Address 2": "", "Postal Code/Zip": "3372"},
+    "C-00215": {"City": "Son", "Postal Code/Zip": "5692 ED"}, "C-00232": {"Postal Code/Zip": "852 29"},
+    "C-00271": {"Postal Code/Zip": "60329"}, "C-00296": {"Postal Code/Zip": "1150"}, "C-00315": {"Postal Code/Zip": "93059"},
+    "C-00317": {"Postal Code/Zip": ""}, "C-00327": {"Postal Code/Zip": "111 51"}, "C-00368": {"Postal Code/Zip": "8152"},
+    "C-00427": {"Postal Code/Zip": "10709"}, "C-00440": {"Postal Code/Zip": "04289"}, "C-00441": {"Postal Code/Zip": "01510"},
+    "C-00448": {"Postal Code/Zip": ("EC4N 6AE", "rule")}, "C-00492": {"Postal Code/Zip": ("08940", "sfdc")},
+    "C-00518": {"Postal Code/Zip": "115 38"}, "C-00614": {"Postal Code/Zip": "63225"},
+    "C-00566": {"Postal Code/Zip": ("20755", "rule")},
+    "C-00180": {"Province/State": ""}, "C-00132": {"Province/State": "Guatemala"},
+    "C-00316": {"Country": "Monaco"}, "C-00256": {"Country": "Hong Kong"}, "C-00415": {"Country": "Hong Kong"},
+    "C-00208": {"Address 1": ("No 14 Sarı Kanarya Sokak", "sfdc"), "City": ("Kozyataği", "sfdc")},
+    # Customers with no address in Sage: high-confidence addresses approved by Anthony, 2026-10-28.
+    "C-00097": {"Address 1": ("No 14 Sarı Kanarya Sokak", "sfdc"), "City": ("Kozyataği", "sfdc"),
+                "Postal Code/Zip": ("34742", "sfdc"), "Country": ("Turkey", "sfdc")},
+    "C-00530": {"Address 1": ("6 Rue Fructidor", "sfdc"), "City": ("Saint-Ouen-Sur-Seine", "sfdc"),
+                "Postal Code/Zip": ("93400", "sfdc"), "Country": ("France", "sfdc")},
+    "C-00536": {"Address 1": ("ul. Piecewska 34B", "sfdc"), "City": ("Gdańsk", "sfdc"), "Postal Code/Zip": ("80-288", "sfdc"),
+                "Country": ("Poland", "sfdc")},
+    "C-00532": {"Address 1": ("#22-24 Norodom Blvd", "rule"), "Address 2": ("Daun Penh", "rule"), "City": ("Phnom Penh", "rule"),
+                "Country": ("Cambodia", "rule")},
+}
+for _cid, _fix in ADDRESS_FIX2.items():
+    ADDRESS_FIX.setdefault(_cid, {}).update(_fix)
+RESELLER_CONTACT = {"C-00386": "Luc Mortier"}  # Sage had the reseller's contact (Atos) in the customer's street line
+ADDRESS_WHY.update({
+    "C-00097": "No address in Sage; address from the Salesforce account Viennalife (formerly Aegon), Subnet 329, approved 2026-10-28",
+    "C-00530": "No address in Sage; address from the Salesforce account Economie d'Energie, Subnet 947, approved 2026-10-28",
+    "C-00536": "No address in Sage; address from the Salesforce account Nais.co, Subnet 964, approved 2026-10-28",
+    "C-00532": "No address in Sage; head office address from public directories (#22-24 Norodom Blvd), approved 2026-10-28",
+    "C-00208": "Sage street and city had garbled Turkish characters (Sar# Kanarya, Kozyata#i); Salesforce spelling used",
+    "C-00136": "Sage city was the typo Moscoa; postal code 117342 from the Sage street line, which matches Miklukho-Maklaya ul (Sage postal field had 125373)",
+    "C-00594": "Sage postal code 518057 is in Shenzhen, not Hefei; removed",
+    "C-00317": "Sage postal code 1153 is incomplete (Saudi codes have 5 digits); removed",
+    "C-00335": "CP.620 is a P.O. box (Caixa Postal), not a postal code; moved to Address 2",
+    "C-00448": "Sage postal code EC4N GAE is a typo; 66 Cannon Street is EC4N 6AE",
+    "C-00155": "Sage postal code K1A OY7 has the letter O for zero",
+    "C-00153": "Sage ZIP 110018 has an extra digit; West 40th Street, New York is 10018",
+    "C-00566": "No ZIP code in Sage; Fort Meade, MD is 20755",
+})
+ADDRESS_CHECK.update({
+    "C-00019": "Sage has a London street (100 New Bridge Street) with city London, state CT and ZIP 06902 (Stamford, CT); there is no London, CT, so the address cannot be settled from Sage",
+    "C-00618": "City Yvelines (a French department) with postal code 75009 (Paris); left as Salesforce has it",
+})
+ADDRESS_CHECK.pop("C-00153", None)
 
 def match(name):
     k = norm(name)
@@ -328,8 +433,8 @@ COLS = ["External ID", "Subnet ID", "Customer ID", "Company Name", "Parent Compa
         "Postal Code/Zip", "Country", "Default Billing", "Default Shipping", "Account", "Terms", "VAT ID",
         "International VAT ID", "Taxable", "Avalara Entity", "Exemption Certificate No."]
 REQUIRED = {"Customer ID", "Company Name", "Subsidiary", "Status", "Primary Currency", "Customer Category"}
-ADDED = ["Question Categories", "Duplicate Action", "Merged Sage IDs", "Second Address", "Third Address", "Sage Customer ID", "Salesforce Account ID", "Additional Emails", "Other Tax ID", "Billed To (Reseller)",
-         "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
+ADDED = ["Question Categories", "Duplicate Action", "Merged Sage IDs", "Second Address", "Third Address", "Sage Customer ID", "Salesforce Account ID", "Parent Customer ID", "Additional Emails", "Other Tax ID", "Billed To (Reseller)",
+         "Reseller Contact", "Reseller Address", "Reseller Invoice Email", "Salesforce Partners"]
 REVIEW = ["Sage type", "Sage terms", "Last invoice", "Balance", "Salesforce match"]
 
 # One-time-use customers are active in Sage but left out of the customer list report: only the list export has them.
@@ -339,7 +444,7 @@ blank = {k: "" for k in sage[0]}
 onetime_rows = [dict(blank, **{"Customer ID": cid, "Customer name": lst[cid]["Customer name"], "Status": "Active",
                                "Customer type": lst[cid]["Customer type ID"]}) for cid in ONETIME]
 
-out, new_terms, research, parents_dropped, excluded = [], {}, {}, {}, []
+out, new_terms, research, parents_dropped, excluded, parent_sf = [], {}, {}, {}, [], {}
 for r in sage + onetime_rows:
     if r["Status"] != "Active":
         continue
@@ -380,6 +485,7 @@ for r in sage + onetime_rows:
             par = by_id.get(m["Parent Account ID"])
             if par and any(norm(par["Account Name"]) == norm(x["Customer name"]) for x in sage):
                 S("Parent Company", m["Parent Account"], "sfdc")
+                parent_sf[cid] = m["Parent Account ID"]
             else:
                 parents_dropped[m["Parent Account"]] = parents_dropped.get(m["Parent Account"], 0) + 1
     S("Subsidiary", "MinIO, Inc.", "rule")
@@ -485,6 +591,7 @@ for r in sage + onetime_rows:
         vat, other_tax, why = tax_id(c["Country"][0] or r["display_country"], raw_tax)
         if vat:
             S("VAT ID", vat, "sage" if vat == raw_tax and r["Tax ID"] else "rule")
+            S("International VAT ID", vat, "rule")  # same number in both columns; SOA to keep the one they use (2026-10-28)
         if why:
             flags.append(f"Tax ID: {why}")
         if not r["Tax ID"]:
@@ -520,13 +627,42 @@ for r in sage + onetime_rows:
     A("Sage Customer ID", cid)
     if m:
         A("Salesforce Account ID", id18(m["Account ID"]), "sfdc" if how in ("exact", "confirmed") else "prop")
-    A("Additional Emails", "; ".join(more))
     A("Other Tax ID", other_tax)
+    reseller_emails = split_emails(r["billto_email"]) if billto else []
     if billto:
+        # Sage writes the bill-to as "Contact, Company"; the company is the reseller, the person its contact (2026-10-28).
+        company, contact = r["billto_company"].strip(), r["billto_attention"].strip()
+        if re.match(r"(Inc|LLC|Ltd|Corp)\b\.?,\s+", company):  # "Click-Into, Inc., Click-Into Inc" split at the wrong comma
+            company, contact = re.sub(r"^(Inc|LLC|Ltd|Corp)\b\.?,\s+", "", company), ""
+        if norm(company).startswith(norm(contact)):
+            contact = ""  # the contact line repeats the company name
         addr = ", ".join(x.strip(" ,") for x in [r["billto_line1"], r["billto_line2"], r["billto_citystatezip_country"]] if x.strip(" ,"))
-        A("Billed To (Reseller)", r["billto_name"])
+        A("Billed To (Reseller)", company)
+        A("Reseller Contact", contact or RESELLER_CONTACT.get(cid, ""))
         A("Reseller Address", re.sub(r"\s*,(\s*,)+", ",", addr))
-        A("Reseller Invoice Email", r["billto_email"])
+        # Billed through a reseller (not the customer's own billing entity): the reseller's addresses Sage holds on the
+        # customer move to Reseller Invoice Email, since invoices go to the reseller (2026-10-28).
+        squashed = norm(r["Customer name"]).replace(" ", "")
+        own_entity = bool(set(norm(company).split()) & set(norm(r["Customer name"]).split()))
+        rdomains = {e.split("@")[1].lower() for e in reseller_emails}
+        rwords = set(norm(company).split())
+        def is_reseller(e):
+            d = e.split("@")[1].lower()
+            labels = [x for x in d.split(".")[:-1] if x not in ("com", "co", "gov", "org", "net", "ac", "edu", "email")]
+            root = labels[-1] if labels else d
+            mine_ = root in squashed or (len(squashed) > 3 and squashed in root)  # the customer's own domain
+            return not own_entity and not mine_ and (d in rdomains or root in rwords)
+        moved = [e for e in [inv] + more if e and is_reseller(e)]
+        if moved:
+            mine = [e for e in [inv] + more if e and e not in moved]
+            ap_mine = [e for e in mine if AP.search(e.split("@")[0])]
+            inv = (ap_mine or mine or [""])[0]
+            more = [e for e in mine if e != inv]
+            c["Customer Invoice Email"] = [inv, "sage" if inv else ""]
+            reseller_emails += [e for e in moved if e.lower() not in {x.lower() for x in reseller_emails}]
+            flags.append("Reseller's email moved from the customer's emails to Reseller Invoice Email: " + ", ".join(moved))
+        A("Reseller Invoice Email", "; ".join(reseller_emails), "sage" if not moved else "rule")
+    A("Additional Emails", "; ".join(more))
     p = partners.get(norm(r["Customer name"]))
     if not p and m:
         p = partners.get(norm(m["Account Name"]))
@@ -724,6 +860,66 @@ for g in (g for g in groups.values() if len(g) > 1):
     for x in xs:
         if x is not keep:
             x["cells"][DA] = ["Merge into " + kid, "rule"]
+
+# Final pass over the loaded rows (2026-10-28).
+CI_, NI_, DA_ = COLS.index("Customer ID"), COLS.index("Company Name"), len(COLS) + ADDED.index("Duplicate Action")
+loaded = [x for x in out if not x["cells"][DA_][0].startswith("Merge into")]
+# Customers with the same name and different Subnet IDs get -01, -02 in Customer ID order, as the L3Harris split did.
+same_name = {}
+for x in loaded:
+    same_name.setdefault(x["cells"][NI_][0], []).append(x)
+for name, xs in same_name.items():
+    if len(xs) > 1 and len({x["cells"][SNI][0] for x in xs}) == len(xs) and all(x["cells"][SNI][0] for x in xs):
+        for n_, x in enumerate(sorted(xs, key=lambda x: x["cells"][CI_][0]), 1):
+            x["cells"][NI_] = [f"{name} -{n_:02d}", "rule"]
+            x["flags"].append(f"Name suffix -{n_:02d}: {len(xs)} customers named {name}, each its own Subnet account")
+# Parent Company names the parent as it is in this load, and Parent Customer ID gives its Customer ID.
+PCI = len(COLS) + ADDED.index("Parent Customer ID")
+for x in loaded:
+    psf = parent_sf.get(x["cells"][SCI0][0])
+    if not x["cells"][COLS.index("Parent Company")][0] or not psf:
+        continue
+    pname = norm(by_id[psf]["Account Name"]) if psf in by_id else ""
+    par = [y for y in loaded if y["cells"][SAI][0][:15] == psf] or \
+          [y for y in loaded if norm(re.sub(r" -0\d$", "", y["cells"][NI_][0])) == pname]
+    if len(par) == 1:
+        if par[0]["cells"][NI_][0] != x["cells"][COLS.index("Parent Company")][0]:
+            x["flags"].append(f"Parent Company written as the parent's name in this load (Salesforce: {x['cells'][COLS.index('Parent Company')][0]})")
+        x["cells"][COLS.index("Parent Company")] = [par[0]["cells"][NI_][0], "rule"]
+        x["cells"][PCI] = [par[0]["cells"][CI_][0], "rule"]
+    else:
+        x["flags"].append("Parent Company not found in this load")
+# US states as two-letter codes; Canadian provinces by full name (2026-10-28).
+US_CODE = {"Alabama": "AL", "Alaska": "AK", "Arizona": "AZ", "Arkansas": "AR", "California": "CA", "Colorado": "CO",
+           "Connecticut": "CT", "Delaware": "DE", "District of Columbia": "DC", "Florida": "FL", "Georgia": "GA", "Hawaii": "HI",
+           "Idaho": "ID", "Illinois": "IL", "Indiana": "IN", "Iowa": "IA", "Kansas": "KS", "Kentucky": "KY", "Louisiana": "LA",
+           "Maine": "ME", "Maryland": "MD", "Massachusetts": "MA", "Michigan": "MI", "Minnesota": "MN", "Mississippi": "MS",
+           "Missouri": "MO", "Montana": "MT", "Nebraska": "NE", "Nevada": "NV", "New Hampshire": "NH", "New Jersey": "NJ",
+           "New Mexico": "NM", "New York": "NY", "North Carolina": "NC", "North Dakota": "ND", "Ohio": "OH", "Oklahoma": "OK",
+           "Oregon": "OR", "Pennsylvania": "PA", "Rhode Island": "RI", "South Carolina": "SC", "South Dakota": "SD",
+           "Tennessee": "TN", "Texas": "TX", "Utah": "UT", "Vermont": "VT", "Virginia": "VA", "Washington": "WA",
+           "West Virginia": "WV", "Wisconsin": "WI", "Wyoming": "WY"}
+CA_NAME = {"AB": "Alberta", "BC": "British Columbia", "MB": "Manitoba", "NB": "New Brunswick", "NL": "Newfoundland and Labrador",
+           "NS": "Nova Scotia", "NT": "Northwest Territories", "NU": "Nunavut", "ON": "Ontario", "PE": "Prince Edward Island",
+           "QC": "Quebec", "SK": "Saskatchewan", "YT": "Yukon"}
+# Country names as NetSuite lists them for CSV import (Country enumeration, Oracle help, 2026-10-28).
+NS_COUNTRY = {"Korea, Republic of": "Korea (the Republic of)", "Moldova, Republic of": "Moldova (the Republic of)",
+              "Congo, Democratic Republic": "Congo (the Democratic Republic of the)", "Cape Verde": "Cabo Verde",
+              "Czech Republic": "Czechia", "Curaçao": "Curacao", "Turkey": "Türkiye", "Vietnam": "Viet Nam",
+              "Taiwan": "Taiwan (Province of China)", "Palestinian Territory, Occupied": "Palestine (State of)", "USA": "United States"}
+STI, CTI = COLS.index("Province/State"), COLS.index("Country")
+for x in out:
+    st, ct = x["cells"][STI][0], x["cells"][CTI][0]
+    if ct == "United States" and st in US_CODE:
+        x["cells"][STI] = [US_CODE[st], "rule"]
+    elif ct == "Canada" and st.upper() in CA_NAME:
+        x["cells"][STI] = [CA_NAME[st.upper()], "rule"]
+    if ct in NS_COUNTRY:
+        x["cells"][CTI] = [NS_COUNTRY[ct], x["cells"][CTI][1]]
+    pz = x["cells"][COLS.index("Postal Code/Zip")][0]
+    if re.match(r"[A-Z]{1,2}\s?-\s?\d", pz):  # country prefix on a postal code (MD-2012, L-1748)
+        x["cells"][COLS.index("Postal Code/Zip")] = [re.sub(r"^[A-Z]{1,2}\s?-\s?", "", pz), "rule"]
+        x["flags"].append(f"Postal code country prefix removed: was {pz}")
 
 # Bridge from the first Sage export (active customers) to the customers in the load.
 onetime = [(i, lst[i]["Customer name"]) for i in ONETIME]

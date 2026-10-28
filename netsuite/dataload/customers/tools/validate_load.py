@@ -20,20 +20,29 @@ NISHA = {"C-00381": ("End Customer", "779"), "C-00313": ("Direct Customer", "669
          "C-00333": (None, "695"), "C-00385": (None, "784"), "C-00562": (None, "1026")}
 L3_NEW = {"716", "720"}
 # Words in Sage's address text that are labels, not address, and words removed on purpose (each named in Flags).
+# Corrections confirmed from the full address rather than copied from Sage (each named in Flags): spelling of a place,
+# a postal code read from the address, a web-sourced head office address approved on 2026-10-28.
+CHECKED_FIX = {"C-00566", "C-00069", "C-00111", "C-00139", "C-00148", "C-00153", "C-00155", "C-00213", "C-00355", "C-00361",
+               "C-00376", "C-00437", "C-00448", "C-00481", "C-00532", "C-00569", "C-00075", "C-00136"}
+CA_PROVINCES = {"Alberta", "British Columbia", "Manitoba", "New Brunswick", "Newfoundland and Labrador", "Nova Scotia",
+                "Northwest Territories", "Nunavut", "Ontario", "Prince Edward Island", "Quebec", "Saskatchewan", "Yukon"}
 LABEL_WORDS = {"attn", "attention", "to", "atn", "poc", "vat", "id", "number", "rfc", "postal", "code"}
-INTENDED = {"C-00066": {"budapest"}, "C-00115": {"deilver", "digitally"}, "C-00253": {"france"}, "C-00387": {"cincinnati"},
+INTENDED = {"C-00069": {"delatan"}, "C-00075": {"pittsburg"}, "C-00111": {"600", "081"}, "C-00132": {"744", "gt"},
+            "C-00136": {"125373", "moscoa"}, "C-00139": {"province"}, "C-00140": {"cep", "rondonia"}, "C-00148": {"francsico"},
+            "C-00153": {"110018"}, "C-00155": {"oy7"}, "C-00226": {"ref"}, "C-00227": {"t", "a", "v"}, "C-00317": {"1153"},
+            "C-00335": {"cape"}, "C-00361": {"rodonia"}, "C-00369": {"city"}, "C-00376": {"weisbaden"},
+            "C-00386": {"luc", "mortier"}, "C-00437": {"sanjose"}, "C-00448": {"gae"}, "C-00481": {"wil"}, "C-00543": {"city"},
+            "C-00569": {"t'bilisi"}, "C-00594": {"518057", "city"}, "C-00058": {"e", "mail"},
+            "C-00066": {"budapest"}, "C-00115": {"deilver", "digitally"}, "C-00253": {"france"}, "C-00387": {"cincinnati"},
             "C-00108": {"c", "josa", "saeo"}, "C-00374": {"r", "o", "c"}, "C-00291": {"ci"}, "C-00425": {"fi"}}
 # Full country names as NetSuite and Sage write them; a cut-off name ("Republic of") fails.
-COUNTRIES = {"Argentina", "Armenia", "Australia", "Austria", "Bangladesh", "Belgium", "Bosnia and Herzegovina", "Brazil",
-             "Canada", "Cape Verde", "China", "Congo, Democratic Republic", "Croatia", "Curaçao", "Cyprus", "Czech Republic",
-             "Côte d'Ivoire", "Denmark", "Ecuador", "Estonia", "Ethiopia", "Faroe Islands", "Finland", "France", "Georgia",
-             "Germany", "Guatemala", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iraq", "Ireland", "Isle of Man",
-             "Israel", "Italy", "Japan", "Kazakhstan", "Korea, Republic of", "Lebanon", "Liechtenstein", "Lithuania",
-             "Luxembourg", "Malaysia", "Mexico", "Moldova, Republic of", "Mongolia", "Morocco", "Mozambique", "Netherlands",
-             "New Zealand", "Nigeria", "Norway", "Oman", "Pakistan", "Palestinian Territory, Occupied", "Poland", "Portugal",
-             "Qatar", "Russian Federation", "Saudi Arabia", "Senegal", "Singapore", "Slovakia", "South Africa", "Spain",
-             "Sweden", "Switzerland", "Taiwan", "Turkey", "Uganda", "United Arab Emirates", "United Kingdom",
-             "United States", "Vietnam", "Zambia"}
+# NetSuite's country names for CSV import (Country enumeration in Oracle's NetSuite help, given by Anthony 2026-10-28).
+COUNTRIES = set("""Afghanistan|Åland Islands|Albania|Algeria|American Samoa|Andorra|Angola|Anguilla|Antarctica|Antigua and Barbuda|Argentina|Armenia|Aruba|Australia|Austria|Azerbaijan|Bahamas|Bahrain|Bangladesh|Barbados|Belarus|Belgium|Belize|Benin|Bermuda|Bhutan|Bolivia (Plurinational State of)|Bonaire, Sint Eustatius and Saba|Bosnia and Herzegovina|Botswana|Bouvet Island|Brazil|British Indian Ocean Territory|Brunei Darussalam|Bulgaria|Burkina Faso|Burundi|Cabo Verde|Cambodia|Cameroon|Canada|Canary Islands|Cayman Islands|Central African Republic|Ceuta and Melilla|Chad|Chile|China|Christmas Island|Cocos (Keeling) Islands|Colombia|Comoros|Congo|Congo (the Democratic Republic of the)|Cook Islands|Costa Rica|Côte d'Ivoire|Croatia|Cuba|Curacao|Cyprus|Czechia|Denmark|Djibouti|Dominica|Dominican Republic|Ecuador|Egypt|El Salvador|Equatorial Guinea|Eritrea|Estonia|Eswatini|Ethiopia|Falkland Islands (Malvinas)|Faroe Islands|Fiji|Finland|France|French Guiana|French Polynesia|French Southern Territories|Gabon|Gambia|Georgia|Germany|Ghana|Gibraltar|Greece|Greenland|Grenada|Guadeloupe|Guam|Guatemala|Guernsey|Guinea|Guinea-Bissau|Guyana|Haiti|Heard Island and McDonald Islands|Holy See|Honduras|Hong Kong|Hungary|Iceland|India|Indonesia|Iran (Islamic Republic of)|Iraq|Ireland|Isle of Man|Israel|Italy|Jamaica|Japan|Jersey|Jordan|Kazakhstan|Kenya|Kiribati|Korea (the Democratic People's Republic of)|Korea (the Republic of)|Kosovo|Kuwait|Kyrgyzstan|Lao, People's Democratic Republic|Latvia|Lebanon|Lesotho|Liberia|Libya|Liechtenstein|Lithuania|Luxembourg|Macao|Madagascar|Malawi|Malaysia|Maldives|Mali|Malta|Marshall Islands|Martinique|Mauritania|Mauritius|Mayotte|Mexico|Micronesia (Federated States of)|Moldova (the Republic of)|Monaco|Mongolia|Montenegro|Montserrat|Morocco|Mozambique|Myanmar|Namibia|Nauru|Nepal|Netherlands|New Caledonia|New Zealand|Nicaragua|Niger|Nigeria|Niue|Norfolk Island|Northern Mariana Islands|North Macedonia|Norway|Oman|Pakistan|Palau|Palestine (State of)|Panama|Papua New Guinea|Paraguay|Peru|Philippines|Pitcairn|Poland|Portugal|Puerto Rico|Qatar|Réunion|Romania|Russian Federation|Rwanda|Saint Barthélemy|Saint Helena, Ascension and Tristan da Cunha|Saint Kitts and Nevis|Saint Lucia|Saint Martin (French part)|Saint Pierre and Miquelon|Saint Vincent and the Grenadines|Samoa|San Marino|Sao Tome and Principe|Saudi Arabia|Senegal|Serbia|Seychelles|Sierra Leone|Singapore|Sint Maarten (Dutch part)|Slovakia|Slovenia|Solomon Islands|Somalia|South Africa|South Georgia and the South Sandwich Islands|South Sudan|Spain|Sri Lanka|Sudan|Suriname|Svalbard and Jan Mayen|Sweden|Switzerland|Syrian Arab Republic|Taiwan (Province of China)|Tajikistan|Tanzania, the United Republic of|Thailand|Timor-Leste|Togo|Tokelau|Tonga|Trinidad and Tobago|Tunisia|Türkiye|Turkmenistan|Turks and Caicos Islands|Tuvalu|Uganda|Ukraine|United Arab Emirates|United Kingdom|United States|United States Minor Outlying Islands|Uruguay|Uzbekistan|Vanuatu|Venezuela (Bolivarian Republic of)|Viet Nam|Virgin Islands (British)|Virgin Islands (U.S.)|Wallis and Futuna Islands|Western Sahara|Yemen|Zambia|Zimbabwe""".split("|"))
+# Sage's spelling to NetSuite's, for tracing a country back to the Sage text.
+SAGE_TO_NS = {"Korea, Republic of": "Korea (the Republic of)", "Moldova, Republic of": "Moldova (the Republic of)",
+              "Congo, Democratic Republic": "Congo (the Democratic Republic of the)", "Cape Verde": "Cabo Verde",
+              "Czech Republic": "Czechia", "Curaçao": "Curacao", "Turkey": "Türkiye", "Vietnam": "Viet Nam",
+              "Taiwan": "Taiwan (Province of China)", "Palestinian Territory, Occupied": "Palestine (State of)"}
 def unmangle(v):
     if re.search(r"Ã|Â|â€", v or ""):
         try:
@@ -135,7 +144,14 @@ for d, src in draft:
         bad("Customer Category vs Sage type", sid, f"{d['Customer Category']!r} from {H['Customer type']!r}")
     disp = R["blocks"].get("Display contact:", []) + R["blocks"].get("Primary contact:", [])
     btxt = squash(" ".join(disp))
-    if d["Company Name"] != unmangle(H["Customer name"]):
+    base_name = re.sub(r" -0\d$", "", d["Company Name"])
+    twins = [e for e, _ in draft if re.sub(r" -0\d$", "", e["Company Name"]) == base_name and not e["Duplicate Action"].startswith("Merge into")]
+    separate = len(twins) > 1 and len({e["Subnet ID"] for e in twins}) == len(twins) and all(e["Subnet ID"] for e in twins)
+    if separate and d["Company Name"] == base_name and sid != "C-00333":
+        bad("Same name, separate Subnet accounts, no suffix", sid, d["Company Name"])
+    if d["Company Name"] != base_name and not separate:
+        bad("Name suffix without separate Subnet accounts", sid, d["Company Name"])
+    if base_name != unmangle(H["Customer name"]):
         bad("Company Name", sid, f"{d['Company Name']!r} vs Sage {H['Customer name']!r}")
     if re.match(r"C-\d{5}$", sid) and d["Customer ID"] != sid:
         bad("Customer ID", sid, d["Customer ID"])
@@ -150,13 +166,14 @@ for d, src in draft:
     L = lst.get(sid, {})
     for col, f in (("City", "City"), ("Province/State", "State or territory"), ("Postal Code/Zip", "ZIP or postal code")):
         want = unmangle(L.get(f, "").strip(" ,"))
-        if col == "Postal Code/Zip" and src[col] == "rule" and d["Country"] == "United States" and want:
+        if col == "Postal Code/Zip" and src[col] == "rule" and d["Country"] == "United States" and want and sid not in CHECKED_FIX:
             want = re.sub(r"^(\d{3,4})", lambda m: m.group(1).zfill(5), want)
             if d[col] != want:
                 bad(f"{col} vs Sage list", sid, f"{d[col]!r} vs {L.get(f)!r}")
-        elif src[col] == "sage" and d[col] != want:
+        elif src[col] == "sage" and d[col] != want and sid not in CHECKED_FIX:
             bad(f"{col} vs Sage list", sid, f"{d[col]!r} vs {L.get(f)!r}")
-    if src["Country"] == "sage" and not any(l.strip().endswith(d["Country"]) for l in disp):
+    if src["Country"] == "sage" and not any(l.strip().endswith(d["Country"]) or
+                                            any(l.strip().endswith(k) and v == d["Country"] for k, v in SAGE_TO_NS.items()) for l in disp):
         bad("Country not in Sage text", sid, d["Country"])
     # Address fields moved by rule: every word must come from Sage's own text for this customer (Salesforce values are
     # tagged sfdc and checked against Salesforce below), and no word of Sage's address may be lost.
@@ -168,7 +185,8 @@ for d, src in draft:
         if src[col] == "rule" and d[col] and src["Address 1"] != "sfdc":  # an address from Salesforce is checked there
             extra = W(squash(d[col])) - sage_words
             if extra and not (col == "Province/State" and d["Country"] == "United States" and re.fullmatch(r"[A-Z]{2}", d[col])) \
-                    and not (col == "City" and d[col] in ("Singapore", "Berlin")) and sid != "C-00108":  # C-00108 corrected 2026-10-26
+                    and not (col == "City" and d[col] in ("Singapore", "Berlin")) and sid != "C-00108" and sid not in CHECKED_FIX \
+                    and not (col == "Province/State" and d["Country"] == "Canada" and d[col] in CA_PROVINCES):  # C-00108 corrected 2026-10-26
                 bad("Moved address text not in Sage", sid, f"{col}: {d[col]!r} ({sorted(extra)})")
     got_words = W(squash(" ".join(d[c] for c in addr_cols + ("Country", "Second Address", "Third Address"))))
     street = [l for b in ("Display contact:",) for l in R["blocks"].get(b, [])[1:]
@@ -176,6 +194,16 @@ for d, src in draft:
     lost = W(squash(" ".join(street) + " " + " ".join(lst.get(sid, {}).get(k, "") for k in ("City", "State or territory", "ZIP or postal code")))) - got_words
     lost -= {"united", "states", "usa"} | set(squash(H["Tax ID"]).split()) | {w for w in lost if re.search(r"@|\.(com|net|org)", w)}
     lost -= W(squash(d["Other Tax ID"] + " " + d["VAT ID"] + " " + d["Customer Invoice Email"] + " " + d["Additional Emails"]))
+    # Words that change with a decided rewrite: Sage's country name where NetSuite spells it differently or the country was
+    # corrected, a US state written as its code or a Canadian code as its name, and country prefixes on postal codes.
+    if src["Country"] != "sage" or d["Country"] in SAGE_TO_NS.values():
+        lost -= W(squash(" ".join(k for k, v in SAGE_TO_NS.items() if v == d["Country"]) + " " +
+                         " ".join(l.split(",")[-1] for l in street)))
+    if d["Country"] in ("United States", "Canada") and src["Province/State"] == "rule":
+        lost -= W(squash(" ".join(l.split(",")[-2] if l.count(",") > 1 else "" for l in street) + " " +
+                         lst.get(sid, {}).get("State or territory", "") + " " + lst.get(sid, {}).get("City", "")))
+    if src["Postal Code/Zip"] == "rule":
+        lost -= {"d", "b", "l", "ch", "se", "fi", "it", "gt", "lon", "sverige", "li", "md", "fo"}
     lost -= LABEL_WORDS | INTENDED.get(sid, set()) | {w for w in lost if re.fullmatch(r"\d{4}", w) and w.zfill(5) in got_words}
     lost -= {w for w in lost if w in re.sub(r"[^a-z0-9]", "", d["VAT ID"].lower())}
     if lost and src["Address 1"] != "sfdc":
@@ -191,8 +219,11 @@ for d, src in draft:
         mbt = mb.get("Bill-to contact:", [])
         if mbt and mbt[0].strip() == (mb.get("Display contact:", [""])[0].strip()):
             own |= set(e.lower() for e in EMAIL.findall(" ".join(mbt)))
-    if d["Merged Sage IDs"] and got <= own and d["Customer Invoice Email"].lower() in own:
+    to_reseller = {e.lower() for e in d["Reseller Invoice Email"].split("; ") if e}
+    if d["Merged Sage IDs"] and got <= own and (d["Customer Invoice Email"].lower() in own or not d["Customer Invoice Email"]):
         pass
+    elif got <= own and (own - got) <= to_reseller and got.isdisjoint(to_reseller):
+        pass  # the reseller's addresses Sage held on the customer moved to Reseller Invoice Email
     elif got != own:
         bad("Emails vs Sage", sid, f"missing {sorted(own - got)}, extra {sorted(got - own)}")
     for col in ("Second Address", "Third Address"):
@@ -204,10 +235,11 @@ for d, src in draft:
                 mt = squash(" ".join(raw[m.group(1)]["blocks"].get("Display contact:", [])))
                 for part in ([] if m.group(2) else d[col][:m.start()].split(", ")):
                     part = re.sub(r"^0(\d{4})$", r"\1", part)
-                    if part and squash(part) not in mt and squash(part) not in squash(" ".join(lst.get(m.group(1), {}).values())):
+                    if part and squash(part) not in mt and squash(part) not in squash(" ".join(lst.get(m.group(1), {}).values())) \
+                            and part.strip() not in COUNTRIES:
                         bad("Extra address not in merged Sage record", sid, part)
     if d["Reseller Invoice Email"]:
-        rb = set(e.lower() for e in EMAIL.findall(" ".join(bt)))
+        rb = set(e.lower() for e in EMAIL.findall(" ".join(bt + disp)))
         if not set(e.lower() for e in EMAIL.findall(d["Reseller Invoice Email"])) <= rb:
             bad("Reseller email vs Sage bill-to", sid, d["Reseller Invoice Email"])
     t = H["Term"]
@@ -223,6 +255,14 @@ for d, src in draft:
         v = core(re.sub(r"^US EIN ", "", d[col]))
         if v and not any(v[k:] in sage_tax for k in range(0, 4)):
             bad(f"{col} vs Sage", sid, d[col])
+    if d["International VAT ID"] != d["VAT ID"]:
+        bad("International VAT ID differs from VAT ID", sid, d["International VAT ID"])
+    if d["Reseller Contact"] and squash(d["Reseller Contact"]) not in squash(" ".join(bt + disp)):
+        bad("Reseller Contact not in Sage text", sid, d["Reseller Contact"])
+    if d["Reseller Contact"] and squash(d["Reseller Contact"]) in squash(d["Billed To (Reseller)"]):
+        bad("Billed To still holds the contact", sid, d["Billed To (Reseller)"])
+    if d["Billed To (Reseller)"] and squash(d["Billed To (Reseller)"]) not in squash(" ".join(bt[:1])):
+        bad("Billed To not the Sage bill-to company", sid, d["Billed To (Reseller)"])
     if H["Tax ID"] and not (d["VAT ID"] or d["Other Tax ID"]):
         bad("Sage Tax ID not loaded", sid, H["Tax ID"])
     if d["Salesforce Account ID"]:
@@ -232,8 +272,12 @@ for d, src in draft:
         else:
             if d["Subnet ID"] != a["Subnet Account Id"]:
                 bad("Subnet ID vs Salesforce", sid, f"{d['Subnet ID']!r} vs {a['Subnet Account Id']!r}")
-            if d["Parent Company"] and d["Parent Company"] != a["Parent Account"]:
-                bad("Parent vs Salesforce", sid, d["Parent Company"])
+            if d["Parent Company"]:
+                par = [e for e, _ in draft if e["Customer ID"] == d["Parent Customer ID"]]
+                nq = lambda t: re.sub(r"[^a-z0-9]", "", unmangle(t).lower())
+                if len(par) != 1 or par[0]["Company Name"] != d["Parent Company"] or not (
+                        par[0]["Salesforce Account ID"][:15] == a["Parent Account ID"] or nq(par[0]["Company Name"]) == nq(a["Parent Account"])):
+                    bad("Parent vs Salesforce", sid, f"{d['Parent Company']} / {d['Parent Customer ID']}")
     for col, v in d.items():
         if not v:
             continue

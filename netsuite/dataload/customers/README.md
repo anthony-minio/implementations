@@ -85,6 +85,9 @@ Sage Intacct "Customer list" report, 652 customers. Laid out for print: a header
 - 2026-10-27: Country names with a comma (Korea, Republic of) were cut to "Republic of" by the parser; fixed. Addresses with parts in the wrong field corrected by moving Sage's own text (`ADDRESS_FIX` in `tools/build_review.py`); country follows the address; no address means no country.
 - 2026-10-27: Workbook `data/MinIO_Customer_Load_to_NetSuite_20261027.xlsx` (tabs Notes, Customers-Draft): 633 rows, 617 to load (650 active - 16 investors - StoreManager - 2 one-time + 2 L3Harris split = 633; - 16 merged = 617). Notes give each decision as scenario, decision and change. Built by `tools/build_delivery.py`; the review page's notes are no longer maintained.
 
+- 2026-10-28: VAT number in both VAT ID and International VAT ID. Countries in NetSuite's spelling (Korea (the Republic of), Türkiye, Czechia, Viet Nam and so on). High-confidence addresses for 4 customers with no Sage address (C-00097, C-00530, C-00536 from Salesforce; C-00532 head office); the other 11 keep a blank address and country. Parent Company named as in this load, with an added Parent Customer ID column. Billed To (Reseller) split into company and an added Reseller Contact column; reseller addresses Sage held on 34 customers moved to Reseller Invoice Email. Second address pass (`ADDRESS_FIX2`): contacts to Attention, cities confirmed against street and postal code, Sage typos, postal prefixes and leading zeros; US states as codes, Canadian provinces by name. Same-name customers with separate Subnet accounts get -01/-02 (Saudi Telecom, Davidson). Workbook `data/MinIO_Customer_Load_to_NetSuite_20261028.xlsx`.
+- 2026-10-28: `tools/build_sf_review.py` writes `data/MinIO_Customer_Salesforce_Matches_to_Review_20261028.xlsx`: Salesforce accounts found by email domain for customers with no Salesforce match, with a recommendation each; applied only after review.
+
 ## Template lists
 
 | List | Values |
