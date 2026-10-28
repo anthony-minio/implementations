@@ -215,6 +215,24 @@ DECISIONS = [
      "removed. US states as two-letter codes, Canadian provinces by full name (2026-10-28).",
      f"Corrected addresses are listed in Flags (\"Address fields corrected\"); {len(prefix)} more postal codes lost a country "
      "prefix (\"Postal code country prefix removed\"). Addresses that could not be settled are flagged \"Address to check\"."),
+    ("Country that did not match the address",
+     "BlueTech (C-00177) had country Georgia, but its address is in Germany: Everswinkel, postal code 48351, a German "
+     "GmbH & Co. KG, phone +49 2582 and an email ending .de. Every customer was checked the same way against its city, "
+     "postal code, phone and email; the other mismatches are a head office's phone or a contact's email, not the address.",
+     "Correct the country where the confidence is high (2026-10-28).",
+     "BlueTech's country is Germany. With the earlier fixes (Monte-Carlo to Monaco, two Hong Kong customers), no other "
+     "address sits in a different country from its Country field."),
+    ("Kayak's address",
+     "Kayak Software Corp (C-00019) has a London street (100 New Bridge Street) with city London, state CT and ZIP 06902, "
+     "which is Stamford, Connecticut. There is no London, CT, so Sage cannot settle which address is right.",
+     "Leave the address blank and note it (2026-10-28).",
+     "Address and country blank for C-00019. Its Sage bill-to, Kayak Software Corporation, 7 Market Street, Stamford, CT 06902, "
+     "is in the reseller columns."),
+    ("Attention repeating the company",
+     "Attention is the \"Attn:\" line on the invoice address. On 12 customers Sage had the company's own name there, so "
+     "the invoice would read \"Attn: Memory Express / Memory Express\".",
+     "Remove it (2026-10-28).",
+     "Attention blank on those 12 customers, each flagged \"Attention removed\"."),
     ("Customers with the same name",
      "Some customers share a name but are separate Subnet accounts, so they would look identical in NetSuite.",
      "Add -01, -02 to the name, as for the new L3Harris customers (2026-10-28).",
@@ -223,19 +241,19 @@ DECISIONS = [
 
 NOTES = [
     ("Customer count",
-     f"Sage has {B['first']} active customers (Sage's active customer list; its customer list report has {B['report']} "
-     f"customers, the same {B['first'] - len(B['onetime'])} plus 4 inactive ones that are not loaded "
-     f"({', '.join(i for i, _ in B['inactive'])}), and leaves out the {len(B['onetime'])} one-time-use customers). "
-     f"Not loaded: 16 investor records (C00001 to C00016), StoreManager (C-00036), and the {len(B['onetime'])} one-time-use "
-     f"customers ({', '.join(f'{i} {n}' for i, n in B['onetime'])}): {B['first']} - {len(B['excluded'])} = "
-     f"{B['first'] - len(B['excluded'])}. Added: the {B['split']} new L3Harris customers split from C-00333 ({ids(split)}): "
-     f"{B['first'] - len(B['excluded'])} + {B['split']} = {B['rows']}, the rows on the Customers-Draft tab. Of these, "
-     f"{B['merged']} are duplicates marked \"Merge into\" and merged into {B['kept']} other customers: {B['rows']} - "
-     f"{B['merged']} = {B['load']} customers to load. The merged duplicates are already merged: their Sage IDs, addresses and "
-     f"emails are on the customer they merge into. They stay on the tab only so the merge can be checked, and must be filtered "
-     f"out (Duplicate Action \"Merge into\") before the import. {B['merged']} duplicates merge into {B['kept']} customers because "
-     f"two customers each had two duplicates: Scotia BNS Canadian Banking (C-00405) merges C-00039 and C-00049, and "
-     f"Ministry of Defence UK (C-00481) merges C-00497 and C-00629."),
+     f"Bridge from Sage's active customers to this file. Sage active customers (Sage's active customer list): {B['first']}. "
+     f"Less 16 investor records, C00001 to C00016 (not customers): {B['first'] - 16}. "
+     f"Less 1, StoreManager (C-00036; no invoices and no address, left out per Nisha): {B['first'] - 17}. "
+     f"Less {len(B['onetime'])} one-time-use customers with no category and no invoices "
+     f"({', '.join(f'{i} {n}' for i, n in B['onetime'])}): {B['first'] - len(B['excluded'])}. "
+     f"Plus {B['split']} new L3Harris customers split from C-00333 ({ids(split)}): {B['rows']}, the rows on the "
+     f"Customers-Draft tab. Less {B['merged']} duplicates merged into {B['kept']} other customers: {B['load']} customers to load. "
+     f"The merged duplicates are already merged: their Sage IDs, addresses and emails are on the customer they merge into. "
+     f"They stay on the tab, marked \"Merge into\" in Duplicate Action, only so the merge can be checked, and must be "
+     f"filtered out before the import. {B['merged']} duplicates merge into {B['kept']} customers because two customers each "
+     f"had two duplicates: Scotia BNS Canadian Banking (C-00405) merges C-00039 and C-00049, and Ministry of Defence UK "
+     f"(C-00481) merges C-00497 and C-00629. Sage's customer list report also has 4 inactive customers, not counted above "
+     f"and not loaded: {', '.join(i for i, _ in B['inactive'])}."),
     ("Customer ID and External ID",
      "Customer ID is the Sage C-##### number. External ID is the same value, so later loads and updates can find each "
      "customer by it. The two new L3Harris customers take the next numbers after the highest Sage number (C-00641)."),
@@ -292,6 +310,9 @@ OPEN = [
     f"{sum(nt.values())} customers concerned are marked \"New NetSuite term\" in Question Categories.",
     "VAT ID and International VAT ID carry the same number; SOA to keep the column they use, and say whether Other Tax ID "
     "(US EINs and company registration numbers) should be loaded anywhere.",
+    "Standard Chartered Bank: C-00048 (London, last invoiced 2026-05-28) and C-00641 (Singapore, last invoiced 2026-10-15, "
+    "open balance 2,104,668.00) share Subnet ID 775. Kept as two customers for now; to decide whether to merge them or "
+    "give them -01 and -02.",
     "Salesforce matches by email domain: about 100 customers without a Salesforce match have a likely Salesforce account "
     "(and Subnet ID) under another name. A review list is with Anthony; accepted matches will be added.",
     "L3Harris: assign contracts CN-SO0565 and CN-SO0603 to the new customers C-00642 (Subnet 716) and C-00643 (Subnet 720) "

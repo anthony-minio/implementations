@@ -362,6 +362,8 @@ ADDRESS_FIX2 = {
     "C-00518": {"Postal Code/Zip": "115 38"}, "C-00614": {"Postal Code/Zip": "63225"},
     "C-00566": {"Postal Code/Zip": ("20755", "rule")},
     "C-00180": {"Province/State": ""}, "C-00132": {"Province/State": "Guatemala"},
+    "C-00177": {"Country": "Germany"},
+    "C-00019": {"Address 1": "", "Address 2": "", "City": "", "Province/State": "", "Postal Code/Zip": "", "Country": ""},
     "C-00316": {"Country": "Monaco"}, "C-00256": {"Country": "Hong Kong"}, "C-00415": {"Country": "Hong Kong"},
     "C-00208": {"Address 1": ("No 14 Sarı Kanarya Sokak", "sfdc"), "City": ("Kozyataği", "sfdc")},
     # Customers with no address in Sage: high-confidence addresses approved by Anthony, 2026-10-28.
@@ -385,6 +387,8 @@ ADDRESS_WHY.update({
     "C-00208": "Sage street and city had garbled Turkish characters (Sar# Kanarya, Kozyata#i); Salesforce spelling used",
     "C-00136": "Sage city was the typo Moscoa; postal code 117342 from the Sage street line, which matches Miklukho-Maklaya ul (Sage postal field had 125373)",
     "C-00594": "Sage postal code 518057 is in Shenzhen, not Hefei; removed",
+    "C-00177": "Sage country Georgia; the address is in Germany (Everswinkel 48351, a GmbH & Co. KG, phone +49 2582, email .de)",
+    "C-00019": "Address left blank (2026-10-28): Sage has a London street (100 New Bridge Street) with city London, state CT and ZIP 06902 (Stamford, CT), which cannot be settled; Sage's bill-to is Kayak Software Corporation, 7 Market Street, Stamford, CT 06902",
     "C-00317": "Sage postal code 1153 is incomplete (Saudi codes have 5 digits); removed",
     "C-00335": "CP.620 is a P.O. box (Caixa Postal), not a postal code; moved to Address 2",
     "C-00448": "Sage postal code EC4N GAE is a typo; 66 Cannon Street is EC4N 6AE",
@@ -393,7 +397,6 @@ ADDRESS_WHY.update({
     "C-00566": "No ZIP code in Sage; Fort Meade, MD is 20755",
 })
 ADDRESS_CHECK.update({
-    "C-00019": "Sage has a London street (100 New Bridge Street) with city London, state CT and ZIP 06902 (Stamford, CT); there is no London, CT, so the address cannot be settled from Sage",
     "C-00618": "City Yvelines (a French department) with postal code 75009 (Paris); left as Salesforce has it",
 })
 ADDRESS_CHECK.pop("C-00153", None)
@@ -873,6 +876,13 @@ for name, xs in same_name.items():
         for n_, x in enumerate(sorted(xs, key=lambda x: x["cells"][CI_][0]), 1):
             x["cells"][NI_] = [f"{name} -{n_:02d}", "rule"]
             x["flags"].append(f"Name suffix -{n_:02d}: {len(xs)} customers named {name}, each its own Subnet account")
+# Attention that only repeats the company's own name is removed: the invoice would read "Attn: X / X" (2026-10-28).
+ATI = COLS.index("Attention")
+for x in out:
+    att = x["cells"][ATI][0]
+    if att and norm(att) == norm(re.sub(r" -0\d$", "", x["cells"][NI_][0])):
+        x["cells"][ATI] = ["", ""]
+        x["flags"].append(f"Attention removed: it repeated the company name ({att})")
 # Parent Company names the parent as it is in this load, and Parent Customer ID gives its Customer ID.
 PCI = len(COLS) + ADDED.index("Parent Customer ID")
 for x in loaded:

@@ -206,6 +206,8 @@ for d, src in draft:
         lost -= {"d", "b", "l", "ch", "se", "fi", "it", "gt", "lon", "sverige", "li", "md", "fo"}
     lost -= LABEL_WORDS | INTENDED.get(sid, set()) | {w for w in lost if re.fullmatch(r"\d{4}", w) and w.zfill(5) in got_words}
     lost -= {w for w in lost if w in re.sub(r"[^a-z0-9]", "", d["VAT ID"].lower())}
+    if sid == "C-00019":
+        lost = set()  # Kayak: address left blank on purpose (2026-10-28)
     if lost and src["Address 1"] != "sfdc":
         issues_lost[sid] = sorted(lost)
     own = set(e.lower() for e in EMAIL.findall(" ".join(disp)))
