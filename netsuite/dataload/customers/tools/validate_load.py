@@ -238,7 +238,7 @@ for d, src in draft:
                 for part in ([] if m.group(2) else d[col][:m.start()].split(", ")):
                     part = re.sub(r"^0(\d{4})$", r"\1", part)
                     if part and squash(part) not in mt and squash(part) not in squash(" ".join(lst.get(m.group(1), {}).values())) \
-                            and part.strip() not in COUNTRIES:
+                            and part.strip() not in COUNTRIES and not re.fullmatch(r"[A-Z]{2}", part.strip()):
                         bad("Extra address not in merged Sage record", sid, part)
     if d["Reseller Invoice Email"]:
         rb = set(e.lower() for e in EMAIL.findall(" ".join(bt + disp)))

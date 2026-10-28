@@ -180,6 +180,26 @@ for a in accounts:
 sfkeys = list(sf)
 by_id = {a["Account ID"]: a for a in accounts}
 
+# Salesforce matches by email domain, decided on the review page (2026-10-28) and exported to
+# data/sf-match-decisions/decisions/<key>.json by tools/build_sf_review.py's page. Keys: <cid>__<account id> for a match,
+# <cid>__merge__<cid> for a merge, <cid>__unmerge__<subnet> for a record that keeps its own Subnet account.
+import glob, os
+SF_ACCEPT, REVIEW_MERGE = {}, []
+_by_subnet = {a["Subnet Account Id"]: a["Account ID"] for a in accounts if a["Subnet Account Id"]}
+for _f in sorted(glob.glob("data/sf-match-decisions/decisions/*.json")):
+    _k, _d = os.path.basename(_f)[:-5], json.load(open(_f, encoding="utf-8"))
+    if _d.get("decision") != "accept":
+        continue
+    if "__merge__" in _k:
+        REVIEW_MERGE.append(tuple(_k.split("__merge__")))
+    elif "__unmerge__" in _k:
+        _c, _sn = _k.split("__unmerge__")
+        SF_ACCEPT[_c] = _by_subnet[_sn]
+    else:
+        _c, _id = _k.split("__")
+        assert _c not in SF_ACCEPT, f"two accepted Salesforce accounts for {_c}"
+        SF_ACCEPT[_c] = _id[:15]
+
 # Likely name matches reviewed by Anthony on 2026-10-26: all confirmed except these, which are not the same company.
 NOT_MATCHED = {"C-00044": "Ministry of Defence (Singapore), not Ministry of Defence UK",
                "C-00142": "Bae Systems, kept separate from BAE Systems US"}
@@ -313,6 +333,7 @@ ADDRESS_FIX2 = {
     "C-00320": {"Address 1": "Auf dem Steinbüchel 22", "Address 2": ""},
     "C-00386": {"Address 1": "Rue de la Fusée 96", "Address 2": ""},  # Luc Mortier is Atos's contact: Reseller Contact
     "C-00540": {"Attention": "Shil Bhattacharyya", "Address 1": "1003 W FM 193", "Address 2": ""},
+    "C-00489": {"Attention": "Pat Main, CustPO: P010375714", "Address 1": "22714 Glenn Drive, Door #5", "Address 2": "Origin IV"},
     "C-00565": {"Attention": "Ms Jenny Parrish - Finance Department (L)", "Address 1": "PO Box 8000", "Address 2": ""},
     "C-00058": {"Address 1": "Rudolf-Breitscheid-Str 1-5", "Postal Code/Zip": "35037"},
     "C-00623": {"Address 2": "Clieveragh Road", "City": "Listowel", "Province/State": "Kerry"},
@@ -469,7 +490,9 @@ for r in sage + onetime_rows:
     last, bal = date(r["Last invoice date"]), float(r["Balance"] or 0)
     in_scope = True  # every customer not marked inactive in Sage
     m, how = match(r["Customer name"])
-    if cid in NOT_MATCHED:
+    if cid in SF_ACCEPT:
+        m, how = by_id[SF_ACCEPT[cid]], "domain"
+    elif cid in NOT_MATCHED:
         m, how = None, ""
     elif how == "likely":
         how = "confirmed"
@@ -521,7 +544,7 @@ for r in sage + onetime_rows:
     S("Province/State", l.get("State or territory", "").strip(" ,"))
     S("Postal Code/Zip", l.get("ZIP or postal code", "").strip(" ,"))
     S("Country", r["display_country"])
-    if not r["display_line1"] and m and m["Billing Street"]:
+    if not r["display_line1"] and m and m["Billing Street"] and how != "domain":  # no-address customers stay blank
         S("Address 1", m["Billing Street"], "sfdc")
         S("City", m["Billing City"], "sfdc")
         S("Province/State", m["Billing State/Province"], "sfdc")
@@ -616,6 +639,8 @@ for r in sage + onetime_rows:
         flags.append("No Salesforce match")
     elif how == "confirmed":
         flags.append("Salesforce match confirmed by name review")
+    elif how == "domain":
+        flags.append("Salesforce match by email domain, reviewed 2026-10-28")
     if not cat:
         flags.append("No customer type in Sage: Customer Category missing")
     if not last:
@@ -629,7 +654,7 @@ for r in sage + onetime_rows:
     A("Question Categories", "; ".join(qc), "rule")
     A("Sage Customer ID", cid)
     if m:
-        A("Salesforce Account ID", id18(m["Account ID"]), "sfdc" if how in ("exact", "confirmed") else "prop")
+        A("Salesforce Account ID", id18(m["Account ID"]), "sfdc" if how in ("exact", "confirmed", "domain") else "prop")
     A("Other Tax ID", other_tax)
     reseller_emails = split_emails(r["billto_email"]) if billto else []
     if billto:
@@ -673,7 +698,7 @@ for r in sage + onetime_rows:
         A("Salesforce Partners", "; ".join(sorted(p)), "sfdc")
     added = [a[k] for k in ADDED]
     review = [r["Customer type"], r["Term"], last.isoformat() if last else "", f"{bal:,.2f}" if bal else "",
-              (m["Account Name"] + (" (likely)" if how == "likely" else " (confirmed)" if how == "confirmed" else "")) if m else ""]
+              (m["Account Name"] + (" (likely)" if how == "likely" else " (confirmed)" if how == "confirmed" else " (email domain)" if how == "domain" else "")) if m else ""]
     out.append({"scope": bool(in_scope), "cells": [c[k] for k in COLS] + added, "review": review, "flags": flags})
 
 # Subnet IDs are a key identifier: one NetSuite customer per Subnet account. Where several Sage records matched the same
@@ -797,7 +822,8 @@ for x in out:
                 if o in byid:
                     parent[find(o)] = find(x["cells"][CI][0])
 # Duplicates found by shared email domain and confirmed by Anthony on 2026-10-26 (same company, different name).
-for a, b in [("C-00575", "C-00640"), ("C-00039", "C-00405"), ("C-00049", "C-00405"), ("C-00465", "C-00204"), ("C-00629", "C-00481")]:
+# Merges decided on the Salesforce review page (2026-10-28) follow the same rule.
+for a, b in [("C-00575", "C-00640"), ("C-00039", "C-00405"), ("C-00049", "C-00405"), ("C-00465", "C-00204"), ("C-00629", "C-00481")] + REVIEW_MERGE:
     parent[find(a)] = find(b)
 groups = {}
 for i in byid:

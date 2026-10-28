@@ -91,6 +91,7 @@ nt = collections.Counter(V(r, "Terms") for r in load if V(r, "Terms") and V(r, "
 new_terms = ", ".join(f"{t} ({nt[t]})" for t in sorted(nt, key=lambda t: int(t.split()[1])))
 split = [r for r in load if V(r, "Duplicate Action").startswith("New: split")]
 moved_mail = [r for r in load if has_flag(r, "Reseller's email moved")]
+domain = [r for r in load if has_flag(r, "Salesforce match by email domain")]
 suffixed = [r for r in load if re.search(r" -0\d$", V(r, "Company Name"))]
 second_pass = [r for r in load if any("Address fields corrected" in f for f in r["flags"])]
 prefix = [r for r in load if has_flag(r, "Postal code country prefix removed")]
@@ -233,6 +234,18 @@ DECISIONS = [
      "the invoice would read \"Attn: Memory Express / Memory Express\".",
      "Remove it (2026-10-28).",
      "Attention blank on those 12 customers, each flagged \"Attention removed\"."),
+    ("Salesforce matches by email domain",
+     f"Matching Sage to Salesforce by name left about 300 customers with no Salesforce Account ID or Subnet ID. Some are in "
+     "Salesforce under another name (an acronym, a parent company, a former name).",
+     "Match by email domain: a Salesforce account whose website is the customer's email domain, each pair reviewed with "
+     "evidence (name, city, Salesforce partner against the Sage reseller) on 2026-10-28. Where a company has two Sage records "
+     "and two Subnet accounts, pair the one that can be matched with confidence and the other by elimination. Records with "
+     "different Subnet IDs are never merged.",
+     f"{len(domain)} customers gained a Salesforce Account ID (and Subnet ID where the account has one), flagged \"Salesforce "
+     "match by email domain\". C-00097 Aegon Emeklilik merged into C-00208 Aegon_Viennalife, and C-00120 Federal Home Loan "
+     "Mortgage Corporation into C-00219 Freddie Mac. Two Chargebee records merged earlier are separate customers again, "
+     "each with its own Subnet account: C-00575 Hollister.com (1012, beside C-00640 on 1132) and C-00489 Leidos (895, "
+     "beside C-00516 on 972). The count to load is unchanged. C-00480 Senukai Digital was left unmatched."),
     ("Customers with the same name",
      "Some customers share a name but are separate Subnet accounts, so they would look identical in NetSuite.",
      "Add -01, -02 to the name, as for the new L3Harris customers (2026-10-28).",
@@ -313,8 +326,11 @@ OPEN = [
     "Standard Chartered Bank: C-00048 (London, last invoiced 2026-05-28) and C-00641 (Singapore, last invoiced 2026-10-15, "
     "open balance 2,104,668.00) share Subnet ID 775. Kept as two customers for now; to decide whether to merge them or "
     "give them -01 and -02.",
-    "Salesforce matches by email domain: about 100 customers without a Salesforce match have a likely Salesforce account "
-    "(and Subnet ID) under another name. A review list is with Anthony; accepted matches will be added.",
+    "ZATCA: Salesforce has Subnet accounts 715 (ZATCA-Certscan Platform, partners EG&G Middle East and Accelerated "
+    "Solutions) and 731 (ZATCA-Rapiscan, partner EG&G Middle East) with no Sage customer; neither reseller is in Sage. "
+    "Nisha to confirm whether they were ever invoiced and need customers of their own.",
+    "Leidos: C-00489 (Chargebee) was given Subnet 895 (Leidos-1) by elimination; Salesforce lists CDW as Leidos-1's partner. "
+    "Nisha to confirm.",
     "L3Harris: assign contracts CN-SO0565 and CN-SO0603 to the new customers C-00642 (Subnet 716) and C-00643 (Subnet 720) "
     "when contracts are loaded.",
 ]
