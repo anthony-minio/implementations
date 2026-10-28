@@ -59,6 +59,11 @@ Activity of the 1,770 active Sage vendors, using the latest of Sage last bill, S
 
 `tools/validate_load.py` checks every row of the review workbook against the raw Sage detail export, the Sage vendor list report and the Ramp export, independently of the build: row set (every active Sage vendor once, every Ramp-only vendor once), unique Vendor IDs, and each value traced to its own source record (name, IDs, category, phone, email, comments, fax, address, legal name, terms, expense account, tax ID, 1099, currency, Ramp link, bank details, last bill, last payment, balance, Ramp created, Ramp last spend, Ramp category and owner). It also checks the masked page matches the workbook row for row. 2026-10-26: no issues; a test with deliberately swapped values was caught.
 
+## Decisions
+
+- 2026-10-28 (meeting with Ming, Nisha, Richard, Tori and Sheng; Asana FS-51): Sage only vendors loaded only with activity since 2024-10-26 (85 of 1,219); MinIO, Inc. for every vendor; duplicates by name, email or address merged, the record with the most recent activity kept. Anthony: duplicates inside Ramp keep the record linked to Sage and the other is archived in Ramp before the sync (4, Nisha to action); Moss Adams and Baker Tilly kept separate; SOA gets the full version (tax IDs and bank details) in one workbook. Only vendors in the load are renumbered (74, V-01769 to V-01842; next V-01843). Individuals with a plain two-word name and no first and last name in Sage are split (3).
+- `tools/build_delivery.py` writes `data/MinIO_Vendor_Load_to_NetSuite_20261028.xlsx` (tabs Notes, Vendors-Draft): 663 rows, 658 vendors in NetSuite (574 by the Ramp sync, 84 from the file), 1 merged, 4 to archive in Ramp. `tools/validate_load.py` checks it: no issues; planted errors (subsidiary, Vendor ID on an archived record, a loaded record in Merged Sage IDs, a duplicate name) all caught.
+
 ## Load log
 
 | Date | File | Records | Errors | Outcome |

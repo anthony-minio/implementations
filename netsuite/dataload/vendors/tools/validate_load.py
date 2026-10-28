@@ -6,7 +6,7 @@ import csv, collections, datetime as dt, json, re
 import openpyxl
 
 SAGE, REPORT, RAMP = "data/sage-vendors-all-detail-20261025.csv", "data/sage-vendor-list-report-20261025.csv", "data/ramp-vendors-sensitive-20261025.csv"
-WB, MASKED, COA = "data/MinIO_Vendor_Load_FULL_20261026.xlsx", "data/vendor-review.html", "data/coa-sage-map.json"
+WB, MASKED, COA = "data/MinIO_Vendor_Load_to_NetSuite_20261028.xlsx", "data/vendor-review.html", "data/coa-sage-map.json"
 
 rows = list(csv.reader(open(SAGE, encoding="utf-8-sig")))
 H = rows[0]
@@ -22,7 +22,7 @@ ramp_by_sage = {r["Sage Intacct ID"].strip(): r for r in ramp_all if r["Sage Int
 ramp_by_id = {r["Vendor ID"]: r for r in ramp_all}
 coa = json.load(open(COA))
 
-ws = openpyxl.load_workbook(WB, read_only=True)["Vendors"]
+ws = openpyxl.load_workbook(WB, read_only=True)["Vendors-Draft"]
 data = list(ws.iter_rows(values_only=True))
 hdr = [str(h).replace(" *", "") if h else "" for h in data[1]]
 # Template columns repeat names (two address blocks); index them by position within the header.
@@ -68,10 +68,11 @@ for r in recs:
             if col(r, k) != v:
                 bad(f"{k} vs source", key, f"{col(r, k)!r} expected {v!r}")
         vid = col(r, "Vendor ID")
-        if re.match(r"V-\d{5}$", sid) and vid != sid:
+        gone = col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp"))
+        if not gone and re.match(r"V-\d{5}$", sid) and vid != sid:
             bad("Vendor ID vs Sage", key, vid)
         top = max(int(i[2:]) for i in sage if re.match(r"V-\d{5}$", i))
-        if not re.match(r"V-\d{5}$", sid) and not (re.match(r"V-\d{5}$", vid) and top < int(vid[2:]) <= top + len(sage)):
+        if not gone and not re.match(r"V-\d{5}$", sid) and not (re.match(r"V-\d{5}$", vid) and top < int(vid[2:]) <= top + len(sage)):
             bad("Renumbered Vendor ID out of range", key, vid)
         if col(r, "ExternalID") != vid:
             bad("ExternalID vs Vendor ID", key, col(r, "ExternalID"))
@@ -137,7 +138,25 @@ for r in recs:
             if col(r, k) != v:
                 bad(f"{k} vs Ramp (Ramp only)", key, "differs" if k == "Tax ID" else f"{col(r, k)!r} expected {v!r}")
 
-active = {i for i, S in sage.items()}
+# Scope (Ming, 2026-10-28): every Sage vendor in Ramp, and Sage only vendors billed or paid since 2024-10-26.
+active = {i for i, S in sage.items() if i in ramp_by_sage or max(d(g(S, "Last bill created on")), d(g(S, "Last payment made on"))) >= "2024-10-26"}
+for r in recs:
+    if col(r, "Primary Subsidiary") != "MinIO, Inc.":
+        bad("Subsidiary not MinIO, Inc.", col(r, "Sage Vendor ID") or col(r, "Ramp Vendor ID"), col(r, "Primary Subsidiary"))
+    if col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp")) and (col(r, "Vendor ID") or col(r, "ExternalID")):
+        bad("Merged or archived record keeps a Vendor ID", col(r, "Sage Vendor ID") or col(r, "Ramp Vendor ID"), col(r, "Vendor ID"))
+# No two vendors in NetSuite with the same name; Merged Sage IDs are same-name Sage records left out of the load.
+nk = lambda t: re.sub(r"[^a-z0-9]", "", t.lower())
+live = [r for r in recs if not col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp"))]
+for k, c in collections.Counter(nk(col(r, "Company Name")) for r in live).items():
+    if c > 1:
+        bad("Same name twice in NetSuite", k, c)
+for r in recs:
+    for m in filter(None, col(r, "Merged Sage IDs").split(", ")):
+        if m in active and not any(col(x, "Sage Vendor ID") == m and col(x, "Duplicate Action").startswith("Merge into") for x in recs):
+            bad("Merged Sage ID is in the load", col(r, "Sage Vendor ID"), m)
+        elif m not in active and (m not in sage or nk(g(sage[m], "Vendor name")) != nk(col(r, "Company Name"))):
+            bad("Merged Sage ID not a same-name record", col(r, "Sage Vendor ID"), m)
 if set(seen_sage) != active:
     bad("Row set", "Sage", f"missing {sorted(active - set(seen_sage))[:5]}, extra {sorted(set(seen_sage) - active)[:5]}")
 for i, n in seen_sage.items():

@@ -7,7 +7,7 @@ import openpyxl
 
 # --full writes an unmasked copy (data/vendor-review-full.html) for the controller and AP. It is never published.
 FULL = "--full" in sys.argv
-TODAY = dt.date(2026, 10, 26)
+TODAY = dt.date(2026, 10, 28)
 ACTIVE_FROM = dt.date(2024, 10, 26)
 SAGE = "data/sage-vendors-all-detail-20261025.csv"
 EXPORT = "data/sage-vendors-active-export-20261025.csv"
@@ -54,19 +54,40 @@ COLS = [c.value for c in openpyxl.load_workbook("MINIO_Vendor_Template_10192026.
 FIELDS = [c.value for c in openpyxl.load_workbook("MINIO_Vendor_Template_10192026.xlsx")["Vendor Template"][1] if c.value]
 assert len(COLS) == len(FIELDS) == 61
 REQUIRED = {"companyName"}
-ADDED = ["Question Categories", "Duplicate Action", "Sage Vendor ID", "Ramp Vendor ID", "In Ramp", "Bank Details",
+ADDED = ["Question Categories", "Duplicate Action", "Merged Sage IDs", "Sage Vendor ID", "Ramp Vendor ID", "In Ramp", "Bank Details",
          "Bank Source", "Bank Name", "Bank Account Type", "Bank Routing Number", "Bank Account Number"]
 REVIEW = ["Sage type", "Ramp created", "Last activity", "Sage last bill", "Sage last payment", "Sage balance", "Ramp last spend",
           "Ramp 365-day spend", "Ramp category", "Ramp owner", "Ramp department", "Differs from other records"]
 
-# Vendor ID: keep V-#####; older V##### and Ramp-created RMP_# get the next numbers after the highest V-#####.
+# Scope (Ming, meeting of 2026-10-28): every Ramp vendor, and the Sage only vendors with activity since 2024-10-26.
+def last_activity(r, rp):
+    return max([d for d in (date(G(r, "Last bill created on")), date(G(r, "Last payment made on")),
+                            date(rp["Last spend date"]) if rp else None) if d], default=None)
+in_scope = {G(r, "Vendor ID") for r in sage if G(r, "Vendor ID") in ramp
+            or (last_activity(r, None) or dt.date.min) >= ACTIVE_FROM}
+# Duplicates in scope (2026-10-28): same vendor by name, email or address; the record with the most recent activity is kept.
+# Sage only duplicates merge in this file. Duplicates inside Ramp would both come over in the Ramp sync, so the record not
+# linked to Sage is archived in Ramp before the sync (Anthony, 2026-10-28; Nisha to action).
+MERGE = {"V00208": "V-00443"}  # Linux Foundation and The Linux Foundation: same address and email
+RAMP_ARCHIVE = {"RMP_5": "V-01445",  # HostIndia Events & Marketing Pvt. Ltd, kept HOST INDIA EVENTS & MARKETING PVT. LTD
+                "6a461530-6faa-45d1-9cc9-1789847d4bb3": "V-00414",  # Jessica Jones (Ramp only)
+                "12040107-b5aa-48d7-8d79-779dc1766034": "V-01469",  # Dar Al Waleed Hospitality Services (Ramp only)
+                "c3639aaa-cbca-42f5-aae1-9378d0ceb6b3": "V-01513"}  # The Forum and Events Management FZ LLC (Ramp only)
+# Shared details that do not make the same vendor: Baker Tilly took over Moss Adams in 2025 and kept its AR mailbox
+# (both kept, Anthony, 2026-10-28). Mailboxes at MinIO's own domains are set on many unrelated vendors.
+SEPARATE = [{"V-00453", "V-01326"}]
+OWN_DOMAINS = ("@minio.io", "@min.io")
+not_loaded = set(MERGE) | set(RAMP_ARCHIVE)
+
+# Vendor ID: keep V-#####; older V##### and Ramp-created RMP_# vendors in the load get the next numbers after the highest V-#####.
 std = [int(G(r, "Vendor ID")[2:]) for r in sage if re.match(r"V-\d{5}$", G(r, "Vendor ID"))]
 nxt = max(std) + 1
 renumber = {}
 def sortkey(i):
     m = re.match(r"(\D+?)_?(\d+)$", i)
     return (m.group(1), int(m.group(2)))
-for i in sorted((G(r, "Vendor ID") for r in sage if not re.match(r"V-\d{5}$", G(r, "Vendor ID"))), key=sortkey):
+for i in sorted((G(r, "Vendor ID") for r in sage if not re.match(r"V-\d{5}$", G(r, "Vendor ID"))
+                 and G(r, "Vendor ID") in in_scope and G(r, "Vendor ID") not in not_loaded), key=sortkey):
     renumber[i] = f"V-{nxt:05d}"
     nxt += 1
 
@@ -93,10 +114,13 @@ names = {}
 for r in sage:
     names.setdefault(re.sub(r"[^a-z0-9]", "", G(r, "Vendor name").lower()), []).append(G(r, "Vendor ID"))
 
-out, load_rows, bank_file = [], [], []
+out, load_rows, bank_file, dropped = [], [], [], {}
 for r in sage:
     sid = G(r, "Vendor ID")
     rp = ramp.get(sid)
+    if sid not in in_scope:
+        dropped.setdefault(re.sub(r"[^a-z0-9]", "", G(r, "Vendor name").lower()), []).append(sid)
+        continue
     c = {f: ["", ""] for f in FIELDS}
     flags, qc = [], ["Ramp matched" if rp else "Sage only"]
     def S(f, v, src="sage"):
@@ -111,7 +135,12 @@ for r in sage:
     S("isPerson", "TRUE" if person else "FALSE", "sage" if person else "rule")
     if person:
         S("firstName", G(r, "First name")); S("middleName", G(r, "Middle name")); S("lastName", G(r, "Last name"))
-        if not (G(r, "First name") and G(r, "Last name")):
+        nm = G(r, "Vendor name").split()
+        if not (G(r, "First name") and G(r, "Last name")) and len(nm) == 2 and all(re.fullmatch(r"[A-Za-z'-]+", w) for w in nm):
+            # NetSuite needs both names for an individual; a plain two-word name splits without guesswork (2026-10-28).
+            S("firstName", nm[0], "rule"); S("lastName", nm[1], "rule")
+            flags.append("First Name and Last Name taken from the vendor name; Sage has none")
+        elif not (G(r, "First name") and G(r, "Last name")):
             flags.append("Individual without first and last name")
     S("companyName", G(r, "Vendor name"))
     t = G(r, "Vendor type ID")
@@ -121,11 +150,8 @@ for r in sage:
             S("category", cat, "sage" if cat == t else "rule")
         else:
             flags.append(f"Vendor type not on the category list: {t}")
-    S("subsidiary", "MinIO, Inc.", "rule")
+    S("subsidiary", "MinIO, Inc.", "rule")  # every vendor (Ming, 2026-10-28)
     cur = G(r, "Default currency")
-    if cur in ("INR", "SGD"):
-        qc.append("Subsidiary to confirm")
-        c["subsidiary"][1] = "prop"
     S("phone", G(r, "Phone number"))
     if not c["phone"][0] and rp and rp["Contact phone number"].strip():
         S("phone", rp["Contact phone number"].strip().lstrip("'"), "ramp")
@@ -215,18 +241,13 @@ for r in sage:
               G(r, "ACH bank routing number"), G(r, "ACH account number")]
     else:
         bk = ["", "", "", "", ""]
-    if any(bk[3:]):
+    if any(bk[3:]) and sid not in not_loaded:
         bank_file.append([vid, sid, G(r, "Vendor name")] + bk)
-    k = re.sub(r"[^a-z0-9]", "", G(r, "Vendor name").lower())
-    dup = [x for x in names[k] if x != sid]
-    if dup:
-        flags.append("Duplicate name: " + ", ".join(dup))
-        qc.append("Duplicate to review")
     if not c["email"][0]:
         flags.append("No email")
     if not last:
         flags.append("No activity recorded")
-    added = [["; ".join(qc), "rule" if qc else ""], ["", ""], [sid, "sage"], [rp["Vendor ID"] if rp else "", "ramp" if rp else ""],
+    added = [["; ".join(qc), "rule" if qc else ""], ["", ""], ["", ""], [sid, "sage"], [rp["Vendor ID"] if rp else "", "ramp" if rp else ""],
              ["Yes" if rp else "No", "rule"], [bank, "rule" if bank else ""],
              [bk[0], "rule" if bk[0] else ""], [bk[1], ("ramp" if bk[0] == "Ramp" else "sage") if bk[1] else ""],
              [bk[2], "sage" if bk[2] else ""], [bk[3], ("ramp" if bk[0] == "Ramp" else "sage") if bk[3] else ""],
@@ -250,12 +271,12 @@ for r in sage:
         page[ti][0] = "•••" + re.sub(r"\W", "", cells[ti][0])[-4:]
     flags = flags if FULL else [mask(f) for f in flags]
     attrs = {"address": (G(r, "Address line 1").lower(), G(r, "City").lower(), G(r, "ZIP or postal code")),
-             "email": G(r, "Email address").lower(), "phone": re.sub(r"\D", "", G(r, "Phone number")),
+             "email": c["email"][0].lower(), "phone": re.sub(r"\D", "", G(r, "Phone number")),
              "tax ID": re.sub(r"\W", "", G(r, "Tax ID")), "bank account": G(r, "ACH account number")[-4:],
              "terms": G(r, "Term"), "vendor type": t, "currency": cur, "1099": G(r, "Form 1099 type")}
     used = bool(G(r, "Last bill created on") or G(r, "Last payment made on") or bal or rp)
-    out.append({"cells": page, "review": review, "flags": flags, "active": bool(last and last >= ACTIVE_FROM),
-                "_name": re.sub(r"[^a-z0-9]", "", G(r, "Vendor name").lower()), "_attrs": attrs, "_used": used, "_last": last.isoformat() if last else "", "_bal": bal})
+    out.append({"cells": page, "review": review, "flags": flags, "active": bool(last and last >= ACTIVE_FROM), "_key": sid, "_full": cells,
+                "_name": re.sub(r"[^a-z0-9]", "", G(r, "Vendor name").lower()), "_attrs": attrs, "_last": last.isoformat() if last else ""})
 
 # Ramp-only vendors: in Ramp with no Sage vendor. The Ramp sync creates them in NetSuite; shown for completeness.
 for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
@@ -278,9 +299,9 @@ for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
     c["Source System"] = ["Ramp", "rule"]
     rb = bool(rp["Default ACH account number"].strip())
     bk = ["Ramp", rp["Default bank name"].strip(), "", rp["Default ACH routing number"].strip(), rp["Default ACH account number"].strip()] if rb else ["", "", "", "", ""]
-    if rb:
+    if rb and rp["Vendor ID"] not in not_loaded:
         bank_file.append(["", "", rp["Vendor name"]] + bk)
-    added = [["Ramp only", "rule"], ["", ""], ["", ""], [rp["Vendor ID"], "ramp"], ["Yes", "rule"], ["Ramp" if rb else "", "rule" if rb else ""],
+    added = [["Ramp only", "rule"], ["", ""], ["", ""], ["", ""], [rp["Vendor ID"], "ramp"], ["Yes", "rule"], ["Ramp" if rb else "", "rule" if rb else ""],
              [bk[0], "rule" if bk[0] else ""], [bk[1], "ramp" if bk[1] else ""], ["", ""],
              [bk[3], "ramp" if bk[3] else ""], [bk[4], "ramp" if bk[4] else ""]]
     cells = [c[f] for f in FIELDS] + added
@@ -292,47 +313,83 @@ for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
     last = date(rp["Last spend date"])
     review = ["", rp["Creation date"][:10], last.isoformat() if last else "", "", "", "", rp["Last spend date"],
               f"{float(rp['Total 365 day spend'] or 0):,.2f}", rp["Ramp category"], rp["Owner name"], rp["Department"], ""]
-    out.append({"cells": page, "review": review, "flags": ["Created by the Ramp sync; no Sage vendor"], "active": bool(last and last >= ACTIVE_FROM)})
+    out.append({"cells": page, "review": review, "flags": ["Created by the Ramp sync; no Sage vendor"], "active": bool(last and last >= ACTIVE_FROM),
+                "_key": rp["Vendor ID"], "_full": cells, "_name": re.sub(r"[^a-z0-9]", "", (rp["Display name"] or rp["Vendor name"]).lower()), "_last": last.isoformat() if last else "",
+                "_attrs": {"email": rp["Contact email"].strip().lower(), "address": (rp["Check mailing address line 1"].strip().lower(), "",
+                           rp["Check mailing zip/postal code"].strip()) if rp["Check mailing address line 1"].strip() else ("", "", "")}})
 
 QI = len(FIELDS)
 DA = QI + ADDED.index("Duplicate Action")
+MI = QI + ADDED.index("Merged Sage IDs")
 VI = FIELDS.index("vendorId")
-# Duplicate vendor names: what each record shows, and a proposal where exactly one record has been used.
-dups = {}
+by_key = {x["_key"]: x for x in out}
+# Check the duplicates in scope (name, email, street address and postal code) against the decisions above, so a new one fails the build.
+links = {}
 for x in out:
-    if x.get("_name") and "Duplicate to review" in x["cells"][QI][0]:
-        dups.setdefault(x["_name"], []).append(x)
-dup_clear, dup_multi, dup_none = [], [], []
-for name, xs in dups.items():
-    for x in xs:
-        diff = [a for a in x["_attrs"] if len({y["_attrs"][a] for y in xs if y["_attrs"][a] not in ("", ("", "", ""))}) > 1]
-        x["review"][REVIEW.index("Differs from other records")] = ", ".join(diff)
-    used = [x for x in xs if x["_used"]]
-    label = xs[0]["cells"][FIELDS.index("companyName")][0]
-    tag = "Duplicate, one record used" if len(used) == 1 else "Duplicate, decision needed"
-    for x in xs:
-        q = [p for p in x["cells"][QI][0].split("; ") if p and p != "Duplicate to review"]
-        x["cells"][QI] = ["; ".join([tag] + q), "rule"]
-    if len(used) == 1:
-        keep = used[0]
-        dup_clear.append(label)
-        keep["cells"][DA] = ["Keep: only record used (proposed)", "prop"]
-        for x in xs:
-            if x is not keep:
-                x["cells"][DA] = [f"Merge into {keep['cells'][VI][0]} (proposed)", "prop"]
+    a = x["_attrs"]
+    keys = [("name", x["_name"])]
+    if a["email"] and not a["email"].endswith(OWN_DOMAINS):
+        keys.append(("email", a["email"]))
+    if a["address"][0]:
+        keys.append(("address", (a["address"][0], a["address"][2])))
+    for k in keys:
+        links.setdefault(k, []).append(x["_key"])
+found = {frozenset(v) for v in links.values() if len(v) > 1}
+decided = {frozenset({k, v}) for k, v in list(MERGE.items()) + list(RAMP_ARCHIVE.items())} | {frozenset(p) for p in SEPARATE}
+assert found == decided, f"duplicates in scope differ from the decisions: new {[sorted(f) for f in found - decided]}, gone {[sorted(f) for f in decided - found]}"
+dup_n = {"merge": 0, "archive": 0, "dropped": 0}
+for lost, keep in list(MERGE.items()) + list(RAMP_ARCHIVE.items()):
+    x, k = by_key[lost], by_key[keep]
+    kid = k["cells"][VI][0]
+    lid = x["cells"][QI + ADDED.index("Sage Vendor ID")][0] or x["cells"][QI + ADDED.index("Ramp Vendor ID")][0]
+    x["cells"][VI] = ["", ""]
+    x["cells"][FIELDS.index("externalId")] = ["", ""]
+    if lost in MERGE:
+        dup_n["merge"] += 1
+        x["cells"][DA] = [f"Merge into {kid}", "rule"]
+        k["cells"][DA] = [f"Keep, merges {lid}", "rule"]
+        k["cells"][MI] = [", ".join(p for p in [k["cells"][MI][0], lid] if p), "rule"]
+        x["flags"].append(f"Same vendor as {kid} (same address and email); {kid} has the more recent activity")
     else:
-        (dup_multi if used else dup_none).append(label)
-        for x in xs:
-            x["cells"][DA] = ["Decide: more than one record used" if used else "Decide: no record used", "prop"]
+        dup_n["archive"] += 1
+        x["cells"][DA] = [f"Archive in Ramp before the sync: duplicate of {kid}", "rule"]
+        x["cells"][QI] = [x["cells"][QI][0] + "; Duplicate in Ramp", "rule"]
+        k["cells"][DA] = [f"Keep: its duplicate in Ramp is archived before the sync", "rule"]
+        k["cells"][QI] = [k["cells"][QI][0] + "; Duplicate in Ramp", "rule"]
+        x["flags"].append(f"Duplicate in Ramp of {kid} ({k['cells'][FIELDS.index('companyName')][0]}), the record linked to Sage")
+for p in SEPARATE:
+    for i in p:
+        o = next(j for j in p if j != i)
+        by_key[i]["flags"].append(f"Shares an email with {by_key[o]['cells'][VI][0]} {by_key[o]['cells'][FIELDS.index('companyName')][0]}; kept as a separate vendor")
+# Duplicates left out of the load (no activity since 2024-10-26): their Sage IDs are listed on the record kept.
+for x in out:
+    if x["_key"] in not_loaded:
+        continue
+    gone = dropped.get(x["_name"], [])
+    if gone:
+        dup_n["dropped"] += len(gone)
+        x["cells"][MI] = [", ".join(p for p in [x["cells"][MI][0]] + gone if p), "rule"]
+        if not x["cells"][DA][0]:
+            x["cells"][DA] = ["Keep: other records with this name not loaded", "rule"]
+        x["flags"].append(f"Same name as {', '.join(gone)}, not loaded (no activity since {ACTIVE_FROM.isoformat()}); this record has the most recent activity")
+        assert (x["_last"] or "0001-01-01") >= max([(last_activity(r, ramp.get(G(r, "Vendor ID"))) or dt.date.min).isoformat()
+                   for r in sage if G(r, "Vendor ID") in gone]), x["_key"]
+# The duplicate columns hold no masked values: carry them to the full rows behind the load file.
+for x in out:
+    for j in (VI, FIELDS.index("externalId"), QI, DA, MI):
+        x["_full"][j] = list(x["cells"][j])
+dups = {}
 
 GROUP = {"Ramp only": 0, "Ramp matched": 1, "Sage only": 2}
 EXTRA = {"Subsidiary to confirm": 0}
 def order(x):
     q = x["cells"][QI][0].split("; ")
-    if x.get("_name") in dups:  # decision-needed names first, then names with one record used; grouped by name, keeper first
-        return (0 if q[0] == "Duplicate, decision needed" else 1, 0, x["_name"], 0 if x["cells"][DA][0].startswith("Keep") else 1, x["cells"][VI][0])
-    return (2, GROUP.get(q[0], 3), "", min([EXTRA.get(p, 9) for p in q[1:]] or [9]), x["cells"][FIELDS.index("companyName")][0].lower())
+    pair = next((k for a_, k in list(MERGE.items()) + list(RAMP_ARCHIVE.items()) if x["_key"] in (a_, k)), None)
+    if pair:  # duplicates in scope first, the record kept above its duplicate
+        return (0, 0, pair, 0 if x["_key"] == pair else 1, "")
+    return (1, GROUP.get(q[0], 3), "", 9, x["cells"][FIELDS.index("companyName")][0].lower())
 out.sort(key=order)
+load_rows = [x["_full"] for x in out]
 for x in out:
     for k in [k for k in x if k.startswith("_")]:
         del x[k]
@@ -340,13 +397,13 @@ for x in out:
 export = list(csv.reader(open(EXPORT, encoding="utf-8-sig")))
 rep = [x for x in csv.reader(open(REPORT, encoding="utf-8-sig")) if re.match(r"(V-?\d+|RMP_\d+)$", x[0].strip())]
 bridge = {"export": len(export) - 1, "onetime": [(x[0], x[1]) for x in export[1:] if x[7] == "True"],
-          "report": len(rep), "inactive": sum(1 for x in rep if x[8] != "Active"), "active": sum(1 for x in out if not "Ramp only" in x["cells"][QI][0].split("; ")),
+          "report": len(rep), "inactive": sum(1 for x in rep if x[8] != "Active"), "active": len(sage),
           "in_ramp": sum(1 for x in out if "Ramp matched" in x["cells"][QI][0].split("; ")), "ramp_total": len(ramp_rows),
-          "sage_only": sum(1 for x in out if "Sage only" in x["cells"][QI][0].split("; ")),
-          "sage_only_recent": sum(1 for x in out if "Sage only" in x["cells"][QI][0].split("; ") and x["active"]),
-          "sage_only_none": sum(1 for x in out if "Sage only" in x["cells"][QI][0].split("; ") and not x["review"][REVIEW.index("Last activity")]),
-          "dups": {"names": len(dups), "records": sum(len(v) for v in dups.values()), "clear": sorted(dup_clear),
-                   "multi": sorted(dup_multi), "none": sorted(dup_none)},
+          "sage_only": sum(1 for r in sage if G(r, "Vendor ID") not in ramp),
+          "sage_only_recent": sum(1 for x in out if "Sage only" in x["cells"][QI][0].split("; ")),
+          "sage_only_none": sum(1 for r in sage if G(r, "Vendor ID") not in in_scope and not last_activity(r, None)),
+          "dups": {"names": 0, "records": 0, "clear": [], "multi": [], "none": [], **dup_n},
+          "out_of_scope": len(sage) - len(in_scope), "older": sum(1 for r in sage if G(r, "Vendor ID") not in in_scope and last_activity(r, None)),
           "bank": {"ramp": sum(1 for b in bank_file if b[3] == "Ramp"), "sage": sum(1 for b in bank_file if b[3] == "Sage")},
           "ramp_only": [r["Vendor name"] for r in ramp_rows if not r["Sage Intacct ID"].strip()]}
 data = {"cols": COLS + ADDED, "fields": FIELDS + ADDED, "required": ["Company Name"], "review": REVIEW, "rows": out,
@@ -375,8 +432,9 @@ with open("data/vendor-load.csv", "w", newline="", encoding="utf-8-sig") as o:
     w.writerow((FIELDS + ADDED)[:NB])
     w.writerow((COLS + ADDED)[:NB])
     for cells in load_rows:
-        if cells[QI + ADDED.index("In Ramp")][0] == "No":
+        if cells[QI + ADDED.index("In Ramp")][0] == "No" and not cells[DA][0].startswith("Merge into"):
             w.writerow([x[0] for x in cells[:NB]])
-print(f"{len(out)} rows ({len(out) - len(bridge['ramp_only'])} active Sage vendors + {len(bridge['ramp_only'])} Ramp only); {bridge['in_ramp']} Ramp matched; {bridge['sage_only']} Sage only -> data/vendor-load.csv")
+print(f"{len(out)} rows in scope ({bridge['in_ramp']} Ramp matched, {len(bridge['ramp_only'])} Ramp only, {bridge['sage_only_recent']} Sage only of {bridge['sage_only']}); "
+      f"merged {dup_n['merge']}, archived in Ramp {dup_n['archive']}, duplicates not loaded {dup_n['dropped']} -> data/vendor-load.csv")
 print(f"bank details for {len(bank_file)} vendors -> data/vendor-bank-details.csv (local only)")
 print(f"renumbered {len(renumber)} ({min(renumber.values())} to {max(renumber.values())}); next {data['next_id']}")
