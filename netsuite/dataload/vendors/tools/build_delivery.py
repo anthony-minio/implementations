@@ -28,39 +28,39 @@ wrap_top = Alignment(wrap_text=True, vertical="top")
 wb = openpyxl.Workbook()
 ns = wb.active
 ns.title = "Notes"
-ws = wb.create_sheet("Vendors-Draft")
-col = 1
-for name, span in GROUPS:
-    ws.cell(row=1, column=col, value=name.upper())
-    ws.merge_cells(start_row=1, start_column=col, end_row=1, end_column=col + span - 1)
-    for k in range(col, col + span):
-        c = ws.cell(row=1, column=k); c.fill = head_fill; c.border = grid
-        c.font = Font(bold=True, size=9, color="5B6874")
-    col += span
 headers = cols + review + ["Flags"]
-for k, h in enumerate(headers, 1):
-    c = ws.cell(row=2, column=k, value=h + (" *" if h in required else ""))
-    c.font = Font(bold=True); c.fill = head_fill; c.border = grid
-    c.alignment = Alignment(vertical="top", wrap_text=True)
-for i, r in enumerate(rows, 3):
-    vals = [(v, src) for v, src in r["cells"]] + [(v, "") for v in r["review"]] + [("; ".join(r["flags"]), "")]
-    for k, (v, src) in enumerate(vals, 1):
-        c = ws.cell(row=i, column=k, value=v if v != "" else None)
-        c.number_format = "@"
-        c.border = grid
-        if src in FILL:
-            c.fill = PatternFill("solid", fgColor=FILL[src])
-            c.font = Font(color=INK[src], italic=(src == "prop"))
-        if k > len(cols):
-            c.fill = PatternFill("solid", fgColor="F3F6F7") if not c.fill.fgColor.rgb or c.fill.fgColor.rgb == "00000000" else c.fill
 widths = {"Company Name": 40, "Addressee": 32, "Address 1": 36, "Address 2": 24, "Email": 32, "Legal Name": 32,
           "Comments": 30, "Flags": 70, "Question Categories": 26, "Duplicate Action": 34, "Merged Sage IDs": 18,
           "Bank Name": 28, "Default Expense Account": 30, "Default Payables Account": 30, "Ramp Vendor ID": 38}
-for k, h in enumerate(headers, 1):
-    ws.column_dimensions[get_column_letter(k)].width = widths.get(h, 16)
-ws.row_dimensions[2].height = 30
-ws.freeze_panes = "H3"
-ws.auto_filter.ref = f"A2:{get_column_letter(len(headers))}{len(rows) + 2}"
+def table(ws, rows):
+    col = 1
+    for name, span in GROUPS:
+        ws.cell(row=1, column=col, value=name.upper())
+        ws.merge_cells(start_row=1, start_column=col, end_row=1, end_column=col + span - 1)
+        for k in range(col, col + span):
+            c = ws.cell(row=1, column=k); c.fill = head_fill; c.border = grid
+            c.font = Font(bold=True, size=9, color="5B6874")
+        col += span
+    for k, h in enumerate(headers, 1):
+        c = ws.cell(row=2, column=k, value=h + (" *" if h in required else ""))
+        c.font = Font(bold=True); c.fill = head_fill; c.border = grid
+        c.alignment = Alignment(vertical="top", wrap_text=True)
+    for i, r in enumerate(rows, 3):
+        vals = [(v, src) for v, src in r["cells"]] + [(v, "") for v in r["review"]] + [("; ".join(r["flags"]), "")]
+        for k, (v, src) in enumerate(vals, 1):
+            c = ws.cell(row=i, column=k, value=v if v != "" else None)
+            c.number_format = "@"
+            c.border = grid
+            if src in FILL:
+                c.fill = PatternFill("solid", fgColor=FILL[src])
+                c.font = Font(color=INK[src], italic=(src == "prop"))
+            if k > len(cols):
+                c.fill = PatternFill("solid", fgColor="F3F6F7") if not c.fill.fgColor.rgb or c.fill.fgColor.rgb == "00000000" else c.fill
+    for k, h in enumerate(headers, 1):
+        ws.column_dimensions[get_column_letter(k)].width = widths.get(h, 16)
+    ws.row_dimensions[2].height = 30
+    ws.freeze_panes = "H3"
+    ws.auto_filter.ref = f"A2:{get_column_letter(len(headers))}{len(rows) + 2}"
 
 # Figures for the notes, counted from the table itself.
 ix = {c: k for k, c in enumerate(cols)}
@@ -68,8 +68,13 @@ V = lambda r, c: r["cells"][ix[c]][0]
 QC = lambda r: V(r, "Question Categories").split("; ")
 has_flag = lambda r, p: any(f.startswith(p) for f in r["flags"])
 merged = [r for r in rows if V(r, "Duplicate Action").startswith("Merge into")]
-archived = [r for r in rows if V(r, "Duplicate Action").startswith("Archive in Ramp")]
-gone = merged + archived
+archived = [r for r in rows if V(r, "Duplicate Action").startswith("Archive in Ramp before the sync: duplicate")]
+retired = [r for r in rows if V(r, "Duplicate Action").startswith("Archive in Ramp before the sync: no longer used")]
+gone = merged + archived + retired
+# Vendors-Draft holds only the rows loaded to NetSuite (Anthony, 2026-10-28); records not loaded are on the Not Loaded tab.
+table(wb.create_sheet("Vendors-Draft"), [r for r in rows if r not in gone])
+table(wb.create_sheet("Not Loaded"), gone)
+which = lambda r: f"{V(r, 'Company Name')} ({V(r, 'Legacy Vendor ID') or 'Ramp only, Ramp ID ' + V(r, 'Ramp Vendor ID')})"
 nsv = [r for r in rows if r not in gone]  # vendors in NetSuite
 by_sync = [r for r in nsv if "Sage only" not in QC(r)]
 from_file = [r for r in nsv if "Sage only" in QC(r)]
@@ -125,10 +130,15 @@ DECISIONS = [
      "Four vendors are in Ramp twice. In each pair one record was created in Ramp and a second, linked to Sage, a few days "
      "later. The Ramp sync would bring both into NetSuite, so this file cannot merge them.",
      "Keep the records linked to Sage; archive the others in Ramp before the sync (Anthony, 2026-10-28). Nisha to action.",
-     f"The {len(archived)} records to archive are marked \"Archive in Ramp before the sync\" in Duplicate Action, listed under "
-     f"the record kept, and are not counted in the load: " + "; ".join(
-         f"{V(r, 'Company Name')} ({V(r, 'Legacy Vendor ID') or 'Ramp only'}), a duplicate of {V(r, 'Duplicate Action').split('duplicate of ')[1]}"
-         for r in archived) + "."),
+     f"The {len(archived)} records to archive are on the Not Loaded tab: " + "; ".join(
+         f"{which(r)}, a duplicate of {V(r, 'Duplicate Action').split('duplicate of ')[1]}" for r in archived)
+     + ". The record kept in each pair is marked \"Keep: its duplicate in Ramp is archived before the sync\" in Duplicate Action."),
+    ("Ramp vendors no longer used",
+     "Two Ramp vendors have not been paid since July 2025: Kar Lu Caroline Harreld (V-01200), an FP&A contractor from "
+     "January to July 2025, and Neil Martin (V-01355), typed MinIO employee in Sage. The Ramp sync would create both in "
+     "NetSuite.",
+     "Leave them out: archive both in Ramp before the sync (Anthony, 2026-10-28). Nisha to action.",
+     f"On the Not Loaded tab: {', '.join(which(r) for r in retired)}."),
     ("Moss Adams and Baker Tilly",
      "Moss Adams LLP (V-00453, last used 2025-05-19) and Baker Tilly Advisory Group Parent, LP (V-01326, billing now) share "
      "the email mossadamsar@mossadams.com: Baker Tilly took over Moss Adams in 2025.",
@@ -153,8 +163,8 @@ DECISIONS = [
      "NetSuite needs First Name and Last Name for a vendor that is an individual. Sage has neither for some individuals.",
      "Where the vendor name is a plain first and last name, split it; otherwise leave it for review. Vishnu Daya & Co LLP "
      "is a firm, so Individual is unticked (Anthony, 2026-10-28).",
-     f"{len(split_names)} split ({ids(split_names)}). V-01459 Vishnu Daya & Co LLP loads as a company. {len(no_names)} "
-     "left blank and listed in the open items."),
+     f"{len(split_names)} split ({ids(split_names)}). V-01459 Vishnu Daya & Co LLP loads as a company. Kar Lu Caroline "
+     "Harreld would have been First Kar Lu, Middle Caroline, Last Harreld, but is now archived in Ramp (next decision)."),
 ]
 
 NOTES = [
@@ -165,12 +175,12 @@ NOTES = [
      f"linked by the Sage vendor ID held in Ramp, and {n(B['sage_only'])} are not (Sage only). Less "
      f"{n(B['out_of_scope'])} Sage only vendors with no activity since 2024-10-26 ({B['older']} with older activity only, "
      f"{B['sage_only_none']} with none): {n(B['active'] - B['out_of_scope'])}. Less {B['employees_out']} MinIO employees, Sage only, set up for expense reimbursements, which Ramp now creates its own vendors for: {n(B['active'] - B['out_of_scope'] - B['employees_out'])}. Plus {len(B['ramp_only'])} vendors in Ramp "
-     f"that are not in Sage (Ramp only), mostly added since 2025-08: {n(len(rows))}, the rows on the Vendors-Draft tab. Less "
-     f"{len(merged)} duplicate merged ({ids(merged)}) and {len(archived)} duplicates in Ramp to archive before the sync: "
-     f"{n(len(nsv))} vendors in NetSuite. Of these, {len(by_sync)} come in through the Ramp sync ({B['in_ramp'] - sum(1 for r in archived if 'Ramp matched' in QC(r))} "
-     f"Ramp matched and {len(B['ramp_only']) - sum(1 for r in archived if 'Ramp only' in QC(r))} Ramp only) and "
-     f"{len(from_file)} are loaded from this file (Sage only). The merged and archived records stay on the tab only so the "
-     f"decision can be checked, and must be filtered out before the import. Sage's vendor list report also has "
+     f"that are not in Sage (Ramp only), mostly added since 2025-08: {n(len(rows))}. Less {len(merged)} duplicate merged "
+     f"({ids(merged)}), {len(archived)} duplicates in Ramp and {len(retired)} Ramp vendors no longer used, all archived in "
+     f"Ramp before the sync: {n(len(nsv))} vendors in NetSuite, the rows on the Vendors-Draft tab. Of these, {len(by_sync)} "
+     f"come in through the Ramp sync ({sum(1 for r in by_sync if 'Ramp matched' in QC(r))} Ramp matched and "
+     f"{sum(1 for r in by_sync if 'Ramp only' in QC(r))} Ramp only) and {len(from_file)} are loaded from this file (Sage "
+     f"only). Sage's vendor list report also has "
      f"{B['inactive']} inactive vendors, not counted above and not loaded."),
     ("Bank details",
      "Ramp supersedes Sage. Ramp does not push bank details to NetSuite, so they are imported separately for every vendor. "
@@ -205,11 +215,12 @@ NOTES = [
 ]
 
 OPEN = [
-    f"Nisha: archive the {len(archived)} duplicate vendors in Ramp before the Ramp sync to NetSuite, keeping the record "
-    "linked to Sage in each pair: " + "; ".join(
-        f"archive {V(r, 'Company Name')} ({V(r, 'Legacy Vendor ID') or 'Ramp only'}), keep {V(r, 'Duplicate Action').split('duplicate of ')[1]}"
-        for r in archived) + ".",
-    f"Individuals with no first and last name in Sage, which NetSuite requires: {ids(no_names)}. AP to supply the names.",
+    f"Nisha: archive {len(archived) + len(retired)} vendors in Ramp before the Ramp sync to NetSuite. Duplicates, keeping "
+    "the record linked to Sage: " + "; ".join(
+        f"archive {which(r)}, keep {V(r, 'Duplicate Action').split('duplicate of ')[1]}" for r in archived)
+    + ". No longer used: " + "; ".join(which(r) for r in retired) + ".",
+] + ([f"Individuals with no first and last name in Sage, which NetSuite requires: {ids(no_names)}. AP to supply the names."]
+     if no_names else []) + [
     f"Sage expense accounts with no COA Draft v1 mapping, so Default Expense Account is blank: " + "; ".join(
         f"{a} ({c} vendor{'s' if c > 1 else ''})" for a, c in sorted(collections.Counter(
             f.split("account ")[1].split(" has")[0] for r in no_coa for f in r["flags"] if f.startswith("Sage expense account")).items()))
@@ -230,8 +241,8 @@ ns.column_dimensions["E"].width = 60
 ns["A1"] = "MinIO vendor load to NetSuite: notes"; ns["A1"].font = Font(bold=True, size=14)
 ns["A2"] = (f"Built 2026-10-28 from the Sage and Ramp vendor exports of 2026-10-25 (attached to the Asana task, {ASANA}). "
             f"Full version for SOA, the controller and AP: tax IDs and bank details in full. Do not circulate further. The "
-            f"Vendors-Draft tab has {len(rows)} rows: {len(nsv)} vendors in NetSuite and {len(gone)} duplicates marked in "
-            "Duplicate Action, which are not loaded. Columns marked * are required. Flags (last column) lists everything "
+            f"Vendors-Draft tab has {len(nsv)} rows, one per vendor in NetSuite, and nothing else. The Not Loaded tab lists the "
+            f"{len(gone)} records left out by the decisions below, for reference only: do not import it. Columns marked * are required. Flags (last column) lists everything "
             "changed or worth checking on each row. Cell colors show where each value comes from:")
 ns.merge_cells("A2:E2"); ns["A2"].alignment = wrap_top; ns.row_dimensions[2].height = 64
 row = 3

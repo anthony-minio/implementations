@@ -30,40 +30,46 @@ wrap_top = Alignment(wrap_text=True, vertical="top")
 wb = openpyxl.Workbook()
 ns = wb.active
 ns.title = "Notes"
-ws = wb.create_sheet("Customers-Draft")
-col = 1
-for name, span in GROUPS:
-    ws.cell(row=1, column=col, value=name.upper())
-    ws.merge_cells(start_row=1, start_column=col, end_row=1, end_column=col + span - 1)
-    for k in range(col, col + span):
-        c = ws.cell(row=1, column=k); c.fill = head_fill; c.border = grid
-        c.font = Font(bold=True, size=9, color="5B6874")
-    col += span
 headers = cols + review + ["Flags"]
-for k, h in enumerate(headers, 1):
-    c = ws.cell(row=2, column=k, value=h + (" *" if h in required else ""))
-    c.font = Font(bold=True); c.fill = head_fill; c.border = grid
-    c.alignment = Alignment(vertical="top", wrap_text=True)
-for i, r in enumerate(rows, 3):
-    vals = [(v, src) for v, src in r["cells"]] + [(v, "") for v in r["review"]] + [("; ".join(r["flags"]), "")]
-    for k, (v, src) in enumerate(vals, 1):
-        c = ws.cell(row=i, column=k, value=v if v != "" else None)
-        c.number_format = "@"
-        c.border = grid
-        if src in FILL:
-            c.fill = PatternFill("solid", fgColor=FILL[src])
-            c.font = Font(color=INK[src], italic=(src == "prop"))
-        if k > len(cols):
-            c.fill = PatternFill("solid", fgColor="F3F6F7") if not c.fill.fgColor.rgb or c.fill.fgColor.rgb == "00000000" else c.fill
-widths = {"Company Name": 40, "Addressee": 32, "Address 1": 36, "Address 2": 24, "Customer Invoice Email": 32,
-          "Additional Emails": 40, "Second Address": 44, "Third Address": 44, "Reseller Address": 40,
-          "Salesforce Partners": 30, "Flags": 70, "Question Categories": 22, "Phone": 20,
-          "Duplicate Action": 30, "Billed To (Reseller)": 28, "Parent Company": 26, "Attention": 26}
-for k, h in enumerate(headers, 1):
-    ws.column_dimensions[get_column_letter(k)].width = widths.get(h, 16)
-ws.row_dimensions[2].height = 30
-ws.freeze_panes = "E3"
-ws.auto_filter.ref = f"A2:{get_column_letter(len(headers))}{len(rows) + 2}"
+def table(ws, rows):
+    col = 1
+    for name, span in GROUPS:
+        ws.cell(row=1, column=col, value=name.upper())
+        ws.merge_cells(start_row=1, start_column=col, end_row=1, end_column=col + span - 1)
+        for k in range(col, col + span):
+            c = ws.cell(row=1, column=k); c.fill = head_fill; c.border = grid
+            c.font = Font(bold=True, size=9, color="5B6874")
+        col += span
+    for k, h in enumerate(headers, 1):
+        c = ws.cell(row=2, column=k, value=h + (" *" if h in required else ""))
+        c.font = Font(bold=True); c.fill = head_fill; c.border = grid
+        c.alignment = Alignment(vertical="top", wrap_text=True)
+    for i, r in enumerate(rows, 3):
+        vals = [(v, src) for v, src in r["cells"]] + [(v, "") for v in r["review"]] + [("; ".join(r["flags"]), "")]
+        for k, (v, src) in enumerate(vals, 1):
+            c = ws.cell(row=i, column=k, value=v if v != "" else None)
+            c.number_format = "@"
+            c.border = grid
+            if src in FILL:
+                c.fill = PatternFill("solid", fgColor=FILL[src])
+                c.font = Font(color=INK[src], italic=(src == "prop"))
+            if k > len(cols):
+                c.fill = PatternFill("solid", fgColor="F3F6F7") if not c.fill.fgColor.rgb or c.fill.fgColor.rgb == "00000000" else c.fill
+    widths = {"Company Name": 40, "Addressee": 32, "Address 1": 36, "Address 2": 24, "Customer Invoice Email": 32,
+              "Additional Emails": 40, "Second Address": 44, "Third Address": 44, "Reseller Address": 40,
+              "Salesforce Partners": 30, "Flags": 70, "Question Categories": 22, "Phone": 20,
+              "Duplicate Action": 30, "Billed To (Reseller)": 28, "Parent Company": 26, "Attention": 26}
+    for k, h in enumerate(headers, 1):
+        ws.column_dimensions[get_column_letter(k)].width = widths.get(h, 16)
+    ws.row_dimensions[2].height = 30
+    ws.freeze_panes = "E3"
+    ws.auto_filter.ref = f"A2:{get_column_letter(len(headers))}{len(rows) + 2}"
+
+# Customers-Draft holds only the rows loaded to NetSuite (Anthony, 2026-10-28); merged duplicates are on the Not Loaded tab.
+loaded_rows = [r for r in rows if not r["cells"][cols.index("Duplicate Action")][0].startswith("Merge into")]
+assert len(loaded_rows) == data["bridge"]["load"]
+table(wb.create_sheet("Customers-Draft"), loaded_rows)
+table(wb.create_sheet("Not Loaded"), [r for r in rows if r["cells"][cols.index("Duplicate Action")][0].startswith("Merge into")])
 
 # Figures for the notes, counted from the table itself.
 ix = {c: k for k, c in enumerate(cols)}
@@ -280,11 +286,10 @@ NOTES = [
      f"Less 1, StoreManager (C-00036; no invoices and no address, left out per Nisha): {B['first'] - 17}. "
      f"Less {len(B['onetime'])} one-time-use customers with no category and no invoices "
      f"({', '.join(f'{i} {n}' for i, n in B['onetime'])}): {B['first'] - len(B['excluded'])}. "
-     f"Plus {B['split']} new L3Harris customers split from C-00333 ({ids(split)}): {B['rows']}, the rows on the "
-     f"Customers-Draft tab. Less {B['merged']} duplicates merged into {B['kept']} other customers: {B['load']} customers to load. "
-     f"The merged duplicates are already merged: their Sage IDs, addresses and emails are on the customer they merge into. "
-     f"They stay on the tab, marked \"Merge into\" in Duplicate Action, only so the merge can be checked, and must be "
-     f"filtered out before the import. {B['merged']} duplicates merge into {B['kept']} customers because "
+     f"Plus {B['split']} new L3Harris customers split from C-00333 ({ids(split)}): {B['rows']}. Less {B['merged']} duplicates merged into "
+     f"{B['kept']} other customers: {B['load']} customers to load, the rows on the Customers-Draft tab. The merged "
+     f"duplicates are already merged: their Sage IDs, addresses and emails are on the customer they merge into. They are on "
+     f"the Not Loaded tab, marked \"Merge into\" in Duplicate Action, so the merge can be checked; do not import it. {B['merged']} duplicates merge into {B['kept']} customers because "
      + " and ".join(f"{V(r, 'Company Name')} ({V(r, 'Customer ID')}) merges {V(r, 'Merged Sage IDs').replace(', ', ' and ')}" for r in multi)
      + f" ({len(multi)} customer{'s' if len(multi) > 1 else ''} with two duplicates). Sage's customer list report also has 4 inactive customers, not counted above "
      f"and not loaded: {', '.join(i for i, _ in B['inactive'])}."),
@@ -363,8 +368,8 @@ ns.column_dimensions["D"].width = 55
 ns.column_dimensions["E"].width = 60
 ns["A1"] = "MinIO customer load to NetSuite: notes"; ns["A1"].font = Font(bold=True, size=14)
 ns["A2"] = (f"Built {data['built']} from the Sage and Salesforce exports of 2026-10-25 and 2026-10-26 (attached to the Asana "
-            f"task). The Customers-Draft tab has {B['rows']} rows: {B['load']} customers to load and {B['merged']} duplicates "
-            "marked \"Merge into\" in Duplicate Action, which are not loaded. Columns marked * are required. Flags (last "
+            f"task). The Customers-Draft tab has {B['load']} rows, one per customer to load, and nothing else. The Not Loaded tab "
+            f"lists the {B['merged']} duplicates merged into other customers, for reference only: do not import it. Columns marked * are required. Flags (last "
             "column) lists everything changed or worth checking on each row. Cell colors show where each value comes from:")
 ns.merge_cells("A2:E2"); ns["A2"].alignment = wrap_top; ns.row_dimensions[2].height = 48
 row = 3

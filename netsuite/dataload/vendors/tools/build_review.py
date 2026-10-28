@@ -82,7 +82,12 @@ SEPARATE = [{"V-00453", "V-01326"}]
 OWN_DOMAINS = ("@minio.io", "@min.io")
 # Marked as an individual in Sage but a company (Anthony, 2026-10-28).
 NOT_PERSON = {"V-01459": "Vishnu Daya & Co LLP is a firm, not a person"}
-not_loaded = set(MERGE) | set(RAMP_ARCHIVE)
+# Ramp vendors no longer used, archived in Ramp before the sync so they do not come over (Anthony, 2026-10-28; Nisha to action).
+RAMP_RETIRE = {"V-01200": "former FP&A contractor (January to July 2025), last paid 2025-07-16",
+               "V-01355": "MinIO employee in Sage, last paid 2025-07-16"}
+# First, middle and last name where Sage has none and the vendor name does not split plainly (Anthony, 2026-10-28).
+NAMES = {"V-01200": ("Kar Lu", "Caroline", "Harreld")}
+not_loaded = set(MERGE) | set(RAMP_ARCHIVE) | set(RAMP_RETIRE)
 
 # Vendor ID (Anthony, 2026-10-28): vendors in Ramp are created in NetSuite by the Ramp sync, which sets their ID, so their
 # Vendor ID and External ID read SYNCED FROM RAMP, for SOA to plan rather than load. Sage only vendors keep their Sage ID as is.
@@ -142,6 +147,9 @@ for r in sage:
             # NetSuite needs both names for an individual; a plain two-word name splits without guesswork (2026-10-28).
             S("firstName", nm[0], "rule"); S("lastName", nm[1], "rule")
             flags.append("First Name and Last Name taken from the vendor name; Sage has none")
+        elif sid in NAMES:
+            S("firstName", NAMES[sid][0], "rule"); S("middleName", NAMES[sid][1], "rule"); S("lastName", NAMES[sid][2], "rule")
+            flags.append("First, Middle and Last Name set from the vendor name; Sage has none")
         elif not (G(r, "First name") and G(r, "Last name")):
             flags.append("Individual without first and last name")
     S("companyName", G(r, "Vendor name"))
@@ -341,7 +349,13 @@ for x in out:
 found = {frozenset(v) for v in links.values() if len(v) > 1}
 decided = {frozenset({k, v}) for k, v in list(MERGE.items()) + list(RAMP_ARCHIVE.items())} | {frozenset(p) for p in SEPARATE}
 assert found == decided, f"duplicates in scope differ from the decisions: new {[sorted(f) for f in found - decided]}, gone {[sorted(f) for f in decided - found]}"
-dup_n = {"merge": 0, "archive": 0, "dropped": 0}
+dup_n = {"merge": 0, "archive": 0, "dropped": 0, "retire": len(RAMP_RETIRE)}
+for i, why in RAMP_RETIRE.items():
+    x = by_key[i]
+    x["cells"][VI] = ["", ""]
+    x["cells"][FIELDS.index("externalId")] = ["", ""]
+    x["cells"][DA] = [f"Archive in Ramp before the sync: no longer used ({why})", "rule"]
+    x["flags"].append(f"Not loaded: {why}; archived in Ramp so the sync does not create it")
 for lost, keep in list(MERGE.items()) + list(RAMP_ARCHIVE.items()):
     x, k = by_key[lost], by_key[keep]
     kid = k["cells"][QI + ADDED.index("Sage Vendor ID")][0]

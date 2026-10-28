@@ -147,11 +147,16 @@ for r in recs:
 # Sage only MinIO employees are left out: Ramp creates its own reimbursement vendors (2026-10-28).
 active = {i for i, S in sage.items() if i in ramp_by_sage or (max(d(g(S, "Last bill created on")), d(g(S, "Last payment made on"))) >= "2024-10-26"
           and g(S, "Vendor type ID") != "MinIO employee")}
+# Records decided out of the load (2026-10-28) are not in the file: a merged duplicate, duplicates in Ramp and Ramp vendors
+# no longer used, all archived in Ramp before the sync.
+MERGED = {"V00208": "V-00443"}
+OUT_SAGE = set(MERGED) | {"RMP_5", "V-01200", "V-01355"}
+OUT_RAMP = {"6a461530-6faa-45d1-9cc9-1789847d4bb3", "12040107-b5aa-48d7-8d79-779dc1766034", "c3639aaa-cbca-42f5-aae1-9378d0ceb6b3"}
 for r in recs:
     if col(r, "Primary Subsidiary") != "MinIO, Inc.":
         bad("Subsidiary not MinIO, Inc.", col(r, "Sage Vendor ID") or col(r, "Ramp Vendor ID"), col(r, "Primary Subsidiary"))
-    if col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp")) and (col(r, "Vendor ID") or col(r, "ExternalID")):
-        bad("Merged or archived record keeps a Vendor ID", col(r, "Sage Vendor ID") or col(r, "Ramp Vendor ID"), col(r, "Vendor ID"))
+    if col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp")):
+        bad("Record not loaded is in the load file", col(r, "Sage Vendor ID") or col(r, "Ramp Vendor ID"), col(r, "Duplicate Action"))
 # No two vendors in NetSuite with the same name; Merged Sage IDs are same-name Sage records left out of the load.
 nk = lambda t: re.sub(r"[^a-z0-9]", "", t.lower())
 live = [r for r in recs if not col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp"))]
@@ -160,16 +165,24 @@ for k, c in collections.Counter(nk(col(r, "Company Name")) for r in live).items(
         bad("Same name twice in NetSuite", k, c)
 for r in recs:
     for m in filter(None, col(r, "Merged Sage IDs").split(", ")):
-        if m in active and not any(col(x, "Sage Vendor ID") == m and col(x, "Duplicate Action").startswith("Merge into") for x in recs):
+        if m in active and m not in MERGED:
             bad("Merged Sage ID is in the load", col(r, "Sage Vendor ID"), m)
         elif m not in active and (m not in sage or nk(g(sage[m], "Vendor name")) != nk(col(r, "Company Name"))):
             bad("Merged Sage ID not a same-name record", col(r, "Sage Vendor ID"), m)
+for m, k in MERGED.items():
+    if not any(col(r, "Sage Vendor ID") == k and m in col(r, "Merged Sage IDs").split(", ") for r in recs):
+        bad("Merged record not listed on the vendor kept", k, m)
+active -= OUT_SAGE
+nl = list(openpyxl.load_workbook(WB, read_only=True)["Not Loaded"].iter_rows(values_only=True))[2:]
+nl_keys = {str(x[pos["Sage Vendor ID"][0]] or x[pos["Ramp Vendor ID"][0]]) for x in nl}
+if nl_keys != OUT_SAGE | OUT_RAMP or len(nl) != len(nl_keys):
+    bad("Not Loaded tab", "-", f"extra {sorted(nl_keys - OUT_SAGE - OUT_RAMP)}, missing {sorted(OUT_SAGE | OUT_RAMP - nl_keys)}")
 if set(seen_sage) != active:
     bad("Row set", "Sage", f"missing {sorted(active - set(seen_sage))[:5]}, extra {sorted(set(seen_sage) - active)[:5]}")
 for i, n in seen_sage.items():
     if n > 1:
         bad("Row set", i, f"appears {n} times")
-ro = {r["Vendor ID"] for r in ramp_all if not r["Sage Intacct ID"].strip()}
+ro = {r["Vendor ID"] for r in ramp_all if not r["Sage Intacct ID"].strip()} - OUT_RAMP
 if set(seen_ramp_only) != ro:
     bad("Row set", "Ramp only", f"missing {len(ro - set(seen_ramp_only))}, extra {len(set(seen_ramp_only) - ro)}")
 vids = collections.Counter(col(r, "Vendor ID") for r in recs if col(r, "Vendor ID") and col(r, "Vendor ID") != "SYNCED FROM RAMP")
@@ -179,10 +192,15 @@ if any(n > 1 for n in vids.values()):
 # The masked page must match the workbook row for row, apart from masked values.
 s = open(MASKED, encoding="utf-8").read()
 page = json.loads(s[s.index("const DATA = ") + 13:s.index(";\nconst $")])
-if len(page["rows"]) != len(recs):
-    bad("Masked page rows", "-", f"{len(page['rows'])} vs workbook {len(recs)}")
+RVI, SVI = (hdr.index("Ramp Vendor ID"), hdr.index("Sage Vendor ID"))
+pkey = lambda cells: cells[SVI] or cells[RVI]
+by_page = {pkey([c[0] for c in pr["cells"]]): pr for pr in page["rows"]}
+missing = [col(wr, "Sage Vendor ID") or col(wr, "Ramp Vendor ID") for wr in recs if pkey(["" if v is None else str(v) for v in wr]) not in by_page]
+if missing:
+    bad("Masked page rows", "-", f"workbook rows not on the page: {missing[:5]}")
 else:
-    for pr, wr in zip(page["rows"], recs):
+    for wr in recs:
+        pr = by_page[pkey(["" if v is None else str(v) for v in wr])]
         vals = [c[0] for c in pr["cells"]] + pr["review"]
         for j, v in enumerate(vals):
             w = "" if wr[j] is None else str(wr[j])
