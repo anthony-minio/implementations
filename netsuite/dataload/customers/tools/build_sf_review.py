@@ -142,6 +142,18 @@ CALL = {
     ("C-00516", "Leidos-2"): ("accept", "high", "Sage bills C-00516 through ThunderCat, and ThunderCat is the Salesforce partner on Leidos-2 (972)."),
     ("C-00516", "Leidos-1"): ("reject", "high", "Not this customer's account: C-00516 is billed through ThunderCat, the partner on Leidos-2. Leidos-1 (895) goes to the Chargebee record C-00489 by elimination; see that question."),
     ("C-00516", "Leidos-3"): ("reject", "high", "No Subnet ID; a child of Leidos-1 in Salesforce."),
+    ("C-00044", "CSIT"): ("accept", "high", "CSIT is Singapore's Centre for Strategic Infocomm Technologies under the Ministry of Defence; the Sage address is the CSIT Building, and the Sage email domain is csit.gov.sg."),
+    ("C-00092", "CIBC"): ("accept", "high", "CIBC is the Canadian Imperial Bank of Commerce; same city, email domain cibc.com."),
+    ("C-00128", "Swiss National"): ("accept", "high", "SUVA is the Swiss National Accident Insurance Fund; same city (Luzern), email domain suva.ch."),
+    ("C-00182", "Environmental Systems"): ("accept", "high", "Esri is Environmental Systems Research Institute; same city (Redlands), email domain esri.com."),
+    ("C-00195", "Super League"): ("accept", "high", "SLGG is Super League Gaming's stock ticker; same city (Santa Monica), email domain superleague.com."),
+    ("C-00216", "ISS"): ("accept", "high", "ISS is Institutional Shareholder Services; same city (Rockville), email domain issgovernance.com."),
+    ("C-00220", "Norges"): ("accept", "high", "Norges forskningsråd is the Norwegian name of the Research Council of Norway; same city (Oslo), email domain forskningsradet.no."),
+    ("C-00231", "fpu.gov.ba"): ("accept", "high", "The Salesforce account is named after the customer's own web domain (fpu.gov.ba, the Federation of Bosnia and Herzegovina tax administration); same city (Sarajevo)."),
+    ("C-00331", "AMD"): ("accept", "high", "AMD is Advanced Micro Devices; same city (Santa Clara), email domain amd.com."),
+    ("C-00405", "Scotiabank"): ("accept", "high", "Scotiabank is the Bank of Nova Scotia; same city (Toronto), email domain scotiabank.com, and the only Scotiabank account found by that domain."),
+    ("C-00433", "Healthcare Fraud"): ("accept", "medium", "Names differ: Sage's \u201ccloudtech\u201d is a Chargebee record whose only contact uses hcfraudshield.com, Healthcare Fraud Shield's domain, in the same city (Chesterfield). Likely Healthcare Fraud Shield is the customer and cloudtech a sign-up name; your call."),
+    ("C-00480", "UAB"): ("accept", "medium", "Names differ: Sage's \u201cSenukai Digital\u201d is a Chargebee record whose only contact uses teamhosty.com, the domain of UAB Hosty, a Lithuanian hosting company. Likely Hosty is the paying customer (perhaps hosting for Senukai); your call."),
     ("C-00050", "Broadcom"): ("accept", "high", "The only Broadcom or VMware account in Salesforce; its Subnet account is named Broadcom-NSXi (NSX is a VMware product), and every email Sage holds for VMware is @broadcom.com."),
     ("C-00512", "Xerox"): None,  # decided by Subnet ID below
 }
