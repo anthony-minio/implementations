@@ -145,8 +145,10 @@ DECISIONS = [
      "number."),
     ("Individuals without first and last name",
      "NetSuite needs First Name and Last Name for a vendor that is an individual. Sage has neither for some individuals.",
-     "Where the vendor name is a plain first and last name, split it; otherwise leave it for review.",
-     f"{len(split_names)} split ({ids(split_names)}). {len(no_names)} left blank and listed in the open items."),
+     "Where the vendor name is a plain first and last name, split it; otherwise leave it for review. Vishnu Daya & Co LLP "
+     "is a firm, so Individual is unticked (Anthony, 2026-10-28).",
+     f"{len(split_names)} split ({ids(split_names)}). V-01459 Vishnu Daya & Co LLP loads as a company. {len(no_names)} "
+     "left blank and listed in the open items."),
 ]
 
 NOTES = [
@@ -201,8 +203,7 @@ OPEN = [
     "linked to Sage in each pair: " + "; ".join(
         f"archive {V(r, 'Company Name')} ({V(r, 'Legacy Vendor ID') or 'Ramp only'}), keep {V(r, 'Duplicate Action').split('duplicate of ')[1]}"
         for r in archived) + ".",
-    f"Individuals with no first and last name in Sage, which NetSuite requires: {ids(no_names)}. AP to supply the names, "
-    "or untick Individual where the vendor is a company.",
+    f"Individuals with no first and last name in Sage, which NetSuite requires: {ids(no_names)}. AP to supply the names.",
     f"Sage expense accounts with no COA Draft v1 mapping, so Default Expense Account is blank: " + "; ".join(
         f"{a} ({c} vendor{'s' if c > 1 else ''})" for a, c in sorted(collections.Counter(
             f.split("account ")[1].split(" has")[0] for r in no_coa for f in r["flags"] if f.startswith("Sage expense account")).items()))

@@ -80,6 +80,8 @@ RAMP_ARCHIVE = {"RMP_5": "V-01445",  # HostIndia Events & Marketing Pvt. Ltd, ke
 # (both kept, Anthony, 2026-10-28). Mailboxes at MinIO's own domains are set on many unrelated vendors.
 SEPARATE = [{"V-00453", "V-01326"}]
 OWN_DOMAINS = ("@minio.io", "@min.io")
+# Marked as an individual in Sage but a company (Anthony, 2026-10-28).
+NOT_PERSON = {"V-01459": "Vishnu Daya & Co LLP is a firm, not a person"}
 not_loaded = set(MERGE) | set(RAMP_ARCHIVE)
 
 # Vendor ID: keep V-#####; older V##### and Ramp-created RMP_# vendors in the load get the next numbers after the highest V-#####.
@@ -136,6 +138,10 @@ for r in sage:
         flags.append(f"Renumbered from Sage ID: {sid}")
     person = G(r, "This vendor is an individual person") == "Yes"
     S("isPerson", "TRUE" if person else "FALSE", "sage" if person else "rule")
+    if person and sid in NOT_PERSON:
+        person = False
+        S("isPerson", "FALSE", "rule")
+        flags.append(f"Individual unticked: {NOT_PERSON[sid]}")
     if person:
         S("firstName", G(r, "First name")); S("middleName", G(r, "Middle name")); S("lastName", G(r, "Last name"))
         nm = G(r, "Vendor name").split()

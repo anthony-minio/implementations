@@ -76,7 +76,7 @@ for r in recs:
             bad("Renumbered Vendor ID out of range", key, vid)
         if col(r, "ExternalID") != vid:
             bad("ExternalID vs Vendor ID", key, col(r, "ExternalID"))
-        if col(r, "Individual") != ("TRUE" if g(S, "This vendor is an individual person") == "Yes" else "FALSE"):
+        if col(r, "Individual") != ("TRUE" if g(S, "This vendor is an individual person") == "Yes" and sid != "V-01459" else "FALSE"):
             bad("Individual vs Sage", key, col(r, "Individual"))
         phone = g(S, "Phone number") or (R["Contact phone number"].strip().lstrip("'") if R else "")
         if col(r, "Phone") != phone:
