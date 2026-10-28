@@ -4,32 +4,34 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a reconciliation ledger. Sticky control bar on top; one block per Sage customer, its Salesforce candidates as decision rows beside it. */
+/* Layout: a reconciliation ledger. Sticky control bar; one block per Sage customer; each question states what Accept changes and what Claude recommends. */
 :root {
   --bg: #f5f7f8; --panel: #ffffff; --ink: #18252e; --muted: #5a6872; --rule: #d9e1e5; --accent: #0d6b70;
-  --accept: #1f7a4a; --accept-bg: #e2f2e8; --reject: #a8261f; --reject-bg: #fbe6e3; --decide: #8a5d00; --decide-bg: #fff2cf;
+  --accept: #1f7a4a; --accept-bg: #e2f2e8; --reject: #a8261f; --reject-bg: #fbe6e3; --caution: #8a5d00; --caution-bg: #fff2cf;
   --chip: #eef2f4;
   --f-body: "Public Sans", "Segoe UI", system-ui, sans-serif;
   --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
-  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px;
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #11181d; --panel: #18222a; --ink: #e3eaee; --muted: #9aa8b1; --rule: #2a3742; --accent: #5cc3c8;
-  --accept: #6fd39b; --accept-bg: #183527; --reject: #f2918a; --reject-bg: #3a1d1b; --decide: #f0c565; --decide-bg: #3a2f12;
+  --accept: #6fd39b; --accept-bg: #183527; --reject: #f2918a; --reject-bg: #3a1d1b; --caution: #f0c565; --caution-bg: #3a2f12;
   --chip: #223039; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #11181d; --panel: #18222a; --ink: #e3eaee; --muted: #9aa8b1; --rule: #2a3742; --accent: #5cc3c8;
-  --accept: #6fd39b; --accept-bg: #183527; --reject: #f2918a; --reject-bg: #3a1d1b; --decide: #f0c565; --decide-bg: #3a2f12;
+  --accept: #6fd39b; --accept-bg: #183527; --reject: #f2918a; --reject-bg: #3a1d1b; --caution: #f0c565; --caution-bg: #3a2f12;
   --chip: #223039; color-scheme: dark }
 * { box-sizing: border-box }
 [hidden] { display: none !important }
 body { background: var(--bg); color: var(--ink); font: 400 14px/1.5 var(--f-body);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg) }
-.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: var(--s-4) }
-header.top { display: grid; gap: var(--s-2); padding-block: var(--s-5) var(--s-2) }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: var(--s-4) }
+header.top { display: grid; gap: var(--s-3); padding-block: var(--s-5) 0 }
 h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance }
-.lede { margin: 0; color: var(--muted); max-width: 72ch }
+.how { margin: 0; padding: var(--s-3) var(--s-4); background: var(--panel); border: 1px solid var(--rule); border-radius: 10px;
+  display: grid; gap: var(--s-1); max-width: 80ch }
+.how b { font-weight: 600 }
 .mono { font-family: var(--f-mono); font-size: 12.5px; font-variant-numeric: tabular-nums }
 .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: var(--s-3);
   border-bottom: 1px solid var(--rule); display: grid; gap: var(--s-3) }
@@ -38,7 +40,7 @@ h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; text
 .meter { height: 6px; border-radius: 3px; background: var(--rule); overflow: hidden; display: flex }
 .meter span { display: block; height: 100% }
 .controls { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center }
-.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--panel) }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--panel) }
 .seg button { border: 0; background: none; color: var(--ink); padding: 6px 10px; font: 500 13px var(--f-body); cursor: pointer }
 .seg button + button { border-left: 1px solid var(--rule) }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--panel) }
@@ -49,62 +51,58 @@ label.chk { display: inline-flex; gap: 6px; align-items: center; color: var(--mu
 .btn { border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 8px; padding: 6px 12px;
   font: 600 13px var(--f-body); cursor: pointer }
 .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--panel) }
-.btn:disabled { opacity: .5; cursor: default }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
-.confirm { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; background: var(--decide-bg); color: var(--ink);
+.confirm, .notice { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; background: var(--caution-bg); color: var(--ink);
   border-radius: 8px; padding: var(--s-2) var(--s-3) }
-.notice { border-radius: 8px; padding: var(--s-2) var(--s-3); background: var(--decide-bg); color: var(--ink) }
+.saved { font-size: 12px; color: var(--muted) }
 .list { display: grid; gap: var(--s-3) }
-.cust { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; display: grid;
-  grid-template-columns: minmax(0, 260px) minmax(0, 1fr) }
-.who { padding: var(--s-3) var(--s-4); border-right: 1px solid var(--rule); display: grid; gap: 2px; align-content: start }
-.who .name { font-weight: 600 }
+.cust { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden }
+.who { padding: var(--s-3) var(--s-4); background: var(--chip); display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-3); align-items: baseline }
+.who .name { font-weight: 700 }
 .who .meta { color: var(--muted); font-size: 13px }
-.cands { display: grid }
-.cand { padding: var(--s-3) var(--s-4); display: grid; gap: var(--s-2); grid-template-columns: minmax(0, 1fr) auto; align-items: start }
-.cand + .cand { border-top: 1px dashed var(--rule) }
-.sf { display: grid; gap: 2px; min-width: 0 }
-.sf .acct { font-weight: 600 }
-.sf .meta { color: var(--muted); font-size: 13px }
-.row-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center }
-.chip { font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap }
-.chip.accept { background: var(--accept-bg); color: var(--accept) }
-.chip.reject { background: var(--reject-bg); color: var(--reject) }
-.chip.decide, .chip.group { background: var(--decide-bg); color: var(--decide) }
-.why { font-size: 13px; color: var(--ink); max-width: 80ch }
-.act { display: grid; gap: 6px; justify-items: end }
+.q { padding: var(--s-3) var(--s-4) var(--s-4); display: grid; gap: var(--s-2); border-top: 1px solid var(--rule) }
+.q h3 { margin: 0; font-size: 15px; font-weight: 600; text-wrap: balance }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 2px var(--s-3); font-size: 13px }
+.facts dt { color: var(--muted) }
+.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere }
+.rec { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: baseline; padding: var(--s-2) var(--s-3); border-radius: 8px; background: var(--chip) }
+.rec .verdict { font-weight: 700 }
+.rec.accept .verdict { color: var(--accept) }
+.rec.reject .verdict { color: var(--reject) }
+.conf { font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap }
+.conf.high { background: var(--accept-bg); color: var(--accept) }
+.conf.medium { background: var(--caution-bg); color: var(--caution) }
+.rec .why { flex: 1 1 320px; min-width: 0 }
+.act { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center }
 .choice { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden }
-.choice button { border: 0; background: var(--panel); color: var(--ink); padding: 6px 12px; font: 600 13px var(--f-body); cursor: pointer }
+.choice button { border: 0; background: var(--panel); color: var(--ink); padding: 7px 14px; font: 600 13px var(--f-body); cursor: pointer }
 .choice button + button { border-left: 1px solid var(--rule) }
 .choice button[data-v="accept"][aria-pressed="true"] { background: var(--accept); color: var(--panel) }
 .choice button[data-v="reject"][aria-pressed="true"] { background: var(--reject); color: var(--panel) }
-input.note { width: 220px }
-.saved { font-size: 12px; color: var(--muted); min-height: 18px }
-.warn { color: var(--reject); font-size: 12.5px; font-weight: 600 }
+input.note { flex: 1 1 220px; max-width: 360px }
+.differs { font-size: 12.5px; font-weight: 600; color: var(--caution) }
 .empty { color: var(--muted); padding: var(--s-5); text-align: center }
-@media (max-width: 760px) {
-  .cust { grid-template-columns: minmax(0, 1fr) }
-  .who { border-right: 0; border-bottom: 1px solid var(--rule) }
-  .cand { grid-template-columns: minmax(0, 1fr) }
-  .act { justify-items: start }
-  input.note { width: 100% }
-}
 @media (prefers-reduced-motion: no-preference) { .meter span { transition: width .3s ease } }
 </style>
 
 <div class="wrap">
   <header class="top">
     <h1>Salesforce Match Review</h1>
-    <p class="lede">Customers in the NetSuite load with no Salesforce match, paired with Salesforce accounts whose website is the customer's email domain. Accepting a match sets that customer's Salesforce Account ID and Subnet ID in the load. Each customer gets at most one accepted account. Decisions save as you click.</p>
+    <div class="how">
+      <span>Each question asks whether a Salesforce account (or another Sage record) is the same company as a customer in the NetSuite load. Accounts were found because their Salesforce website matches the customer's email domain.</span>
+      <span><b>Accept</b> means yes: the change under "If you accept" is made in the load. <b>Reject</b> means no: nothing changes.</span>
+      <span>Every question shows my recommendation. The quickest route: <b>Apply my recommendations</b>, then change only the ones you disagree with. Start with <b>Confirm with Nisha</b> and <b>Merges</b>.</span>
+    </div>
   </header>
 
   <section class="bar" aria-label="Progress and filters">
     <div class="tally" id="tally"></div>
     <div class="meter" id="meter" aria-hidden="true"></div>
     <div class="controls">
-      <div class="seg" role="group" aria-label="Recommendation filter" id="recFilter">
+      <div class="seg" role="group" aria-label="Filter" id="recFilter">
         <button type="button" data-f="all" aria-pressed="true">All</button>
-        <button type="button" data-f="needs">Needs your call</button>
+        <button type="button" data-f="merge">Merges</button>
+        <button type="button" data-f="medium">Confirm with Nisha</button>
         <button type="button" data-f="accept">Recommend accept</button>
         <button type="button" data-f="reject">Recommend reject</button>
       </div>
@@ -124,39 +122,35 @@ input.note { width: 220px }
     <div class="notice" id="noDb" hidden>Decisions can't be saved in this view, so they last only until the page closes. Open the page on claude.ai while signed in to save them, or use Copy decisions and paste the result to Claude.</div>
   </section>
 
-  <main class="list" id="list"><p class="empty">Loading matches…</p></main>
+  <main class="list" id="list"><p class="empty">Loading questions…</p></main>
 </div>
 
 <script>
 const DATA = /*DATA*/null;
-const REC = { decide: "Decide", group: "Same group: decide", reject: "Recommend reject", accept: "Recommend accept" };
-const ORDER = { decide: 0, group: 1, reject: 2, accept: 3 };
 const state = { filter: "all", undecided: false, q: "", decisions: {}, db: null };
 const $ = (s) => document.querySelector(s);
-const key = (r) => (r.cid + "__" + (r.sfid || r.sfname.replace(/[^A-Za-z0-9]/g, ""))).slice(0, 190);
+const KIND = { match: "Salesforce match", merge: "Merge", unmerge: "Separate customer" };
 
-// Customers, each with its candidate accounts, most uncertain first.
-const customers = [];
-const byCid = {};
+const customers = [], byCid = {};
 for (const r of DATA) {
-  if (!byCid[r.cid]) { byCid[r.cid] = { cid: r.cid, cname: r.cname, ccity: r.ccity, ccountry: r.ccountry, cands: [] }; customers.push(byCid[r.cid]); }
-  byCid[r.cid].cands.push(r);
+  if (!byCid[r.cid]) { byCid[r.cid] = { cid: r.cid, cname: r.cname, cplace: r.cplace, last: r.last, balance: r.balance, items: [] }; customers.push(byCid[r.cid]); }
+  byCid[r.cid].items.push(r);
 }
-const rank = (c) => Math.min(...c.cands.map((r) => ORDER[r.rec]));
-customers.sort((a, b) => rank(a) - rank(b) || a.cid.localeCompare(b.cid));
+const urgency = (c) => Math.min(...c.items.map((r) => r.kind !== "match" ? 0 : r.conf === "medium" ? 1 : r.rec === "reject" ? 2 : 3));
+customers.sort((a, b) => urgency(a) - urgency(b) || a.cid.localeCompare(b.cid));
 
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+const dec = (r) => state.decisions[r.key]?.decision || "";
 
-function visible(c) {
-  const q = state.q.trim().toLowerCase();
-  return c.cands.filter((r) => {
-    if (state.filter === "needs" && !(r.rec === "decide" || r.rec === "group")) return false;
-    if (state.filter === "accept" && r.rec !== "accept") return false;
-    if (state.filter === "reject" && r.rec !== "reject") return false;
-    if (state.undecided && state.decisions[key(r)]?.decision) return false;
-    if (q && ![r.cid, r.cname, r.sfname, r.sfid, r.subnet, r.domain].join(" ").toLowerCase().includes(q)) return false;
-    return true;
-  });
+function keep(r) {
+  const f = state.filter, q = state.q.trim().toLowerCase();
+  if (f === "merge" && r.kind === "match") return false;
+  if (f === "medium" && r.conf !== "medium") return false;
+  if (f === "accept" && r.rec !== "accept") return false;
+  if (f === "reject" && r.rec !== "reject") return false;
+  if (state.undecided && dec(r)) return false;
+  if (q && ![r.cid, r.cname, r.sf, r.sfid, r.subnet, r.q].join(" ").toLowerCase().includes(q)) return false;
+  return true;
 }
 
 function render() {
@@ -164,42 +158,39 @@ function render() {
   list.replaceChildren();
   let shown = 0;
   for (const c of customers) {
-    const rows = visible(c);
+    const rows = c.items.filter(keep);
     if (!rows.length) continue;
     shown++;
     const box = el("article", "cust");
     const who = el("div", "who");
-    who.append(el("span", "mono", c.cid), el("span", "name", c.cname),
-      el("span", "meta", [c.ccity, c.ccountry].filter(Boolean).join(", ") || "No address in Sage"));
-    const accepted = c.cands.filter((r) => state.decisions[key(r)]?.decision === "accept");
-    if (accepted.length > 1) who.append(el("span", "warn", accepted.length + " accounts accepted: keep one"));
-    const cands = el("div", "cands");
-    for (const r of rows) cands.append(candRow(r));
-    box.append(who, cands);
+    const meta = [c.cplace, c.last ? "last invoiced " + c.last : "never invoiced in Sage", c.balance ? c.balance + " open" : ""].filter(Boolean).join(" · ");
+    who.append(el("span", "mono", c.cid), el("span", "name", c.cname), el("span", "meta", meta));
+    box.append(who);
+    for (const r of rows) box.append(question(r));
     list.append(box);
   }
-  if (!shown) list.append(el("p", "empty", "No matches fit these filters."));
+  if (!shown) list.append(el("p", "empty", "No questions fit these filters."));
   tally();
 }
 
-function candRow(r) {
-  const k = key(r), d = state.decisions[k] || {};
-  const row = el("div", "cand");
-  const sf = el("div", "sf");
-  sf.append(el("span", "acct", r.sfname));
-  const meta = el("span", "meta");
-  meta.append(el("span", "mono", r.sfid || "No Account ID"), document.createTextNode(" · Subnet " + (r.subnet || "none") + " · " +
-    ([r.sfcity, r.sfcountry].filter(Boolean).join(", ") || "no address") + " · matched on " + r.domain));
-  sf.append(meta);
-  const chips = el("div", "row-chips");
-  chips.append(el("span", "chip " + r.rec, REC[r.rec]));
-  if (r.used) chips.append(el("span", "chip", "Already matched to " + r.used));
-  sf.append(chips);
-  if (r.why) sf.append(el("span", "why", r.why));
+function question(r) {
+  const d = state.decisions[r.key] || {};
+  const q = el("section", "q");
+  q.append(el("h3", null, r.q));
+  const facts = el("dl", "facts");
+  const add = (k, v) => { facts.append(el("dt", null, k), el("dd", null, v)); };
+  add(r.kind === "match" ? "Salesforce" : "Other record", r.sf);
+  if (r.sfid) { const dd = el("dd", "mono", r.sfid); facts.append(el("dt", null, "Account ID"), dd); }
+  add("If you accept", r.effect);
+  q.append(facts);
+  const rec = el("div", "rec " + r.rec);
+  rec.append(el("span", null, "My recommendation:"), el("span", "verdict", r.rec === "accept" ? "Accept" : "Reject"),
+    el("span", "conf " + r.conf, r.conf === "high" ? "High confidence" : "Confirm with Nisha"), el("span", "why", r.why));
+  q.append(rec);
   const act = el("div", "act");
   const choice = el("div", "choice");
   choice.setAttribute("role", "group");
-  choice.setAttribute("aria-label", "Decision for " + r.cname + " and " + r.sfname);
+  choice.setAttribute("aria-label", "Your decision: " + r.q);
   for (const v of ["accept", "reject"]) {
     const b = el("button", null, v === "accept" ? "Accept" : "Reject");
     b.type = "button"; b.dataset.v = v; b.setAttribute("aria-pressed", String(d.decision === v));
@@ -207,24 +198,23 @@ function candRow(r) {
     choice.append(b);
   }
   const note = el("input", "note");
-  note.id = "note-" + k; note.placeholder = "Note (optional)"; note.value = d.note || "";
+  note.id = "note-" + r.key; note.placeholder = "Note (optional)"; note.value = d.note || "";
   note.setAttribute("aria-label", "Note for " + r.cname);
-  note.addEventListener("change", () => decide(r, (state.decisions[k] || {}).decision || "", note.value.trim()));
+  note.addEventListener("change", () => decide(r, dec(r), note.value.trim()));
   act.append(choice, note);
-  row.append(sf, act);
-  return row;
+  if (d.decision && d.decision !== r.rec) act.append(el("span", "differs", "Differs from my recommendation"));
+  q.append(act);
+  return q;
 }
 
 function tally() {
   const all = DATA.length;
-  let acc = 0, rej = 0;
-  for (const r of DATA) { const v = state.decisions[key(r)]?.decision; if (v === "accept") acc++; else if (v === "reject") rej++; }
-  const custs = customers.length;
-  const done = customers.filter((c) => c.cands.some((r) => state.decisions[key(r)]?.decision)).length;
+  let acc = 0, rej = 0, diff = 0;
+  for (const r of DATA) { const v = dec(r); if (v === "accept") acc++; if (v === "reject") rej++; if (v && v !== r.rec) diff++; }
   const t = $("#tally");
   t.replaceChildren();
   const part = (n, label) => { const s = el("span"); s.append(el("b", null, String(n)), document.createTextNode(" " + label)); return s; };
-  t.append(part(acc + rej, "of " + all + " matches decided"), part(acc, "accepted"), part(rej, "rejected"), part(done, "of " + custs + " customers touched"));
+  t.append(part(acc + rej, "of " + all + " decided"), part(acc, "accepted"), part(rej, "rejected"), part(diff, "differ from my recommendation"));
   const m = $("#meter");
   m.replaceChildren();
   for (const [n, color] of [[acc, "var(--accept)"], [rej, "var(--reject)"]]) {
@@ -235,15 +225,14 @@ function tally() {
 const status = (t) => { $("#status").textContent = t; };
 
 async function decide(r, decision, note) {
-  const k = key(r);
-  const prev = state.decisions[k] || {};
-  const body = { cid: r.cid, sfid: r.sfid, sfname: r.sfname, subnet: r.subnet, rec: r.rec,
+  const prev = state.decisions[r.key] || {};
+  const body = { kind: r.kind, cid: r.cid, sfid: r.sfid, subnet: r.subnet, question: r.q, rec: r.rec,
     decision, note: note ?? prev.note ?? "", at: new Date().toISOString() };
-  state.decisions[k] = body;
+  state.decisions[r.key] = body;
   render();
   if (!state.db) return;
   try {
-    const ref = state.db.collection("decisions").doc(k);
+    const ref = state.db.collection("decisions").doc(r.key);
     if (!body.decision && !body.note) await ref.delete(); else await ref.set(body);
     status("Saved");
   } catch (e) {
@@ -251,27 +240,26 @@ async function decide(r, decision, note) {
   }
 }
 
-// Apply my recommendations: accept the "Recommend accept" rows and reject the "Recommend reject" rows that are still undecided.
-function pendingRecs() { return DATA.filter((r) => (r.rec === "accept" || r.rec === "reject") && !state.decisions[key(r)]?.decision); }
+function pending() { return DATA.filter((r) => !dec(r)); }
 $("#applyRecs").addEventListener("click", () => {
-  const p = pendingRecs();
-  if (!p.length) { status("Every recommended row already has a decision."); return; }
+  const p = pending();
+  if (!p.length) { status("Every question already has a decision."); return; }
   const a = p.filter((r) => r.rec === "accept").length;
-  $("#confirmText").textContent = `Accept ${a} and reject ${p.length - a} undecided rows as recommended? Rows marked Decide are left for you.`;
+  $("#confirmText").textContent = `Set ${p.length} undecided questions to my recommendation (${a} accept, ${p.length - a} reject)? Decisions you already made stay as they are.`;
   $("#confirmBox").hidden = false;
 });
 $("#confirmNo").addEventListener("click", () => { $("#confirmBox").hidden = true; });
 $("#confirmYes").addEventListener("click", async () => {
   $("#confirmBox").hidden = true;
-  const p = pendingRecs();
+  const p = pending();
   status("Applying…");
   for (let i = 0; i < p.length; i += 6) await Promise.all(p.slice(i, i + 6).map((r) => decide(r, r.rec)));
-  status(`Applied to ${p.length} rows`);
+  status(`Applied to ${p.length} questions`);
 });
 
 $("#copyCsv").addEventListener("click", () => {
-  const rows = [["Customer ID", "Customer", "Salesforce account", "Salesforce Account ID", "Subnet ID", "Recommendation", "Decision", "Note"]];
-  for (const r of DATA) { const d = state.decisions[key(r)]; if (d?.decision || d?.note) rows.push([r.cid, r.cname, r.sfname, r.sfid, r.subnet, REC[r.rec], d.decision, d.note]); }
+  const rows = [["Customer ID", "Customer", "Question", "Salesforce Account ID", "Subnet ID", "My recommendation", "Decision", "Note"]];
+  for (const r of DATA) { const d = state.decisions[r.key]; if (d?.decision || d?.note) rows.push([r.cid, r.cname, r.q, r.sfid, r.subnet, r.rec, d.decision, d.note]); }
   const text = rows.map((x) => x.map((v) => '"' + String(v ?? "").replace(/"/g, '""') + '"').join(",")).join("\n");
   navigator.clipboard.writeText(text).then(() => status(`Copied ${rows.length - 1} decisions`), () => {
     const ta = el("textarea"); ta.value = text; ta.style.width = "100%"; ta.rows = 6; $("#status").replaceChildren(ta); ta.select();
@@ -295,10 +283,9 @@ render();
   db.collection("decisions").onSnapshot((snap) => {
     const next = {};
     for (const doc of snap.docs) next[doc.id] = doc.data();
-    // Keep a note being typed: re-render only rows whose stored state changed.
-    const active = document.activeElement && document.activeElement.classList.contains("note") ? document.activeElement.id : null;
+    const typing = document.activeElement && document.activeElement.classList.contains("note");
     state.decisions = next;
-    if (!active) render(); else tally();
+    if (!typing) render(); else tally();
   }, () => { $("#noDb").hidden = false; });
 })();
 </script>
