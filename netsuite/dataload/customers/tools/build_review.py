@@ -217,6 +217,8 @@ SUBNET_DECIDED = {
 NAME_FROM_SF = {"C-00641"}
 # Records kept apart from a duplicate they would otherwise merge into, because each has its own Subnet account.
 SEPARATE = {"C-00497"}
+# Salesforce parent links not carried to NetSuite (Anthony, 2026-10-28).
+NO_PARENT = {"C-00583": "Peraton is a contractor running a DISA program, not part of DISA; billed separately"}
 
 # Likely name matches reviewed by Anthony on 2026-10-26: all confirmed except these, which are not the same company.
 NOT_MATCHED = {"C-00044": "Ministry of Defence (Singapore), not Ministry of Defence UK",
@@ -529,7 +531,9 @@ for r in sage + onetime_rows:
         flags.append(f"Company Name from Salesforce: Sage has {r['Customer name']} for two Subnet accounts")
     if m:
         S("Subnet ID", m["Subnet Account Id"], "sfdc")
-        if m["Parent Account ID"]:
+        if m["Parent Account ID"] and cid in NO_PARENT:
+            flags.append(f"Salesforce parent {m['Parent Account']} not loaded: {NO_PARENT[cid]}")
+        elif m["Parent Account ID"]:
             # Parents that are not Sage customers have no billing history and are left out, so the link is dropped.
             par = by_id.get(m["Parent Account ID"])
             if par and any(norm(par["Account Name"]) == norm(x["Customer name"]) for x in sage):

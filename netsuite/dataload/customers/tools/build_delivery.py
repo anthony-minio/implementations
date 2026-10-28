@@ -263,8 +263,10 @@ DECISIONS = [
      "customer: C-00465 SITE (478) and C-00204 SAUDI INFORMATION TECHNOLOGY COMPANY (894, SITE's other Subnet account); "
      "C-00497 Ministry of Defence (UK) (932, Deployed & Interoperability Services, its address in Sage) and C-00481 "
      "Ministry of Defence UK (888, Defence Cyber Certification), which still merges C-00629. Two more customers to load. "
-     "Parent links follow Salesforce as for every customer: C-00641 under C-00048, C-00204 under C-00465, C-00583 under "
-     "C-00566 Defense Information Systems Agency."),
+     "Parent links follow Salesforce as for every customer: C-00641 under C-00048 and C-00204 under C-00465. Salesforce "
+     "also puts Peraton - DISA MARS Program under Defense Information Systems Agency; that link is not loaded, because "
+     "Peraton is a contractor running a DISA program, not part of DISA, and is invoiced directly while DISA is billed "
+     "through FedData (2026-10-28)."),
     ("Customers with the same name",
      "Some customers share a name but are separate Subnet accounts, so they would look identical in NetSuite.",
      "Add -01, -02 to the name, as for the new L3Harris customers (2026-10-28).",
