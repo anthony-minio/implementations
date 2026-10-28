@@ -74,7 +74,6 @@ nsv = [r for r in rows if r not in gone]  # vendors in NetSuite
 by_sync = [r for r in nsv if "Sage only" not in QC(r)]
 from_file = [r for r in nsv if "Sage only" in QC(r)]
 sage_only = [r for r in rows if "Sage only" in QC(r)]
-employees = [r for r in sage_only if V(r, "Vendor Category") == "MinIO Employee"]
 kept_dups = [r for r in nsv if V(r, "Merged Sage IDs") and not V(r, "Duplicate Action").startswith("Keep, merges")]
 bank = collections.Counter(V(r, "Bank Source") for r in nsv if V(r, "Bank Account Number"))
 bank_differ = [r for r in nsv if has_flag(r, "Bank account differs")]
@@ -84,16 +83,25 @@ no_coa = [r for r in nsv if has_flag(r, "Sage expense account")]
 renum = data["renumber"]
 ids = lambda rs: ", ".join(f"{V(r, 'Vendor ID') or V(r, 'Legacy Vendor ID') or V(r, 'Ramp Vendor ID')} {V(r, 'Company Name')}" for r in rs)
 n = lambda x: f"{x:,}"
-assert len(nsv) == len(by_sync) + len(from_file) and len(rows) == B["active"] - B["out_of_scope"] + len(B["ramp_only"])
+assert len(nsv) == len(by_sync) + len(from_file) and len(rows) == B["active"] - B["out_of_scope"] - B["employees_out"] + len(B["ramp_only"])
 
 DECISIONS = [
     ("Sage only vendors",
-     f"{n(B['sage_only'])} active Sage vendors are not in Ramp. {B['sage_only_recent']} have activity since 2024-10-26, "
+     f"{n(B['sage_only'])} active Sage vendors are not in Ramp. {B['recent']} have activity since 2024-10-26, "
      f"{B['older']} have older activity only, and {B['sage_only_none']} have no activity recorded.",
      "Load only the vendors with activity since 2024-10-26 (Ming, meeting of 2026-10-28).",
-     f"{B['sage_only_recent']} Sage only vendors are on the Vendors-Draft tab, marked \"Sage only\" in Question Categories. "
-     f"The other {n(B['out_of_scope'])} are not in the file. {len(employees)} of the {B['sage_only_recent']} are MinIO "
-     "employees (expense reimbursements paid through Sage until 2025)."),
+     f"The other {n(B['out_of_scope'])} are not in the file. Of the {B['recent']}, {B['employees_out']} MinIO employees "
+     f"are also left out (next decision), so {B['sage_only_recent']} Sage only vendors are on the Vendors-Draft tab, marked "
+     "\"Sage only\" in Question Categories."),
+    ("MinIO employees",
+     f"{B['employees_out']} of the Sage only vendors with recent activity are MinIO employees, set up in Sage to pay expense "
+     "reimbursements. None has an open balance; the last was paid 2025-05-08. Ramp syncs each reimbursement to NetSuite as "
+     "a vendor bill, with the employee as the vendor. It looks for a vendor named exactly \"[First Name] [Last Name] Ramp\" "
+     "and creates one if there is none. Vendors loaded under the Sage name would not match, so each employee would end up "
+     "in NetSuite twice. Ramp does not sync reimbursements to NetSuite employee records or expense reports (Ramp, 2026-10-28).",
+     "Leave the employees out of the load and let Ramp create its own reimbursement vendors (Anthony, 2026-10-28).",
+     f"The {B['employees_out']} MinIO employees are not in the file. Neil Martin (V-01355), in Ramp as a vendor, stays: the "
+     "Ramp sync brings him over."),
     ("Subsidiary",
      "Every vendor was assumed to do business mainly with MinIO, Inc. Vendors with INR or SGD currency in Sage were marked "
      "\"Subsidiary to confirm\" in case they belong to MinIO Pvt. Ltd. or MinIO Singapore Pte. Ltd.",
@@ -105,7 +113,7 @@ DECISIONS = [
      "Merge intelligently: where records are the same vendor by name, email, address or a combination, the record with the "
      "most recent activity wins; where only the name matches, review, but most likely the most recent activity wins "
      "(meeting of 2026-10-28).",
-     f"Of the 31 names, 20 have no record in the load. In {len(kept_dups)}, one record is in the load and it is the one "
+     f"Of the 31 names, {31 - len(kept_dups) - 1} have no record in the load. In {len(kept_dups)}, one record is in the load and it is the one "
      f"with the most recent activity; the Sage IDs of the others, not loaded, are in Merged Sage IDs ({ids(kept_dups)}). "
      "HostIndia has two records in Ramp (next decision). By email and address, Linux Foundation V00208 (Sage only, same "
      f"address and email) merges into The Linux Foundation V-00443, which has the more recent activity. Vendors that share "
@@ -147,7 +155,7 @@ NOTES = [
      f"({', '.join(f'{i} {v}' for i, v in B['onetime'])}): {n(B['active'])}, of which {B['in_ramp']} are also in Ramp, "
      f"linked by the Sage vendor ID held in Ramp, and {n(B['sage_only'])} are not (Sage only). Less "
      f"{n(B['out_of_scope'])} Sage only vendors with no activity since 2024-10-26 ({B['older']} with older activity only, "
-     f"{B['sage_only_none']} with none): {n(B['active'] - B['out_of_scope'])}. Plus {len(B['ramp_only'])} vendors in Ramp "
+     f"{B['sage_only_none']} with none): {n(B['active'] - B['out_of_scope'])}. Less {B['employees_out']} MinIO employees, Sage only, set up for expense reimbursements, which Ramp now creates its own vendors for: {n(B['active'] - B['out_of_scope'] - B['employees_out'])}. Plus {len(B['ramp_only'])} vendors in Ramp "
      f"that are not in Sage (Ramp only), mostly added since 2025-08: {n(len(rows))}, the rows on the Vendors-Draft tab. Less "
      f"{len(merged)} duplicate merged ({ids(merged)}) and {len(archived)} duplicates in Ramp to archive before the sync: "
      f"{n(len(nsv))} vendors in NetSuite. Of these, {len(by_sync)} come in through the Ramp sync ({B['in_ramp'] - sum(1 for r in archived if 'Ramp matched' in QC(r))} "
@@ -192,10 +200,9 @@ OPEN = [
     "linked to Sage in each pair: " + "; ".join(
         f"archive {V(r, 'Company Name')} ({V(r, 'Legacy Vendor ID') or 'Ramp only'}), keep {V(r, 'Duplicate Action').split('duplicate of ')[1]}"
         for r in archived) + ".",
-    f"Ramp reimbursements: {len(employees)} MinIO employees are loaded as vendors from Sage. Ramp records each "
-    "reimbursement in NetSuite as a vendor bill with the employee as the vendor, and creates the vendor if it cannot find "
-    "one. SOA to confirm how the Ramp sync matches employees to existing vendors, so these records are used rather than "
-    "duplicated.",
+    "Ramp reimbursements: decide in Ramp's Accounting Settings whether reimbursements go to a vendor per employee, which "
+    "Ramp creates in NetSuite as \"[First Name] [Last Name] Ramp\" on the first sync, or to one default reimbursement "
+    "vendor. Reimbursements funded in GBP sync only once a default reimbursement vendor is set (SOA, Ming).",
     f"Individuals with no first and last name in Sage, which NetSuite requires: {ids(no_names)}. AP to supply the names, "
     "or untick Individual where the vendor is a company.",
     f"Sage expense accounts with no COA Draft v1 mapping, so Default Expense Account is blank: " + "; ".join(

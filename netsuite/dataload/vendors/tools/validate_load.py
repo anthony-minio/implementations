@@ -139,7 +139,9 @@ for r in recs:
                 bad(f"{k} vs Ramp (Ramp only)", key, "differs" if k == "Tax ID" else f"{col(r, k)!r} expected {v!r}")
 
 # Scope (Ming, 2026-10-28): every Sage vendor in Ramp, and Sage only vendors billed or paid since 2024-10-26.
-active = {i for i, S in sage.items() if i in ramp_by_sage or max(d(g(S, "Last bill created on")), d(g(S, "Last payment made on"))) >= "2024-10-26"}
+# Sage only MinIO employees are left out: Ramp creates its own reimbursement vendors (2026-10-28).
+active = {i for i, S in sage.items() if i in ramp_by_sage or (max(d(g(S, "Last bill created on")), d(g(S, "Last payment made on"))) >= "2024-10-26"
+          and g(S, "Vendor type ID") != "MinIO employee")}
 for r in recs:
     if col(r, "Primary Subsidiary") != "MinIO, Inc.":
         bad("Subsidiary not MinIO, Inc.", col(r, "Sage Vendor ID") or col(r, "Ramp Vendor ID"), col(r, "Primary Subsidiary"))

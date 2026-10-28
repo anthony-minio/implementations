@@ -63,8 +63,11 @@ REVIEW = ["Sage type", "Ramp created", "Last activity", "Sage last bill", "Sage 
 def last_activity(r, rp):
     return max([d for d in (date(G(r, "Last bill created on")), date(G(r, "Last payment made on")),
                             date(rp["Last spend date"]) if rp else None) if d], default=None)
-in_scope = {G(r, "Vendor ID") for r in sage if G(r, "Vendor ID") in ramp
-            or (last_activity(r, None) or dt.date.min) >= ACTIVE_FROM}
+# Sage only vendors of type MinIO employee are left out (Anthony, 2026-10-28): Ramp syncs each reimbursement as a vendor bill
+# to a vendor it names "[First Name] [Last Name] Ramp" and creates on the first sync, so Sage's records would be duplicates.
+recent = {G(r, "Vendor ID") for r in sage if G(r, "Vendor ID") not in ramp and (last_activity(r, None) or dt.date.min) >= ACTIVE_FROM}
+employees_out = {i for i in recent if G(next(r for r in sage if G(r, "Vendor ID") == i), "Vendor type ID") == "MinIO employee"}
+in_scope = {G(r, "Vendor ID") for r in sage if G(r, "Vendor ID") in ramp} | (recent - employees_out)
 # Duplicates in scope (2026-10-28): same vendor by name, email or address; the record with the most recent activity is kept.
 # Sage only duplicates merge in this file. Duplicates inside Ramp would both come over in the Ramp sync, so the record not
 # linked to Sage is archived in Ramp before the sync (Anthony, 2026-10-28; Nisha to action).
@@ -403,7 +406,7 @@ bridge = {"export": len(export) - 1, "onetime": [(x[0], x[1]) for x in export[1:
           "sage_only_recent": sum(1 for x in out if "Sage only" in x["cells"][QI][0].split("; ")),
           "sage_only_none": sum(1 for r in sage if G(r, "Vendor ID") not in in_scope and not last_activity(r, None)),
           "dups": {"names": 0, "records": 0, "clear": [], "multi": [], "none": [], **dup_n},
-          "out_of_scope": len(sage) - len(in_scope), "older": sum(1 for r in sage if G(r, "Vendor ID") not in in_scope and last_activity(r, None)),
+          "out_of_scope": len(sage) - len(in_scope) - len(employees_out), "employees_out": len(employees_out), "recent": len(recent), "older": sum(1 for r in sage if G(r, "Vendor ID") not in in_scope | employees_out and last_activity(r, None)),
           "bank": {"ramp": sum(1 for b in bank_file if b[3] == "Ramp"), "sage": sum(1 for b in bank_file if b[3] == "Sage")},
           "ramp_only": [r["Vendor name"] for r in ramp_rows if not r["Sage Intacct ID"].strip()]}
 data = {"cols": COLS + ADDED, "fields": FIELDS + ADDED, "required": ["Company Name"], "review": REVIEW, "rows": out,
