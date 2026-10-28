@@ -99,7 +99,8 @@ DECISIONS = [
      "a vendor bill, with the employee as the vendor. It looks for a vendor named exactly \"[First Name] [Last Name] Ramp\" "
      "and creates one if there is none. Vendors loaded under the Sage name would not match, so each employee would end up "
      "in NetSuite twice. Ramp does not sync reimbursements to NetSuite employee records or expense reports (Ramp, 2026-10-28).",
-     "Leave the employees out of the load and let Ramp create its own reimbursement vendors (Anthony, 2026-10-28).",
+     "Leave the employees out of the load and let Ramp create its own reimbursement vendors; Ramp is already set up with "
+     "one vendor per employee (Anthony, 2026-10-28).",
      f"The {B['employees_out']} MinIO employees are not in the file. Neil Martin (V-01355), in Ramp as a vendor, stays: the "
      "Ramp sync brings him over."),
     ("Subsidiary",
@@ -200,9 +201,6 @@ OPEN = [
     "linked to Sage in each pair: " + "; ".join(
         f"archive {V(r, 'Company Name')} ({V(r, 'Legacy Vendor ID') or 'Ramp only'}), keep {V(r, 'Duplicate Action').split('duplicate of ')[1]}"
         for r in archived) + ".",
-    "Ramp reimbursements: decide in Ramp's Accounting Settings whether reimbursements go to a vendor per employee, which "
-    "Ramp creates in NetSuite as \"[First Name] [Last Name] Ramp\" on the first sync, or to one default reimbursement "
-    "vendor. Reimbursements funded in GBP sync only once a default reimbursement vendor is set (SOA, Ming).",
     f"Individuals with no first and last name in Sage, which NetSuite requires: {ids(no_names)}. AP to supply the names, "
     "or untick Individual where the vendor is a company.",
     f"Sage expense accounts with no COA Draft v1 mapping, so Default Expense Account is blank: " + "; ".join(
