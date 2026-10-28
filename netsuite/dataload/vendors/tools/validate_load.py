@@ -68,7 +68,7 @@ for r in recs:
             if col(r, k) != v:
                 bad(f"{k} vs source", key, f"{col(r, k)!r} expected {v!r}")
         vid = col(r, "Vendor ID")
-        gone = col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp"))
+        gone = col(r, "Duplicate Action").startswith(("Merge into", "Mark Inactive in Ramp"))
         # Vendors in Ramp: SYNCED FROM RAMP, the Ramp sync sets their ID. Sage only: the Sage ID unchanged (2026-10-28).
         want_id, want_src = ("SYNCED FROM RAMP", "Synced from Ramp") if R else (sid, "Sage Intacct")
         if not gone and vid != want_id:
@@ -133,7 +133,7 @@ for r in recs:
         R = ramp_by_id.get(rid)
         if not R or R["Sage Intacct ID"].strip():
             bad("Ramp only row not a Ramp-only vendor", key, rid); continue
-        if not col(r, "Duplicate Action").startswith("Archive in Ramp") and (col(r, "Vendor ID"), col(r, "ExternalID")) != ("SYNCED FROM RAMP", "SYNCED FROM RAMP"):
+        if not col(r, "Duplicate Action").startswith("Mark Inactive in Ramp") and (col(r, "Vendor ID"), col(r, "ExternalID")) != ("SYNCED FROM RAMP", "SYNCED FROM RAMP"):
             bad("Vendor ID", key, f"{col(r, 'Vendor ID')!r} expected 'SYNCED FROM RAMP'")
         if col(r, "Source System") != "Synced from Ramp":
             bad("Source System", key, col(r, "Source System"))
@@ -155,11 +155,11 @@ OUT_RAMP = {"6a461530-6faa-45d1-9cc9-1789847d4bb3", "12040107-b5aa-48d7-8d79-779
 for r in recs:
     if col(r, "Primary Subsidiary") != "MinIO, Inc.":
         bad("Subsidiary not MinIO, Inc.", col(r, "Sage Vendor ID") or col(r, "Ramp Vendor ID"), col(r, "Primary Subsidiary"))
-    if col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp")):
+    if col(r, "Duplicate Action").startswith(("Merge into", "Mark Inactive in Ramp")):
         bad("Record not loaded is in the load file", col(r, "Sage Vendor ID") or col(r, "Ramp Vendor ID"), col(r, "Duplicate Action"))
 # No two vendors in NetSuite with the same name; Merged Sage IDs are same-name Sage records left out of the load.
 nk = lambda t: re.sub(r"[^a-z0-9]", "", t.lower())
-live = [r for r in recs if not col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp"))]
+live = [r for r in recs if not col(r, "Duplicate Action").startswith(("Merge into", "Mark Inactive in Ramp"))]
 for k, c in collections.Counter(nk(col(r, "Company Name")) for r in live).items():
     if c > 1:
         bad("Same name twice in NetSuite", k, c)

@@ -68,8 +68,8 @@ V = lambda r, c: r["cells"][ix[c]][0]
 QC = lambda r: V(r, "Question Categories").split("; ")
 has_flag = lambda r, p: any(f.startswith(p) for f in r["flags"])
 merged = [r for r in rows if V(r, "Duplicate Action").startswith("Merge into")]
-archived = [r for r in rows if V(r, "Duplicate Action").startswith("Archive in Ramp before the sync: duplicate")]
-retired = [r for r in rows if V(r, "Duplicate Action").startswith("Archive in Ramp before the sync: no longer used")]
+archived = [r for r in rows if V(r, "Duplicate Action").startswith("Mark Inactive in Ramp before the sync: duplicate")]
+retired = [r for r in rows if V(r, "Duplicate Action").startswith("Mark Inactive in Ramp before the sync: no longer used")]
 gone = merged + archived + retired
 # Vendors-Draft holds only the rows loaded to NetSuite (Anthony, 2026-10-28); records not loaded are on the Not Loaded tab.
 table(wb.create_sheet("Vendors-Draft"), [r for r in rows if r not in gone])
@@ -129,15 +129,15 @@ DECISIONS = [
     ("Duplicates inside Ramp",
      "Four vendors are in Ramp twice. In each pair one record was created in Ramp and a second, linked to Sage, a few days "
      "later. The Ramp sync would bring both into NetSuite, so this file cannot merge them.",
-     "Keep the records linked to Sage; archive the others in Ramp before the sync (Anthony, 2026-10-28). Nisha to action.",
-     f"The {len(archived)} records to archive are on the Not Loaded tab: " + "; ".join(
+     "Keep the records linked to Sage; mark the others Inactive in Ramp before the sync (Anthony, 2026-10-28). Nisha to action.",
+     f"The {len(archived)} records to mark Inactive are on the Not Loaded tab: " + "; ".join(
          f"{which(r)}, a duplicate of {V(r, 'Duplicate Action').split('duplicate of ')[1]}" for r in archived)
-     + ". The record kept in each pair is marked \"Keep: its duplicate in Ramp is archived before the sync\" in Duplicate Action."),
+     + ". The record kept in each pair is marked \"Keep: its duplicate in Ramp is marked Inactive before the sync\" in Duplicate Action."),
     ("Ramp vendors no longer used",
      "Two Ramp vendors have not been paid since July 2025: Kar Lu Caroline Harreld (V-01200), an FP&A contractor from "
      "January to July 2025, and Neil Martin (V-01355), typed MinIO employee in Sage. The Ramp sync would create both in "
      "NetSuite.",
-     "Leave them out: archive both in Ramp before the sync (Anthony, 2026-10-28). Nisha to action.",
+     "Leave them out: mark both Inactive in Ramp before the sync (Anthony, 2026-10-28). Nisha to action.",
      f"On the Not Loaded tab: {', '.join(which(r) for r in retired)}."),
     ("Moss Adams and Baker Tilly",
      "Moss Adams LLP (V-00453, last used 2025-05-19) and Baker Tilly Advisory Group Parent, LP (V-01326, billing now) share "
@@ -164,7 +164,7 @@ DECISIONS = [
      "Where the vendor name is a plain first and last name, split it; otherwise leave it for review. Vishnu Daya & Co LLP "
      "is a firm, so Individual is unticked (Anthony, 2026-10-28).",
      f"{len(split_names)} split ({ids(split_names)}). V-01459 Vishnu Daya & Co LLP loads as a company. Kar Lu Caroline "
-     "Harreld would have been First Kar Lu, Middle Caroline, Last Harreld, but is now archived in Ramp (next decision)."),
+     "Harreld would have been First Kar Lu, Middle Caroline, Last Harreld, but is now marked Inactive in Ramp (next decision)."),
 ]
 
 NOTES = [
@@ -176,7 +176,7 @@ NOTES = [
      f"{n(B['out_of_scope'])} Sage only vendors with no activity since 2024-10-26 ({B['older']} with older activity only, "
      f"{B['sage_only_none']} with none): {n(B['active'] - B['out_of_scope'])}. Less {B['employees_out']} MinIO employees, Sage only, set up for expense reimbursements, which Ramp now creates its own vendors for: {n(B['active'] - B['out_of_scope'] - B['employees_out'])}. Plus {len(B['ramp_only'])} vendors in Ramp "
      f"that are not in Sage (Ramp only), mostly added since 2025-08: {n(len(rows))}. Less {len(merged)} duplicate merged "
-     f"({ids(merged)}), {len(archived)} duplicates in Ramp and {len(retired)} Ramp vendors no longer used, all archived in "
+     f"({ids(merged)}), {len(archived)} duplicates in Ramp and {len(retired)} Ramp vendors no longer used, all marked Inactive in "
      f"Ramp before the sync: {n(len(nsv))} vendors in NetSuite, the rows on the Vendors-Draft tab. Of these, {len(by_sync)} "
      f"come in through the Ramp sync ({sum(1 for r in by_sync if 'Ramp matched' in QC(r))} Ramp matched and "
      f"{sum(1 for r in by_sync if 'Ramp only' in QC(r))} Ramp only) and {len(from_file)} are loaded from this file (Sage "
@@ -189,7 +189,7 @@ NOTES = [
      f"{bank['Ramp']} from Ramp and {bank['Sage']} from Sage. The bank columns show the details to import in full."),
     ("NetSuite load plan",
      "(1) Ramp syncs its vendors to NetSuite: the Ramp only and Ramp matched vendors, once the duplicates in Ramp are "
-     "archived. (2) Sage values Ramp does not push are added to the Ramp matched vendors: Sage Vendor ID, category, default "
+     "marked Inactive. (2) Sage values Ramp does not push are added to the Ramp matched vendors: Sage Vendor ID, category, default "
      "expense account, 1099 flag, tax ID where Ramp has none. Ramp-created vendors carry no Sage ID, so this file is matched "
      "to them by Ramp vendor name and Ramp Vendor ID and re-keyed to the NetSuite internal ID after the sync. (3) Bank "
      f"details are imported for every vendor, as above. (4) The {len(from_file)} Sage only vendors are loaded from this file."),
@@ -215,9 +215,9 @@ NOTES = [
 ]
 
 OPEN = [
-    f"Nisha: archive {len(archived) + len(retired)} vendors in Ramp before the Ramp sync to NetSuite. Duplicates, keeping "
+    f"Nisha: mark {len(archived) + len(retired)} vendors Inactive in Ramp before the Ramp sync to NetSuite (vendor profile > status > Inactive; Ramp does not add Inactive vendors to the NetSuite sync). Duplicates, keeping "
     "the record linked to Sage: " + "; ".join(
-        f"archive {which(r)}, keep {V(r, 'Duplicate Action').split('duplicate of ')[1]}" for r in archived)
+        f"mark Inactive {which(r)}, keep {V(r, 'Duplicate Action').split('duplicate of ')[1]}" for r in archived)
     + ". No longer used: " + "; ".join(which(r) for r in retired) + ".",
 ] + ([f"Individuals with no first and last name in Sage, which NetSuite requires: {ids(no_names)}. AP to supply the names."]
      if no_names else []) + [

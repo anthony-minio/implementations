@@ -354,8 +354,8 @@ for i, why in RAMP_RETIRE.items():
     x = by_key[i]
     x["cells"][VI] = ["", ""]
     x["cells"][FIELDS.index("externalId")] = ["", ""]
-    x["cells"][DA] = [f"Archive in Ramp before the sync: no longer used ({why})", "rule"]
-    x["flags"].append(f"Not loaded: {why}; archived in Ramp so the sync does not create it")
+    x["cells"][DA] = [f"Mark Inactive in Ramp before the sync: no longer used ({why})", "rule"]
+    x["flags"].append(f"Not loaded: {why}; marked Inactive in Ramp so the sync does not create it")
 for lost, keep in list(MERGE.items()) + list(RAMP_ARCHIVE.items()):
     x, k = by_key[lost], by_key[keep]
     kid = k["cells"][QI + ADDED.index("Sage Vendor ID")][0]
@@ -370,9 +370,9 @@ for lost, keep in list(MERGE.items()) + list(RAMP_ARCHIVE.items()):
         x["flags"].append(f"Same vendor as {kid} (same address and email); {kid} has the more recent activity")
     else:
         dup_n["archive"] += 1
-        x["cells"][DA] = [f"Archive in Ramp before the sync: duplicate of {kid}", "rule"]
+        x["cells"][DA] = [f"Mark Inactive in Ramp before the sync: duplicate of {kid}", "rule"]
         x["cells"][QI] = [x["cells"][QI][0] + "; Duplicate in Ramp", "rule"]
-        k["cells"][DA] = [f"Keep: its duplicate in Ramp is archived before the sync", "rule"]
+        k["cells"][DA] = [f"Keep: its duplicate in Ramp is marked Inactive before the sync", "rule"]
         k["cells"][QI] = [k["cells"][QI][0] + "; Duplicate in Ramp", "rule"]
         x["flags"].append(f"Duplicate in Ramp of {kid} ({k['cells'][FIELDS.index('companyName')][0]}), the record linked to Sage")
 for p in SEPARATE:
@@ -453,6 +453,6 @@ with open("data/vendor-load.csv", "w", newline="", encoding="utf-8-sig") as o:
         if cells[QI + ADDED.index("In Ramp")][0] == "No" and not cells[DA][0].startswith("Merge into"):
             w.writerow([x[0] for x in cells[:NB]])
 print(f"{len(out)} rows in scope ({bridge['in_ramp']} Ramp matched, {len(bridge['ramp_only'])} Ramp only, {bridge['sage_only_recent']} Sage only of {bridge['sage_only']}); "
-      f"merged {dup_n['merge']}, archived in Ramp {dup_n['archive']}, duplicates not loaded {dup_n['dropped']} -> data/vendor-load.csv")
+      f"merged {dup_n['merge']}, marked Inactive in Ramp {dup_n['archive']}, duplicates not loaded {dup_n['dropped']} -> data/vendor-load.csv")
 print(f"bank details for {len(bank_file)} vendors -> data/vendor-bank-details.csv (local only)")
 print(f"Vendor IDs: {RAMP_ID} for Ramp vendors, Sage ID for Sage only; auto-numbering from {data['next_id']}")
