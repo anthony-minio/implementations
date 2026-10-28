@@ -139,9 +139,10 @@ CALL = {
     ("C-00116", "ZATCA-Certscan"): ("reject", "high", "Salesforce's partners on this account are EG&G Middle East and Accelerated Solutions; no Sage customer is billed through either, so Subnet 715 has no Sage customer. Ask Nisha whether it was ever invoiced."),
     ("C-00116", "ZATCA-Rapiscan"): ("reject", "high", "Salesforce's partner on this account is EG&G Middle East; no Sage customer is billed through EG&G, so Subnet 731 has no Sage customer. Ask Nisha whether it was ever invoiced."),
     ("C-00116", "ZATCA-CCC"): ("reject", "high", "Already matched to C-00445 ZATCA-Monitoring (billed through Datahub Analytics, this account's Salesforce partner)."),
-    ("C-00516", "Leidos-1"): ("accept", "medium", "Leidos has three Salesforce accounts. Paired by date: the first (Subnet 895). Confirm with Nisha."),
-    ("C-00516", "Leidos-2"): ("reject", "medium", "Not this customer's Subnet account if 895 is. Subnet 972 has no Sage customer of its own: may need a new customer. Ask Nisha."),
-    ("C-00516", "Leidos-3"): ("reject", "medium", "No Subnet ID; not needed if Leidos-1 is accepted. Ask Nisha."),
+    ("C-00516", "Leidos-2"): ("accept", "high", "Sage bills C-00516 through ThunderCat, and ThunderCat is the Salesforce partner on Leidos-2 (972)."),
+    ("C-00516", "Leidos-1"): ("reject", "high", "Not this customer's account: C-00516 is billed through ThunderCat, the partner on Leidos-2. Leidos-1 (895) goes to the Chargebee record C-00489 by elimination; see that question."),
+    ("C-00516", "Leidos-3"): ("reject", "high", "No Subnet ID; a child of Leidos-1 in Salesforce."),
+    ("C-00050", "Broadcom"): ("accept", "high", "The only Broadcom or VMware account in Salesforce; its Subnet account is named Broadcom-NSXi (NSX is a VMware product), and every email Sage holds for VMware is @broadcom.com."),
     ("C-00512", "Xerox"): None,  # decided by Subnet ID below
 }
 GROUP_NOTE = "Salesforce holds this under the group or parent company's name; the Sage customer is the billed entity in that group, and the Subnet account is its deal."
@@ -151,12 +152,12 @@ def call(row):
         if c == cid and sfname.startswith(pre) and v:
             return v
     if cid == "C-00512":
-        return ("accept", "medium", "Xerox France account with a Subnet ID; the Sage contact is French. Sage's name is a Xerox service, not a legal entity.") if subnet \
+        return ("accept", "high", "Of Xerox's two Salesforce accounts, only the France account has a Subnet ID, and the Sage contact is French. Sage's name is a Xerox service, not a legal entity.") if subnet \
             else ("reject", "high", "Xerox US head office with no Subnet ID; the France account is the match.")
     if rec0 == "Reject":
         return ("reject", "high", why0)
     if rec0 == "Same group: decide":
-        return ("accept", "medium", GROUP_NOTE) if subnet else ("reject", "high", "Parent or group company with no Subnet ID: it would link a different legal entity and add nothing.")
+        return ("accept", "high", "The only Salesforce account for this company (found by the customer's email domain), with a Subnet ID: one Sage customer, one Salesforce account. " + GROUP_NOTE) if subnet else ("reject", "high", "Parent or group company with no Subnet ID: it would link a different legal entity and add nothing.")
     same_ctry = row[3] and row[9] and (row[3] == row[9] or (row[3], row[9]) in {("Türkiye", "Turkey"), ("Côte d'Ivoire", "Cote d'Ivoire"), ("Korea (the Republic of)", "Korea, Republic of"), ("Czechia", "Czech Republic")})
     return ("accept", "high", "Same company: the names match and the Salesforce website is the customer's email domain"
             + (", in the same country." if same_ctry else f"; Salesforce lists the head office in {row[9] or 'another country'}."))
@@ -179,22 +180,28 @@ def extra(cid, kind, q, sf, effect, rec, conf, why, key):
                   "rec": rec, "conf": conf, "why": why, "key": key})
 extra("C-00097", "merge", "Is C-00097 Aegon Emeklilik the same company as C-00208 Aegon_Viennalife?",
       "C-00208 Aegon_Viennalife \u00b7 last invoiced 2026-08-17 \u00b7 Salesforce Viennalife (formerly Aegon), Subnet 329",
-      "C-00097 is merged into C-00208 and not loaded (617 becomes 616).", "accept", "high",
+      "C-00097 is merged into C-00208 and not loaded (one customer fewer).", "accept", "high",
       "Sage's own name for C-00208, Aegon_Viennalife, links the two: Aegon Emeklilik is the company's name before it became Viennalife. "
       "C-00097 has nothing else in Sage: no address, contact, email or invoice. (The address it shows in the load was copied from "
       "Salesforce's Viennalife account on 2026-10-28, so it is not separate evidence.)",
       "C-00097__merge__C-00208")
 extra("C-00120", "merge", "Is C-00120 Federal Home Loan Mortgage Corporation the same company as C-00219 Freddie Mac?",
       "C-00219 Freddie Mac - Federal Home Loan Mortgage Corporation \u00b7 last invoiced 2026-09-28, 120,000.00 open",
-      "C-00120 is merged into C-00219 and not loaded; C-00219 takes Subnet ID 211 (617 becomes 616).", "accept", "high",
+      "C-00120 is merged into C-00219 and not loaded; C-00219 takes Subnet ID 211 (one customer fewer).", "accept", "high",
       "Freddie Mac is the Federal Home Loan Mortgage Corporation. C-00120 was never invoiced; C-00219 is the active record.",
       "C-00120__merge__C-00219")
 extra("C-00640", "unmerge", "Is the Salesforce account \u201cHollister - Credit Card\u201d (Subnet 1012) the Chargebee record C-00575 Hollister.com?",
       "C-00575 Hollister.com \u00b7 Chargebee, never invoiced in Sage \u00b7 now merged into C-00640",
-      "C-00575 is loaded as its own customer with Subnet ID 1012 instead of being merged into C-00640 (617 becomes 618).",
-      "accept", "medium",
+      "C-00575 is loaded as its own customer with Subnet ID 1012 instead of being merged into C-00640 (one more customer).",
+      "accept", "high",
       "A credit-card account is how Chargebee portal customers pay. Each Subnet account is its own customer, so the Chargebee record should not stay merged into the invoiced Hollister customer.",
       "C-00575__unmerge__1012")
+extra("C-00516", "unmerge", "Is the Salesforce account \u201cLeidos-1\u201d (Subnet 895) the Chargebee record C-00489 Leidos?",
+      "C-00489 Leidos \u00b7 Chargebee, never invoiced in Sage \u00b7 now merged into C-00516",
+      "C-00489 is loaded as its own customer with Subnet ID 895 instead of being merged into C-00516 (one more customer).",
+      "accept", "high",
+      "By elimination, as for Hollister: C-00516 is billed through ThunderCat, Leidos-2's partner, so Leidos-1 (895) is the other Leidos record. Salesforce lists CDW as Leidos-1's partner.",
+      "C-00489__unmerge__895")
 for it in items:
     it.setdefault("key", (it["cid"] + "__" + (it["sfid"] or re.sub(r"[^A-Za-z0-9]", "", it["sf"][:40])))[:190])
 items = [it for it in items if not (it["cid"] == "C-00640" and it["kind"] == "match" and "Credit Card" in it["sf"])]
