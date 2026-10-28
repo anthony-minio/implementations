@@ -69,11 +69,12 @@ for r in recs:
                 bad(f"{k} vs source", key, f"{col(r, k)!r} expected {v!r}")
         vid = col(r, "Vendor ID")
         gone = col(r, "Duplicate Action").startswith(("Merge into", "Archive in Ramp"))
-        if not gone and re.match(r"V-\d{5}$", sid) and vid != sid:
-            bad("Vendor ID vs Sage", key, vid)
-        top = max(int(i[2:]) for i in sage if re.match(r"V-\d{5}$", i))
-        if not gone and not re.match(r"V-\d{5}$", sid) and not (re.match(r"V-\d{5}$", vid) and top < int(vid[2:]) <= top + len(sage)):
-            bad("Renumbered Vendor ID out of range", key, vid)
+        # Vendors in Ramp: SYNCED FROM RAMP, the Ramp sync sets their ID. Sage only: the Sage ID unchanged (2026-10-28).
+        want_id, want_src = ("SYNCED FROM RAMP", "Synced from Ramp") if R else (sid, "Sage Intacct")
+        if not gone and vid != want_id:
+            bad("Vendor ID", key, f"{vid!r} expected {want_id!r}")
+        if col(r, "Source System") != want_src:
+            bad("Source System", key, f"{col(r, 'Source System')!r} expected {want_src!r}")
         if col(r, "ExternalID") != vid:
             bad("ExternalID vs Vendor ID", key, col(r, "ExternalID"))
         if col(r, "Individual") != ("TRUE" if g(S, "This vendor is an individual person") == "Yes" and sid != "V-01459" else "FALSE"):
@@ -132,6 +133,10 @@ for r in recs:
         R = ramp_by_id.get(rid)
         if not R or R["Sage Intacct ID"].strip():
             bad("Ramp only row not a Ramp-only vendor", key, rid); continue
+        if not col(r, "Duplicate Action").startswith("Archive in Ramp") and (col(r, "Vendor ID"), col(r, "ExternalID")) != ("SYNCED FROM RAMP", "SYNCED FROM RAMP"):
+            bad("Vendor ID", key, f"{col(r, 'Vendor ID')!r} expected 'SYNCED FROM RAMP'")
+        if col(r, "Source System") != "Synced from Ramp":
+            bad("Source System", key, col(r, "Source System"))
         name = (R["Display name"] or R["Vendor name"]).strip()
         for k, v in (("Company Name", name), ("Email", R["Contact email"].strip()), ("Tax ID", R["Taxpayer identification number (TIN)"].strip()),
                      ("Ramp created", R["Creation date"][:10]), ("Ramp last spend", R["Last spend date"])):
@@ -167,7 +172,7 @@ for i, n in seen_sage.items():
 ro = {r["Vendor ID"] for r in ramp_all if not r["Sage Intacct ID"].strip()}
 if set(seen_ramp_only) != ro:
     bad("Row set", "Ramp only", f"missing {len(ro - set(seen_ramp_only))}, extra {len(set(seen_ramp_only) - ro)}")
-vids = collections.Counter(col(r, "Vendor ID") for r in recs if col(r, "Vendor ID"))
+vids = collections.Counter(col(r, "Vendor ID") for r in recs if col(r, "Vendor ID") and col(r, "Vendor ID") != "SYNCED FROM RAMP")
 if any(n > 1 for n in vids.values()):
     bad("Unique Vendor ID", "-", [k for k, n in vids.items() if n > 1][:5])
 

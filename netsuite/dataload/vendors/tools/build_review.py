@@ -84,17 +84,12 @@ OWN_DOMAINS = ("@minio.io", "@min.io")
 NOT_PERSON = {"V-01459": "Vishnu Daya & Co LLP is a firm, not a person"}
 not_loaded = set(MERGE) | set(RAMP_ARCHIVE)
 
-# Vendor ID: keep V-#####; older V##### and Ramp-created RMP_# vendors in the load get the next numbers after the highest V-#####.
+# Vendor ID (Anthony, 2026-10-28): vendors in Ramp are created in NetSuite by the Ramp sync, which sets their ID, so their
+# Vendor ID and External ID read SYNCED FROM RAMP, for SOA to plan rather than load. Sage only vendors keep their Sage ID as is.
+RAMP_ID = "SYNCED FROM RAMP"
 std = [int(G(r, "Vendor ID")[2:]) for r in sage if re.match(r"V-\d{5}$", G(r, "Vendor ID"))]
-nxt = max(std) + 1
+nxt = max(std) + 1  # auto-numbering for new vendors starts after the highest Sage V-#####
 renumber = {}
-def sortkey(i):
-    m = re.match(r"(\D+?)_?(\d+)$", i)
-    return (m.group(1), int(m.group(2)))
-for i in sorted((G(r, "Vendor ID") for r in sage if not re.match(r"V-\d{5}$", G(r, "Vendor ID"))
-                 and G(r, "Vendor ID") in in_scope and G(r, "Vendor ID") not in not_loaded), key=sortkey):
-    renumber[i] = f"V-{nxt:05d}"
-    nxt += 1
 
 # Sensitive values (bank numbers, tax IDs) from both systems: masked wherever they appear on the page.
 SECRET_FIELDS = ("ACH account number", "ACH bank routing number", "Bank routing number", "Wire transfer account number")
@@ -131,11 +126,9 @@ for r in sage:
     def S(f, v, src="sage"):
         v = (v or "").strip()
         c[f] = [v, src if v else ""]
-    vid = renumber.get(sid, sid)
-    S("vendorId", vid, "rule" if sid in renumber else "sage")
+    vid = RAMP_ID if rp else sid
+    S("vendorId", vid, "rule" if rp else "sage")
     S("externalId", vid, "rule")
-    if sid in renumber:
-        flags.append(f"Renumbered from Sage ID: {sid}")
     person = G(r, "This vendor is an individual person") == "Yes"
     S("isPerson", "TRUE" if person else "FALSE", "sage" if person else "rule")
     if person and sid in NOT_PERSON:
@@ -228,7 +221,7 @@ for r in sage:
         S("is1099Eligible", "TRUE", "sage" if G(r, "Form 1099 type") else "rule")
     S("currency", cur or "USD", "sage" if cur else "rule")
     S("Legacy Vendor ID", sid)
-    S("Source System", "Sage Intacct; Ramp" if any(v[1] == "ramp" for v in c.values()) else "Sage Intacct", "rule")
+    S("Source System", "Synced from Ramp" if rp else "Sage Intacct", "rule")
     c["companyName"][1] = c["companyName"][1] or "miss"
 
     last = max([d for d in (date(G(r, "Last bill created on")), date(G(r, "Last payment made on")),
@@ -305,7 +298,9 @@ for rp in (r for r in ramp_rows if not r["Sage Intacct ID"].strip()):
         c["terms"] = [term(rp["Net payment terms (days)"]), "ramp"]
     R("taxIdNum", rp["Taxpayer identification number (TIN)"])
     c["subsidiary"] = ["MinIO, Inc.", "rule"]
-    c["Source System"] = ["Ramp", "rule"]
+    c["Source System"] = ["Synced from Ramp", "rule"]
+    c["vendorId"] = [RAMP_ID, "rule"]
+    c["externalId"] = [RAMP_ID, "rule"]
     rb = bool(rp["Default ACH account number"].strip())
     bk = ["Ramp", rp["Default bank name"].strip(), "", rp["Default ACH routing number"].strip(), rp["Default ACH account number"].strip()] if rb else ["", "", "", "", ""]
     if rb and rp["Vendor ID"] not in not_loaded:
@@ -349,7 +344,7 @@ assert found == decided, f"duplicates in scope differ from the decisions: new {[
 dup_n = {"merge": 0, "archive": 0, "dropped": 0}
 for lost, keep in list(MERGE.items()) + list(RAMP_ARCHIVE.items()):
     x, k = by_key[lost], by_key[keep]
-    kid = k["cells"][VI][0]
+    kid = k["cells"][QI + ADDED.index("Sage Vendor ID")][0]
     lid = x["cells"][QI + ADDED.index("Sage Vendor ID")][0] or x["cells"][QI + ADDED.index("Ramp Vendor ID")][0]
     x["cells"][VI] = ["", ""]
     x["cells"][FIELDS.index("externalId")] = ["", ""]
@@ -369,7 +364,7 @@ for lost, keep in list(MERGE.items()) + list(RAMP_ARCHIVE.items()):
 for p in SEPARATE:
     for i in p:
         o = next(j for j in p if j != i)
-        by_key[i]["flags"].append(f"Shares an email with {by_key[o]['cells'][VI][0]} {by_key[o]['cells'][FIELDS.index('companyName')][0]}; kept as a separate vendor")
+        by_key[i]["flags"].append(f"Shares an email with {o} {by_key[o]['cells'][FIELDS.index('companyName')][0]}; kept as a separate vendor")
 # Duplicates left out of the load (no activity since 2024-10-26): their Sage IDs are listed on the record kept.
 for x in out:
     if x["_key"] in not_loaded:
@@ -446,4 +441,4 @@ with open("data/vendor-load.csv", "w", newline="", encoding="utf-8-sig") as o:
 print(f"{len(out)} rows in scope ({bridge['in_ramp']} Ramp matched, {len(bridge['ramp_only'])} Ramp only, {bridge['sage_only_recent']} Sage only of {bridge['sage_only']}); "
       f"merged {dup_n['merge']}, archived in Ramp {dup_n['archive']}, duplicates not loaded {dup_n['dropped']} -> data/vendor-load.csv")
 print(f"bank details for {len(bank_file)} vendors -> data/vendor-bank-details.csv (local only)")
-print(f"renumbered {len(renumber)} ({min(renumber.values())} to {max(renumber.values())}); next {data['next_id']}")
+print(f"Vendor IDs: {RAMP_ID} for Ramp vendors, Sage ID for Sage only; auto-numbering from {data['next_id']}")

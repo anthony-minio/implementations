@@ -80,8 +80,9 @@ bank_differ = [r for r in nsv if has_flag(r, "Bank account differs")]
 split_names = [r for r in nsv if has_flag(r, "First Name and Last Name taken")]
 no_names = [r for r in nsv if has_flag(r, "Individual without first and last name")]
 no_coa = [r for r in nsv if has_flag(r, "Sage expense account")]
-renum = data["renumber"]
-ids = lambda rs: ", ".join(f"{V(r, 'Vendor ID') or V(r, 'Legacy Vendor ID') or V(r, 'Ramp Vendor ID')} {V(r, 'Company Name')}" for r in rs)
+ids = lambda rs: ", ".join(f"{V(r, 'Legacy Vendor ID') or V(r, 'Ramp Vendor ID')} {V(r, 'Company Name')}" for r in rs)
+synced_id = [r for r in nsv if V(r, "Vendor ID") == "SYNCED FROM RAMP"]
+assert len(synced_id) == len(by_sync)
 n = lambda x: f"{x:,}"
 assert len(nsv) == len(by_sync) + len(from_file) and len(rows) == B["active"] - B["out_of_scope"] - B["employees_out"] + len(B["ramp_only"])
 
@@ -137,12 +138,17 @@ DECISIONS = [
      "The review copy for the controller and AP showed tax IDs and bank details in full. SOA needs them for the import.",
      "Send SOA the full version, all in one workbook (Anthony, 2026-10-28).",
      "Tax ID and the bank columns are in full on the Vendors-Draft tab. Share this file only with SOA, the controller and AP."),
-    ("Vendor ID numbering",
-     "The preliminary file renumbered all 376 older V##### and Ramp-created RMP_# IDs across the 1,770 Sage vendors "
-     "(V-01769 to V-02144). Most of those vendors are no longer in the load.",
-     "Renumber only the vendors in the load, so the numbers run on without gaps.",
-     f"{len(renum)} vendors renumbered, {min(renum.values())} to {max(renum.values())}. Merged and archived records get no "
-     "number."),
+    ("Vendor IDs",
+     "The preliminary file gave the 376 older V##### and Ramp-created RMP_# Sage IDs new V-##### numbers. Most vendors "
+     "come into NetSuite through the Ramp sync, which creates them and sets their ID, so an ID in this file could clash "
+     "with the one Ramp sets, and changing IDs could affect Ramp's link to the vendor.",
+     "For vendors that come through the Ramp sync, Vendor ID and External ID read SYNCED FROM RAMP, so SOA plans how the "
+     "sync and this file fit together rather than loading the column as is. Sage only vendors keep their Sage ID "
+     "unchanged; nothing is renumbered (Anthony, 2026-10-28).",
+     f"Vendor ID and External ID are SYNCED FROM RAMP on the {len(synced_id)} Ramp vendors, and Source System reads "
+     f"\"Synced from Ramp\". The {len(from_file)} Sage only vendors keep their Sage ID, with Source System \"Sage Intacct\". "
+     "Every row keeps its original IDs: Legacy Vendor ID and Sage Vendor ID hold the Sage ID, Ramp Vendor ID holds Ramp's "
+     "ID."),
     ("Individuals without first and last name",
      "NetSuite needs First Name and Last Name for a vendor that is an individual. Sage has neither for some individuals.",
      "Where the vendor name is a plain first and last name, split it; otherwise leave it for review. Vishnu Daya & Co LLP "
@@ -178,11 +184,11 @@ NOTES = [
      "to them by Ramp vendor name and Ramp Vendor ID and re-keyed to the NetSuite internal ID after the sync. (3) Bank "
      f"details are imported for every vendor, as above. (4) The {len(from_file)} Sage only vendors are loaded from this file."),
     ("Vendor ID",
-     f"Sage IDs in the V-##### format are kept. The {len(renum)} older V##### and Ramp-created RMP_# IDs in the load get "
-     f"the next numbers after {data['last_std']}: {min(renum.values())} to {max(renum.values())}. External ID is the same "
-     f"as Vendor ID. After the load, NetSuite should auto-generate vendor numbers V-##### starting at {data['next_id']}. The "
-     "Sage ID stays in Legacy Vendor ID and Sage Vendor ID; Ramp Vendor ID is kept as its own field. Ramp only vendors get "
-     "their ID from the Ramp sync."),
+     f"Vendors synced from Ramp: Vendor ID and External ID read SYNCED FROM RAMP; their ID in NetSuite is whatever the Ramp "
+     f"sync sets. Sage only vendors: Vendor ID and External ID are the Sage ID, unchanged. Legacy Vendor ID and Sage Vendor "
+     f"ID hold the original Sage ID on every row from Sage; Ramp Vendor ID holds Ramp's own ID on every row from Ramp, and "
+     f"is the only ID a Ramp only vendor has. The highest Sage V-##### is {data['last_std']}, so NetSuite's vendor "
+     f"auto-numbering, if used, should start at {data['next_id']}."),
     ("Category",
      "Sage vendor types mapped to the template's Vendor Category list: AR reseller to AR Reseller, MinIO employee to MinIO "
      "Employee, Tax to Tax agency, the rest unchanged."),
@@ -208,8 +214,12 @@ OPEN = [
         f"{a} ({c} vendor{'s' if c > 1 else ''})" for a, c in sorted(collections.Counter(
             f.split("account ")[1].split(" has")[0] for r in no_coa for f in r["flags"] if f.startswith("Sage expense account")).items()))
     + ". Ming to map them in COA Draft v1.",
+    f"Vendor IDs (SOA): the {len(synced_id)} vendors marked SYNCED FROM RAMP get their ID from the Ramp sync. Before the "
+    "sync, confirm with Ramp what ID it sets (the vendor name or NetSuite's auto-number) and that it links to each vendor "
+    f"by NetSuite internal ID. If vendor auto-numbering is on during the sync, start it at {data['next_id']} or later so it "
+    "cannot reuse a Sage V-##### number held by a Sage only vendor.",
     "After the Ramp sync: re-key this file's Ramp matched and Ramp only rows to the NetSuite internal IDs the sync creates, "
-    "then load the enrichment values and bank details (SOA).",
+    "using Ramp Vendor ID, then load the enrichment values and bank details (SOA).",
 ]
 
 ns.column_dimensions["A"].width = 5
