@@ -92,6 +92,8 @@ new_terms = ", ".join(f"{t} ({nt[t]})" for t in sorted(nt, key=lambda t: int(t.s
 split = [r for r in load if V(r, "Duplicate Action").startswith("New: split")]
 moved_mail = [r for r in load if has_flag(r, "Reseller's email moved")]
 domain = [r for r in load if has_flag(r, "Salesforce match by email domain")]
+subnet_rev = [r for r in load if has_flag(r, "Subnet account chosen 2026-10-28")]
+multi = [r for r in load if V(r, "Merged Sage IDs").count(",") >= 1]
 suffixed = [r for r in load if re.search(r" -0\d$", V(r, "Company Name"))]
 second_pass = [r for r in load if any("Address fields corrected" in f for f in r["flags"])]
 prefix = [r for r in load if has_flag(r, "Postal code country prefix removed")]
@@ -246,6 +248,23 @@ DECISIONS = [
      "Mortgage Corporation into C-00219 Freddie Mac. Two Chargebee records merged earlier are separate customers again, "
      "each with its own Subnet account: C-00575 Hollister.com (1012, beside C-00640 on 1132) and C-00489 Leidos (895, "
      "beside C-00516 on 972). The count to load is unchanged. C-00480 Senukai Digital was left unmatched."),
+    ("Companies with more than one Subnet account",
+     "Name matching found one Salesforce account per company, so some customers got an account with no Subnet ID, or the "
+     "same Subnet ID as another customer, while the company has other Subnet accounts in Salesforce. Standard Chartered Bank "
+     "C-00048 and C-00641 both had Subnet 775; Salesforce also has Standard Chartered Bank-CoE, Subnet 1081.",
+     "One NetSuite customer per Subnet account: no Subnet ID on two customers (2026-10-28). Each customer takes the Subnet "
+     "account that fits it, by name, address, Salesforce partner or, failing those, by elimination. Where Sage has the same "
+     "name for two Subnet accounts, the name follows Salesforce.",
+     f"{len(subnet_rev)} customers changed, flagged \"Subnet account chosen\": C-00048 Standard Chartered Bank on 775 and C-00641 "
+     "renamed Standard Chartered Bank-CoE on 1081 (the earlier Sage record with the earlier Salesforce account); C-00252 "
+     "Ministry of Home Affairs on 607, Ministry of Home Affairs Singapore (it had been matched to the New Delhi account; "
+     "its Salesforce partner, PCS Security, is the Sage bill-to); C-00577 Naval Air Warfare Center Aircraft Division on "
+     "1007; C-00583 Peraton Inc. on 1003, Peraton - DISA MARS Program. Two merges undone, each record now its own "
+     "customer: C-00465 SITE (478) and C-00204 SAUDI INFORMATION TECHNOLOGY COMPANY (894, SITE's other Subnet account); "
+     "C-00497 Ministry of Defence (UK) (932, Deployed & Interoperability Services, its address in Sage) and C-00481 "
+     "Ministry of Defence UK (888, Defence Cyber Certification), which still merges C-00629. Two more customers to load. "
+     "Parent links follow Salesforce as for every customer: C-00641 under C-00048, C-00204 under C-00465, C-00583 under "
+     "C-00566 Defense Information Systems Agency."),
     ("Customers with the same name",
      "Some customers share a name but are separate Subnet accounts, so they would look identical in NetSuite.",
      "Add -01, -02 to the name, as for the new L3Harris customers (2026-10-28).",
@@ -263,9 +282,9 @@ NOTES = [
      f"Customers-Draft tab. Less {B['merged']} duplicates merged into {B['kept']} other customers: {B['load']} customers to load. "
      f"The merged duplicates are already merged: their Sage IDs, addresses and emails are on the customer they merge into. "
      f"They stay on the tab, marked \"Merge into\" in Duplicate Action, only so the merge can be checked, and must be "
-     f"filtered out before the import. {B['merged']} duplicates merge into {B['kept']} customers because two customers each "
-     f"had two duplicates: Scotia BNS Canadian Banking (C-00405) merges C-00039 and C-00049, and Ministry of Defence UK "
-     f"(C-00481) merges C-00497 and C-00629. Sage's customer list report also has 4 inactive customers, not counted above "
+     f"filtered out before the import. {B['merged']} duplicates merge into {B['kept']} customers because "
+     + " and ".join(f"{V(r, 'Company Name')} ({V(r, 'Customer ID')}) merges {V(r, 'Merged Sage IDs').replace(', ', ' and ')}" for r in multi)
+     + f" ({len(multi)} customer{'s' if len(multi) > 1 else ''} with two duplicates). Sage's customer list report also has 4 inactive customers, not counted above "
      f"and not loaded: {', '.join(i for i, _ in B['inactive'])}."),
     ("Customer ID and External ID",
      "Customer ID is the Sage C-##### number. External ID is the same value, so later loads and updates can find each "
@@ -323,9 +342,9 @@ OPEN = [
     f"{sum(nt.values())} customers concerned are marked \"New NetSuite term\" in Question Categories.",
     "VAT ID and International VAT ID carry the same number; SOA to keep the column they use, and say whether Other Tax ID "
     "(US EINs and company registration numbers) should be loaded anywhere.",
-    "Standard Chartered Bank: C-00048 (London, last invoiced 2026-05-28) and C-00641 (Singapore, last invoiced 2026-10-15, "
-    "open balance 2,104,668.00) share Subnet ID 775. Kept as two customers for now; to decide whether to merge them or "
-    "give them -01 and -02.",
+    "Baker Hughes: C-00040 Baker Hughes Group is on Subnet 166. Salesforce also has Baker Hughes Group - "
+    "DataLake-Engineering, Subnet 333, with no Sage customer. Nisha to confirm whether 333 was billed on C-00040; if so, "
+    "it needs a customer of its own, as L3Harris did.",
     "ZATCA: Salesforce has Subnet accounts 715 (ZATCA-Certscan Platform, partners EG&G Middle East and Accelerated "
     "Solutions) and 731 (ZATCA-Rapiscan, partner EG&G Middle East) with no Sage customer; neither reseller is in Sage. "
     "Nisha to confirm whether they were ever invoiced and need customers of their own.",

@@ -98,6 +98,11 @@ for d in new_rows:
     a = sf.get(d["Salesforce Account ID"][:15])
     if not a or a["Subnet Account Id"] != d["Subnet ID"]:
         bad("L3Harris split rows", d["Customer ID"], "Salesforce Account ID does not carry this Subnet ID")
+# One NetSuite customer per Subnet account: no Subnet ID on two loaded customers (Anthony, 2026-10-28).
+subnet_use = collections.Counter(d["Subnet ID"] for d, _ in draft if d["Subnet ID"] and not d["Duplicate Action"].startswith("Merge into"))
+for sn, n in subnet_use.items():
+    if n > 1:
+        bad("Subnet ID on more than one customer", sn, [d["Customer ID"] for d, _ in draft if d["Subnet ID"] == sn and not d["Duplicate Action"].startswith("Merge into")])
 for col in ("Customer ID", "External ID"):
     dup = [k for k, v in collections.Counter(d[col].lower() for d, _ in draft if d[col]).items() if v > 1]
     if dup:
@@ -151,7 +156,7 @@ for d, src in draft:
         bad("Same name, separate Subnet accounts, no suffix", sid, d["Company Name"])
     if d["Company Name"] != base_name and not separate:
         bad("Name suffix without separate Subnet accounts", sid, d["Company Name"])
-    if base_name != unmangle(H["Customer name"]):
+    if base_name != unmangle(H["Customer name"]) and not (src["Company Name"] == "sfdc" and sf.get(d["Salesforce Account ID"][:15], {}).get("Account Name") == base_name):
         bad("Company Name", sid, f"{d['Company Name']!r} vs Sage {H['Customer name']!r}")
     if re.match(r"C-\d{5}$", sid) and d["Customer ID"] != sid:
         bad("Customer ID", sid, d["Customer ID"])
