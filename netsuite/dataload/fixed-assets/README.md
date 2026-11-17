@@ -18,6 +18,8 @@ The register goes in `data/`, which is not committed.
 | `data/fixed-assets-oct-2026-recon-E100.xlsx` | MinIO's register, `15000-16999 - Fixed Assets - Oct 2026 - recon E100 entity` from Asana, prepared by Richard Li, reviewed by Ming Fu, 2026-11-06. Tab `ALL FA`: one row per asset with depreciation, accumulated depreciation and NBV by month from 2021-01 to 2026-10 |
 | `tools/build.py` | Builds the outputs below from the register |
 | `tools/validate_load.py` | Checks the outputs against the register, independently of the build |
+| `sections/`, `doc.env`, `tools/build.sh` and the other create-doc tools | Fully depreciated assets document. `tools/build_doc_sections.py` writes sections 02 to 04 from `data/assets.json` (written by `tools/build.py`). `tools/style_docx.py` keeps the column widths set by the dashes under a table's header |
+| `output/` | Generated document: `fully-depreciated-assets.html` (published as an Artifact: https://claude.ai/artifact/D2FuHC2TkGemAzD25wwp7V), `.docx` and `-preview.pdf`. Never edit by hand |
 
 ## The two SOA templates
 

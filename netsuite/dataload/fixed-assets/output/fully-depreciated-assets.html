@@ -1,0 +1,781 @@
+<title>Fully depreciated fixed assets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+
+:root {
+--paper: #fbfcfd;
+--ink: #16202b;
+--muted: #5b6673;
+--rule: #c9d0d8;
+--accent: #2e74b5;
+--head-bg: #1f3b5c;
+--head-ink: #ffffff;
+--label-bg: #eef1f5;
+--tbc-bg: #fff3d6;
+--tbc-ink: #7a5300;
+--font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+--font-body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+--font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+}
+:root[data-theme="dark"] {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 1rem; line-height: 1.55; padding-inline: 16px; padding-block: 2rem 4rem; }
+.doc { max-width: 46rem; margin-inline: auto; }
+.doc-head { display: grid; gap: .35rem; padding-block-end: 1.25rem; border-bottom: 1px solid var(--rule); margin-block-end: 1.5rem; }
+.doc-title { color: var(--ink); font-family: var(--font-display); font-weight: 600; font-size: clamp(1.8rem, 5vw, 2.4rem); line-height: 1.15; margin: 0; text-wrap: balance; }
+.doc-sub { color: var(--muted); font-size: 1.1rem; margin: 0; }
+.doc-meta { font-family: var(--font-mono); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+h1, h2, h3 { color: var(--accent); line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+section.level1 { margin-block: 1rem 3rem; }
+section.level2 { margin-block-start: 2rem; }
+.head-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; margin-block-end: .75rem; }
+.head-row > :first-child { min-width: 0; }
+p, ol, ul { margin-block: 0 .9rem; max-width: 65ch; }
+li + li { margin-block-start: .35rem; }
+figure { margin: 1.25rem 0 1.5rem; display: grid; gap: .5rem; justify-items: center; }
+figure img { max-width: 100% !important; height: auto; border: 1px solid var(--rule); border-radius: 4px; background: #ffffff; }
+figure img[style*="6.5in"] { width: 100% !important; }
+figcaption { font-size: .85rem; font-style: italic; color: var(--muted); text-align: center; max-width: 60ch; }
+.table-wrap { overflow-x: auto; margin-block: 1rem 1.5rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { border: 1px solid var(--rule); padding: .4rem .6rem; text-align: left; vertical-align: top; }
+thead th { background: var(--head-bg); color: var(--head-ink); font-weight: 600; }
+table.kv td:first-child { background: var(--label-bg); font-weight: 600; width: 28%; }
+colgroup { display: none; }
+.tbc { font-family: var(--font-mono); font-size: .75em; background: var(--tbc-bg); color: var(--tbc-ink); padding: .05em .35em; border-radius: 3px; white-space: nowrap; }
+button.copy { font: 500 .75rem/1 var(--font-mono); letter-spacing: .03em; color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: .4rem .7rem; cursor: pointer; white-space: nowrap; }
+button.copy:hover { border-color: var(--accent); }
+button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.status { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); min-height: 1em; }
+@media (prefers-reduced-motion: no-preference) { button.copy { transition: border-color .15s; } }
+</style>
+
+<main class="doc">
+  <header class="doc-head">
+    <h1 class="doc-title">Fully depreciated fixed assets</h1>
+    <p class="doc-sub">MinIO, Inc. (E100) fixed asset register as of
+2026-10-31: which assets are still in use?</p>
+    <div class="doc-meta">
+      <span>Draft · updated 2026-11-17</span>
+      <button type="button" class="copy" id="copy-all">Copy whole document</button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+  </header>
+<section id="overview" class="level1">
+<h1>Overview</h1>
+<p>These assets are on MinIO’s fixed asset register and are fully
+depreciated. Assets still in use are loaded to NetSuite; the rest are
+not. For each asset, please fill in <strong>Still in use?</strong> (Yes
+or No) and <strong>Where / who has it</strong>.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>Assets</strong></td>
+<td>50, original cost 655,279.44, net book value 0</td>
+</tr>
+<tr class="even">
+<td><strong>Register</strong></td>
+<td>15000-16999 - Fixed Assets - Oct 2026 - recon E100 entity, as of
+2026-10-31. Prepared by Richard Li, reviewed by Ming Fu, 2026-11-06</td>
+</tr>
+<tr class="odd">
+<td><strong>Entity</strong></td>
+<td>MinIO, Inc. (E100)</td>
+</tr>
+<tr class="even">
+<td><strong>Ref</strong></td>
+<td>Row on the register’s ALL FA tab: FA-022 is row 22</td>
+</tr>
+<tr class="odd">
+<td><strong>Not on this list</strong></td>
+<td>32 assets still depreciating (loaded to NetSuite), 13 leasehold
+improvements from 2017 to 2019 no longer in the GL, and FA-101, not yet
+depreciating</td>
+</tr>
+<tr class="even">
+<td><strong>Asana</strong></td>
+<td>FS-140:
+https://app.asana.com/1/163565154279805/project/1219443754801875/task/1220361265682450</td>
+</tr>
+</tbody>
+</table>
+<section id="observations" class="level2">
+<h2>Observations</h2>
+<ol type="1">
+<li><strong>FA-010 and FA-011 may be one monitor entered twice.</strong>
+Same date, vendor, description and cost (Samsung Curved Monitor 34”,
+1,191.38).</li>
+<li><strong>FA-067 and FA-068 may be one purchase entered
+twice.</strong> Same date, vendor, description and cost (2 Processors
+for Eureka Project, 7,637.66).</li>
+<li><strong>FA-036, accounting software, has no NetSuite asset
+type.</strong> SOA’s asset types have Internally Developed Software
+only. This only matters if it is still in use.</li>
+</ol>
+</section>
+</section>
+<section id="computer-hardware" class="level1">
+<h1>Computer hardware</h1>
+<p>39 assets, cost 548,526.07.</p>
+<table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 15%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 12%" />
+<col style="width: 9%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Ref</strong></th>
+<th><strong>Purchased</strong></th>
+<th><strong>Vendor</strong></th>
+<th><strong>Description</strong></th>
+<th style="text-align: right;"><strong>Cost</strong></th>
+<th><strong>Still in use?</strong></th>
+<th><strong>Where / who has it</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FA-010</strong></td>
+<td>2015-08-09</td>
+<td>Anand Babu Periasany</td>
+<td>Samsung Curved Monitor 34” (Best Buy via AB)</td>
+<td style="text-align: right;">1,191.38</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-011</strong></td>
+<td>2015-08-09</td>
+<td>Anand Babu Periasany</td>
+<td>Samsung Curved Monitor 34” (Best Buy via AB)</td>
+<td style="text-align: right;">1,191.38</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-014</strong></td>
+<td>2015-10-06</td>
+<td>Anand Babu Periasany</td>
+<td>LG 34” Monitor (Amazon for AB)</td>
+<td style="text-align: right;">820.41</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-017</strong></td>
+<td>2015-11-06</td>
+<td>Anand Babu Periasany</td>
+<td>Apple MacBook Pro 13.3” (Best Buy via AB)</td>
+<td style="text-align: right;">1,635.80</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-006</strong></td>
+<td>2015-12-14</td>
+<td>Karthic Rao</td>
+<td>Amazon Laptop Purchase 79,987 INR (FX .015337996633)</td>
+<td style="text-align: right;">1,226.84</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-007</strong></td>
+<td>2016-01-27</td>
+<td>AMAX Information Technologies</td>
+<td>ServMax 2U Intel Xeon Servers - qty 3 (1st inv)</td>
+<td style="text-align: right;">18,150.68</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-008</strong></td>
+<td>2016-02-19</td>
+<td>AMAX Information Technologies</td>
+<td>ServMax 2U Intel Xeon Servers - qty 3 (2nd Inv)</td>
+<td style="text-align: right;">404.10</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-009</strong></td>
+<td>2016-05-07</td>
+<td>Dell Technologies</td>
+<td>SWITCH: N4032, 24x10 GBASE-T Fixed Ports, 1x Hot Swap Modular Bay,
+2x Power Supplies</td>
+<td style="text-align: right;">8,253.04</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-012</strong></td>
+<td>2016-08-04</td>
+<td>Harsha</td>
+<td>Lenovo Laptop</td>
+<td style="text-align: right;">1,210.55</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-013</strong></td>
+<td>2016-09-03</td>
+<td>Lenovo</td>
+<td>ThinkPad X1 Carbon 4th Generation - Anand Babu Periasamy</td>
+<td style="text-align: right;">1,083.21</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-015</strong></td>
+<td>2016-10-08</td>
+<td>Lenovo</td>
+<td>ThinkPad X1 Carbon 4th Generation - Harsha</td>
+<td style="text-align: right;">1,391.85</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-016</strong></td>
+<td>2016-10-11</td>
+<td>Apple.com</td>
+<td>IMAC27/3.2QC/8GB/1TBFD/M390</td>
+<td style="text-align: right;">2,621.61</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-018</strong></td>
+<td>2016-12-31</td>
+<td>Atul Kumar Jha</td>
+<td>Laptop</td>
+<td style="text-align: right;">1,376.00</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-021</strong></td>
+<td>2017-03-17</td>
+<td>AMAX Information Technologies</td>
+<td>ServMax GPU Workstation- PO # M0001</td>
+<td style="text-align: right;">21,664.31</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-019</strong></td>
+<td>2017-03-18</td>
+<td>Apple.com</td>
+<td>GL Ultrafine 5K 27” Display Monitor</td>
+<td style="text-align: right;">1,062.79</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-020</strong></td>
+<td>2017-05-23</td>
+<td>Anand Babu Periasany</td>
+<td>Computer for Nitish (AB Periasamy)</td>
+<td style="text-align: right;">4,422.60</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-030</strong></td>
+<td>2017-06-19</td>
+<td>Dell Technologies</td>
+<td>Computer</td>
+<td style="text-align: right;">3,708.70</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-037</strong></td>
+<td>2017-08-31</td>
+<td>Frank Wessesls</td>
+<td>Computer (Computer for Frank Wessesls)</td>
+<td style="text-align: right;">3,785.03</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-038</strong></td>
+<td>2017-10-31</td>
+<td>Apple.com</td>
+<td>Computer (MacPro for Andy Watson)</td>
+<td style="text-align: right;">2,684.91</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-040</strong></td>
+<td>2017-11-27</td>
+<td>Colfax Intl</td>
+<td>Switches (Mellanox Switch for Servers)</td>
+<td style="text-align: right;">8,008.23</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-041</strong></td>
+<td>2017-12-01</td>
+<td>Lenovo</td>
+<td>Laptop-Kannapan</td>
+<td style="text-align: right;">1,177.50</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-042</strong></td>
+<td>2017-12-01</td>
+<td>Lenovo</td>
+<td>Laptop-Krishna S</td>
+<td style="text-align: right;">1,177.55</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-043</strong></td>
+<td>2017-12-01</td>
+<td>SuperMicro</td>
+<td>Inhouse server</td>
+<td style="text-align: right;">31,296.08</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-044</strong></td>
+<td>2018-03-13</td>
+<td>SuperMicro</td>
+<td>In house server (PO 1007)</td>
+<td style="text-align: right;">27,299.97</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-045</strong></td>
+<td>2018-04-27</td>
+<td>SuperMicro</td>
+<td>in house server (PO 1009)</td>
+<td style="text-align: right;">17,477.51</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-047</strong></td>
+<td>2018-05-24</td>
+<td>SuperMicro</td>
+<td>in house server Revised 7/31/18 to agree to Supermicro Updated PO
+1010</td>
+<td style="text-align: right;">72,853.01</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-046</strong></td>
+<td>2018-05-27</td>
+<td>Apple.com</td>
+<td>Laptop</td>
+<td style="text-align: right;">2,405.00</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-048</strong></td>
+<td>2018-08-27</td>
+<td>Anand Babu Periasany</td>
+<td>laptop (AB Periasamy)</td>
+<td style="text-align: right;">3,249.39</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-049</strong></td>
+<td>2019-01-07</td>
+<td>New Egg Business</td>
+<td>OPEN (CC 2955)</td>
+<td style="text-align: right;">4,135.28</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-057</strong></td>
+<td>2021-02-11</td>
+<td>AMAX Information Technologies</td>
+<td>Servers</td>
+<td style="text-align: right;">199,517.66</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-058</strong></td>
+<td>2022-05-10</td>
+<td>Apple.com</td>
+<td>APPLE ONLINE STORE (APPLE ONLINE STORE - Chase CC 2955 May
+2022)</td>
+<td style="text-align: right;">3,872.74</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-061</strong></td>
+<td>2022-11-03</td>
+<td>B&amp;H Foto &amp; Electronics Corp.</td>
+<td>Apple Laptop for Peter Hnat - Depreciate from July 2022 (xpensify
+Report 17325303 - B&amp;H Foto &amp; Electronics Corp. - Apple Laptop
+for Peter Hnat)</td>
+<td style="text-align: right;">5,596.97</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-062</strong></td>
+<td>2023-01-01</td>
+<td>Allan Reid</td>
+<td>Allan Reid - report #R000flYnZxSO - Macbook Pro Order for Allan
+Reid</td>
+<td style="text-align: right;">3,997.13</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-063</strong></td>
+<td>2023-02-01</td>
+<td>Apple.com</td>
+<td>Zahra’s Laptop (Credit Card payment - trnx #1758)</td>
+<td style="text-align: right;">4,462.79</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-064</strong></td>
+<td>2023-07-05</td>
+<td>Apple.com</td>
+<td>CHASE CC - ALL CREDIT CARDS: APPLE.COM - TRAINING CC 4029</td>
+<td style="text-align: right;">4,355.19</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-065</strong></td>
+<td>2023-07-13</td>
+<td>SuperMicro</td>
+<td>OPTIMIZED 2U 4-GPU H12 SXM4 GPU System -
+4(x2)NVIDIAredstoneGPUBaseboard,4 A100 40GB - Qty 2 Servers for MinIO
+(Eureka Project (Owner - Dil))</td>
+<td style="text-align: right;">61,296.51</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-067</strong></td>
+<td>2023-08-31</td>
+<td>Apple.com</td>
+<td>2 Processors for Eureka Project</td>
+<td style="text-align: right;">7,637.66</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-068</strong></td>
+<td>2023-08-31</td>
+<td>Apple.com</td>
+<td>2 Processors for Eureka Project</td>
+<td style="text-align: right;">7,637.66</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-066</strong></td>
+<td>2023-09-13</td>
+<td>Apple.com</td>
+<td>Computer for new hire</td>
+<td style="text-align: right;">3,187.05</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="furniture-and-trade-booths" class="level1">
+<h1>Furniture and trade booths</h1>
+<p>9 assets, cost 75,309.91.</p>
+<table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 15%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 12%" />
+<col style="width: 9%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Ref</strong></th>
+<th><strong>Purchased</strong></th>
+<th><strong>Vendor</strong></th>
+<th><strong>Description</strong></th>
+<th style="text-align: right;"><strong>Cost</strong></th>
+<th><strong>Still in use?</strong></th>
+<th><strong>Where / who has it</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FA-022</strong></td>
+<td>2017-06-01</td>
+<td>Bay @ Bay Office Solution</td>
+<td>Furniture</td>
+<td style="text-align: right;">2,370.75</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-029</strong></td>
+<td>2017-06-01</td>
+<td>Poppin</td>
+<td>Furniture</td>
+<td style="text-align: right;">27,139.59</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-031</strong></td>
+<td>2017-06-29</td>
+<td>Poppin</td>
+<td>Furniture</td>
+<td style="text-align: right;">3,781.77</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-039</strong></td>
+<td>2017-10-09</td>
+<td>Poppin</td>
+<td>Furniture</td>
+<td style="text-align: right;">3,929.99</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-051</strong></td>
+<td>2019-04-30</td>
+<td>ExpoMarketing</td>
+<td>Tradebooth</td>
+<td style="text-align: right;">8,821.20</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-053</strong></td>
+<td>2019-06-11</td>
+<td>Poppin</td>
+<td>Furniture</td>
+<td style="text-align: right;">6,857.68</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-055</strong></td>
+<td>2019-08-26</td>
+<td>Poppin</td>
+<td>Furniture</td>
+<td style="text-align: right;">9,756.23</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-056</strong></td>
+<td>2020-01-17</td>
+<td>popup tradeshow booth</td>
+<td>PopUp tradebooth (popup tradeshow booth)</td>
+<td style="text-align: right;">3,451.66</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>FA-060</strong></td>
+<td>2022-09-27</td>
+<td>RISE Exhibits &amp; Environments</td>
+<td>22-0730 KubeCon DS WS 22 - Detroit, MI October 24th - 28th Fixed
+asset expenses - Order of Workstation, Crates and Shipping charges</td>
+<td style="text-align: right;">9,201.04</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="leasehold-improvements-and-software" class="level1">
+<h1>Leasehold improvements and software</h1>
+<p>2 assets, cost 31,443.46.</p>
+<table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 15%" />
+<col style="width: 16%" />
+<col style="width: 27%" />
+<col style="width: 12%" />
+<col style="width: 9%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Ref</strong></th>
+<th><strong>Purchased</strong></th>
+<th><strong>Vendor</strong></th>
+<th><strong>Description</strong></th>
+<th style="text-align: right;"><strong>Cost</strong></th>
+<th><strong>Still in use?</strong></th>
+<th><strong>Where / who has it</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FA-036</strong></td>
+<td>2017-08-07</td>
+<td>Acctwo Shared Services</td>
+<td>accounting software</td>
+<td style="text-align: right;">17,600.00</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>FA-059</strong></td>
+<td>2022-07-01</td>
+<td>ADARY ELECTRIC INC.</td>
+<td>ADARY ELECTRIC INC. - New Office Electric Works</td>
+<td style="text-align: right;">13,843.46</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</main>
+
+<script>
+(function () {
+  const status = document.getElementById("status");
+
+  // Tables pandoc wrote without a header row are key/value tables.
+  document.querySelectorAll(".doc table").forEach((t) => {
+    if (!t.querySelector("thead")) t.classList.add("kv");
+    const wrap = document.createElement("div");
+    wrap.className = "table-wrap";
+    t.before(wrap);
+    wrap.append(t);
+  });
+
+  // Mark open questions so they stand out while reviewing.
+  const walker = document.createTreeWalker(document.querySelector(".doc"), NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while (walker.nextNode()) if (walker.currentNode.nodeValue.includes("[TBC")) hits.push(walker.currentNode);
+  hits.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.nodeValue.split(/(\[TBC[^\]]*\])/).forEach((part) => {
+      if (!part) return;
+      if (part.startsWith("[TBC")) {
+        const s = document.createElement("span");
+        s.className = "tbc";
+        s.textContent = part;
+        frag.append(s);
+      } else frag.append(part);
+    });
+    node.replaceWith(frag);
+  });
+
+  // Inline the look Google Docs keeps on paste; it ignores page stylesheets.
+  function forPaste(root) {
+    root.querySelectorAll("button.copy, .doc-meta").forEach((b) => b.remove());
+    root.querySelectorAll(".head-row").forEach((r) => r.replaceWith(...r.childNodes));
+    root.querySelectorAll(".table-wrap").forEach((w) => w.replaceWith(...w.childNodes));
+    root.querySelectorAll("h1, h2, h3").forEach((h) => (h.style.color = "#2E74B5"));
+    root.querySelectorAll("table").forEach((t) => {
+      t.setAttribute("style", "border-collapse:collapse;width:100%");
+      const kv = t.classList.contains("kv");
+      t.querySelectorAll("th, td").forEach((c) => {
+        c.setAttribute("style", "border:1px solid #BFC7D1;padding:4px 6px;vertical-align:top;font-size:10pt");
+      });
+      t.querySelectorAll("thead th").forEach((c) => {
+        c.style.background = "#1F3B5C";
+        c.style.color = "#FFFFFF";
+        c.style.fontWeight = "bold";
+      });
+      if (kv) t.querySelectorAll("tr > td:first-child").forEach((c) => {
+        c.style.background = "#F2F4F7";
+        c.style.fontWeight = "bold";
+      });
+    });
+    root.querySelectorAll("img").forEach((img) => {
+      const m = /([\d.]+)in/.exec(img.getAttribute("style") || "");
+      if (m) img.setAttribute("width", Math.round(parseFloat(m[1]) * 96));
+      img.removeAttribute("style");
+    });
+    root.querySelectorAll("figcaption").forEach((c) => c.setAttribute("style", "font-style:italic;color:#555555;font-size:9pt"));
+    root.querySelectorAll(".tbc").forEach((s) => s.setAttribute("style", "background:#FFF3D6"));
+    return root;
+  }
+
+  async function copy(source, label) {
+    const clone = forPaste(source.cloneNode(true));
+    const html = clone.outerHTML;
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([source.innerText], { type: "text/plain" }),
+        }),
+      ]);
+      status.textContent = "Copied " + label + ". Paste into Google Docs.";
+    } catch (e) {
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      status.textContent = label + " is selected. Press Ctrl+C (Cmd+C on a Mac) to copy it.";
+    }
+  }
+
+  document.querySelectorAll("section.level1, section.level2").forEach((sec) => {
+    const h = sec.querySelector(":scope > h1, :scope > h2");
+    if (!h) return;
+    const row = document.createElement("div");
+    row.className = "head-row";
+    h.before(row);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "copy";
+    b.textContent = "Copy section";
+    const label = h.textContent.trim();
+    b.addEventListener("click", () => copy(sec, "“" + label + "”"));
+    row.append(h, b);
+  });
+
+  document.getElementById("copy-all").addEventListener("click", () => copy(document.querySelector(".doc"), "the whole document"));
+})();
+</script>
