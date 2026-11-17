@@ -7,6 +7,7 @@ Working folder for configuring NetSuite data uploads. One subfolder per load, ea
 | `noninventory-items/` | Non-inventory Item for Sale, 11 items | Waiting on the license delivery trigger and the portal question |
 | `customers/` | Customers, from Sage enriched with Salesforce | Waiting on Sage and Salesforce exports |
 | `vendors/` | Vendors, from Sage | Waiting on the vendor template and Sage export |
+| `fixed-assets/` | Fixed assets (FAM), from the Oct 2026 register: 32 depreciating, 50 fully depreciated for review | Fully depreciated list ready to send for review; questions for SOA |
 
 ## Reference values
 
