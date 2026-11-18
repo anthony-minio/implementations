@@ -1,0 +1,1157 @@
+<title>Fixed asset loads for SOA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+
+:root {
+--paper: #fbfcfd;
+--ink: #16202b;
+--muted: #5b6673;
+--rule: #c9d0d8;
+--accent: #2e74b5;
+--head-bg: #1f3b5c;
+--head-ink: #ffffff;
+--label-bg: #eef1f5;
+--tbc-bg: #fff3d6;
+--tbc-ink: #7a5300;
+--font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+--font-body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+--font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+}
+:root[data-theme="dark"] {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 1rem; line-height: 1.55; padding-inline: 16px; padding-block: 2rem 4rem; }
+.doc { max-width: 46rem; margin-inline: auto; }
+.doc-head { display: grid; gap: .35rem; padding-block-end: 1.25rem; border-bottom: 1px solid var(--rule); margin-block-end: 1.5rem; }
+.doc-title { color: var(--ink); font-family: var(--font-display); font-weight: 600; font-size: clamp(1.8rem, 5vw, 2.4rem); line-height: 1.15; margin: 0; text-wrap: balance; }
+.doc-sub { color: var(--muted); font-size: 1.1rem; margin: 0; }
+.doc-meta { font-family: var(--font-mono); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+h1, h2, h3 { color: var(--accent); line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+section.level1 { margin-block: 1rem 3rem; }
+section.level2 { margin-block-start: 2rem; }
+.head-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; margin-block-end: .75rem; }
+.head-row > :first-child { min-width: 0; }
+p, ol, ul { margin-block: 0 .9rem; max-width: 65ch; }
+li + li { margin-block-start: .35rem; }
+figure { margin: 1.25rem 0 1.5rem; display: grid; gap: .5rem; justify-items: center; }
+figure img { max-width: 100% !important; height: auto; border: 1px solid var(--rule); border-radius: 4px; background: #ffffff; }
+figure img[style*="6.5in"] { width: 100% !important; }
+figcaption { font-size: .85rem; font-style: italic; color: var(--muted); text-align: center; max-width: 60ch; }
+.table-wrap { overflow-x: auto; margin-block: 1rem 1.5rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { border: 1px solid var(--rule); padding: .4rem .6rem; text-align: left; vertical-align: top; }
+thead th { background: var(--head-bg); color: var(--head-ink); font-weight: 600; }
+table.kv td:first-child { background: var(--label-bg); font-weight: 600; width: 28%; }
+colgroup { display: none; }
+.tbc { font-family: var(--font-mono); font-size: .75em; background: var(--tbc-bg); color: var(--tbc-ink); padding: .05em .35em; border-radius: 3px; white-space: nowrap; }
+button.copy { font: 500 .75rem/1 var(--font-mono); letter-spacing: .03em; color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: .4rem .7rem; cursor: pointer; white-space: nowrap; }
+button.copy:hover { border-color: var(--accent); }
+button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.status { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); min-height: 1em; }
+@media (prefers-reduced-motion: no-preference) { button.copy { transition: border-color .15s; } }
+</style>
+
+<main class="doc">
+  <header class="doc-head">
+    <h1 class="doc-title">Fixed asset loads for SOA</h1>
+    <p class="doc-sub">Draft of the two FAM templates: the 32 assets
+still depreciating at 2026-10-31</p>
+    <div class="doc-meta">
+      <span>Draft · updated 2026-11-18</span>
+      <button type="button" class="copy" id="copy-all">Copy whole document</button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+  </header>
+<section id="overview" class="level1">
+<h1>Overview</h1>
+<p>A draft of the two FAM templates for MinIO, Inc., to walk through
+before the final load. It holds the assets still depreciating. Fully
+depreciated assets are out for review and are added once we know which
+are still in use.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><strong>In this draft</strong></td>
+<td>32 assets: cost 1,724,131.20, accumulated depreciation 1,086,007.90,
+net book value 638,123.30</td>
+</tr>
+<tr class="even">
+<td><strong>As of</strong></td>
+<td>2026-10-31, the last month depreciated in Sage. Rebuilt for the
+month before go-live (question 11)</td>
+</tr>
+<tr class="odd">
+<td><strong>Source</strong></td>
+<td>MinIO’s fixed asset register, 15000-16999 - Fixed Assets - Oct 2026
+- recon E100 entity, reconciled to Sage by Richard Li and Ming Fu,
+2026-11-06</td>
+</tr>
+<tr class="even">
+<td><strong>Not in this draft</strong></td>
+<td>50 fully depreciated assets (in review), FA-101 (not yet
+depreciating; start date to confirm), 13 leasehold improvements from
+2017 to 2019 no longer in the GL</td>
+</tr>
+<tr class="odd">
+<td><strong>Ties to Sage</strong></td>
+<td>Net book value in the register 650,224.06: these 32 (638,123.30)
+plus FA-101 (12,100.76). Sage 650,224.18</td>
+</tr>
+<tr class="even">
+<td><strong>Files</strong></td>
+<td>MINIO_FAM_CSVTemplate_Mid-life Asset Record - DRAFT 20261117.xlsx
+and MINIO_ FAM_DHR - DRAFT 20261117.xlsx: SOA’s templates with the
+import tabs filled</td>
+</tr>
+</tbody>
+</table>
+<section id="how-we-read-the-two-templates" class="level2">
+<h2>How we read the two templates</h2>
+<ul>
+<li><strong>Mid-life Asset Record</strong> creates each asset in
+NetSuite part way through its life. NetSuite carries on depreciating it
+from the Last Depreciation Period.</li>
+<li><strong>DHR</strong> records the depreciation already taken, so
+NetSuite’s asset reports show it.</li>
+</ul>
+<p>[TBC: SOA to confirm this reading (question 1)]</p>
+</section>
+</section>
+<section id="mid-life-asset-record" class="level1">
+<h1>Mid-life Asset Record</h1>
+<p>Template
+<code>MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx</code>, tab
+<strong>FAM_Mid-life Asset</strong>. One row per asset.</p>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 73%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Template column</strong></th>
+<th><strong>Value</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Name</strong></td>
+<td>Register Description</td>
+</tr>
+<tr class="even">
+<td><strong>Asset Description</strong></td>
+<td>Register Vendor, then the register Comment when it differs from the
+Description</td>
+</tr>
+<tr class="odd">
+<td><strong>Quantity</strong></td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td><strong>Subsidiary</strong></td>
+<td>MinIO, Inc.</td>
+</tr>
+<tr class="odd">
+<td><strong>Asset Type</strong></td>
+<td>Computer Hardware to Equipment, Lease Improvement to Leasehold
+Improvements</td>
+</tr>
+<tr class="even">
+<td><strong>Asset Status</strong></td>
+<td>Depreciating</td>
+</tr>
+<tr class="odd">
+<td><strong>Asset Lifetime</strong></td>
+<td>Register useful life in months. FA-076 and FA-082: months done plus
+months left (question 5)</td>
+</tr>
+<tr class="even">
+<td><strong>Asset Original Cost, Asset Current Cost</strong></td>
+<td>Register cost. No write-downs</td>
+</tr>
+<tr class="odd">
+<td><strong>Residual Value Percentage, Residual Value</strong></td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td><strong>Depreciation Start Date</strong></td>
+<td>Register Dep Date when it falls in the first month depreciated, else
+the 1st of that month</td>
+</tr>
+<tr class="odd">
+<td><strong>Last Depreciation Date</strong></td>
+<td>2026-10-31</td>
+</tr>
+<tr class="even">
+<td><strong>Last Depreciation Period</strong></td>
+<td>Months depreciated, first month to 2026-10</td>
+</tr>
+<tr class="odd">
+<td><strong>Last Depreciation Amount</strong></td>
+<td>2026-10 depreciation</td>
+</tr>
+<tr class="even">
+<td><strong>Current Net Book Value</strong></td>
+<td>Register NBV at 2026-10-31</td>
+</tr>
+</tbody>
+</table>
+<p>Ref is the row on the register’s ALL FA tab (FA-069 is row 69). It is
+not in the load.</p>
+<section id="equipment" class="level2">
+<h2>Equipment</h2>
+<p>28 assets.</p>
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 27%" />
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 11%" />
+<col style="width: 8%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Ref</strong></th>
+<th><strong>Name</strong></th>
+<th style="text-align: right;"><strong>Lifetime</strong></th>
+<th style="text-align: right;"><strong>Original Cost</strong></th>
+<th><strong>Start Date</strong></th>
+<th style="text-align: right;"><strong>Last Period</strong></th>
+<th style="text-align: right;"><strong>Last Amount</strong></th>
+<th style="text-align: right;"><strong>Current NBV</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FA-069</strong></td>
+<td>Ordered Server - 1 Qty S/N: 311625572 - AceleMax NVIDIA GPU HPC</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">319,888.57</td>
+<td>2023-12-04</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">8,885.80</td>
+<td style="text-align: right;">8,885.79</td>
+</tr>
+<tr class="even">
+<td><strong>FA-070</strong></td>
+<td>Petr Kobalicek: Petr Kobalicek - report #R004ZpgHK6WQ - Laptop
+purchase</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">3,537.82</td>
+<td>2024-02-01</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">98.27</td>
+<td style="text-align: right;">294.82</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-071</strong></td>
+<td>Piotr Wyderski: Laptop purchase and 3 Yr Pro Support - DELL
+Precision 7680 16inch</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">3,694.02</td>
+<td>2024-02-01</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">102.61</td>
+<td style="text-align: right;">307.84</td>
+</tr>
+<tr class="even">
+<td><strong>FA-072</strong></td>
+<td>2 Servers for MinIO OPTIMIZED X13SET-G</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">115,785.93</td>
+<td>2024-02-23</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">3,216.27</td>
+<td style="text-align: right;">9,648.83</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-074</strong></td>
+<td>Computers &amp; Equipment</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">6,981.19</td>
+<td>2024-08-20</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">193.92</td>
+<td style="text-align: right;">1,745.30</td>
+</tr>
+<tr class="even">
+<td><strong>FA-075</strong></td>
+<td>Ordered Server - 1 Qty S/N: MT2413XZ089P - NVIDIA Spectrum-3 SN4700
+switch</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">37,789.32</td>
+<td>2024-09-01</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">1,049.71</td>
+<td style="text-align: right;">10,497.03</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-077</strong></td>
+<td>PowerEdge R7615 server</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">118,177.10</td>
+<td>2024-12-06</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">3,282.70</td>
+<td style="text-align: right;">42,675.06</td>
+</tr>
+<tr class="even">
+<td><strong>FA-078</strong></td>
+<td>PowerEdge R7615 server</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">210,220.56</td>
+<td>2024-12-10</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">5,839.46</td>
+<td style="text-align: right;">75,912.98</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-079</strong></td>
+<td>PowerEdge XE968 server</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">255,032.47</td>
+<td>2024-12-12</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">7,084.23</td>
+<td style="text-align: right;">92,095.06</td>
+</tr>
+<tr class="even">
+<td><strong>FA-080</strong></td>
+<td>ENGINEERING CC 0349 - December 2024 - Center of Excellence
+Project</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">6,088.27</td>
+<td>2024-12-20</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">169.12</td>
+<td style="text-align: right;">2,198.54</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-081</strong></td>
+<td>100GB Switch with 28 cables</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">8,984.28</td>
+<td>2025-01-01</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">249.56</td>
+<td style="text-align: right;">3,493.89</td>
+</tr>
+<tr class="even">
+<td><strong>FA-083</strong></td>
+<td>Server Technology Smart PRO3X with PIPS</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">5,777.72</td>
+<td>2025-02-01</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">160.50</td>
+<td style="text-align: right;">2,407.38</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-084</strong></td>
+<td>Ordered Server - 18 qty-Nvidia CX-7 NIC Card PCIe 5.0x16 400Gb OSFP
+18 qty</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">114,690.77</td>
+<td>2025-01-22</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">3,185.85</td>
+<td style="text-align: right;">44,601.97</td>
+</tr>
+<tr class="even">
+<td><strong>FA-085</strong></td>
+<td>Ordered Server - 18 qty-Mellanox Support and Warranty 3 yrs for
+ADPTR-CX7 36 qty</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">12,090.57</td>
+<td>2025-01-23</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">335.85</td>
+<td style="text-align: right;">4,701.89</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-086</strong></td>
+<td>2- Nvidia Transceiver 400GBE 2- Nvidia Passive Fiber Cable SMF</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">8,873.92</td>
+<td>2025-02-24</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">246.49</td>
+<td style="text-align: right;">3,697.47</td>
+</tr>
+<tr class="even">
+<td><strong>FA-087</strong></td>
+<td>Hardware order for data center March 2025</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">10,635.65</td>
+<td>2025-03-10</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">295.43</td>
+<td style="text-align: right;">4,726.96</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-089</strong></td>
+<td>Ali Yaldaz. Macbook Pro M4 Pro 14” 48 GB</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">3,401.66</td>
+<td>2025-04-02</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">94.49</td>
+<td style="text-align: right;">1,606.34</td>
+</tr>
+<tr class="even">
+<td><strong>FA-090</strong></td>
+<td>Transceiver</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">2,196.18</td>
+<td>2025-04-24</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">61.01</td>
+<td style="text-align: right;">1,037.08</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-091</strong></td>
+<td>Fiber optic jumper cables</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">820.26</td>
+<td>2025-04-30</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">22.79</td>
+<td style="text-align: right;">387.34</td>
+</tr>
+<tr class="even">
+<td><strong>FA-092</strong></td>
+<td>192 Storage Cards</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">182,044.80</td>
+<td>2025-05-01</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">5,056.80</td>
+<td style="text-align: right;">91,022.40</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-093</strong></td>
+<td>SUPERMICRO CUST 2XX550 480GB</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">27,250.25</td>
+<td>2026-03-01</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">756.95</td>
+<td style="text-align: right;">21,194.64</td>
+</tr>
+<tr class="even">
+<td><strong>FA-094</strong></td>
+<td>NVIDIA Spectrum-4 Switch and networking equipment</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">63,995.00</td>
+<td>2026-05-01</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">1,777.64</td>
+<td style="text-align: right;">53,329.17</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-095</strong></td>
+<td>Nvidia CX-7 NIC Card PCIe 5.0x16 400Gb OSFP- warrantly and
+shipping</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">22,496.90</td>
+<td>2026-07-01</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">624.92</td>
+<td style="text-align: right;">19,997.24</td>
+</tr>
+<tr class="even">
+<td><strong>FA-096</strong></td>
+<td>NADDOD Technology Inc - September 2026</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">11,709.23</td>
+<td>2026-10-01</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">325.26</td>
+<td style="text-align: right;">11,383.97</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-097</strong></td>
+<td>Ramp: Kiel Michael Mercado - Laptops are for new hires. 5x
+MacBooks</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">13,199.51</td>
+<td>2026-10-01</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">366.65</td>
+<td style="text-align: right;">12,832.86</td>
+</tr>
+<tr class="even">
+<td><strong>FA-098</strong></td>
+<td>V-00545–AMAX Information Technologies</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">63,995.00</td>
+<td>2026-10-01</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1,777.64</td>
+<td style="text-align: right;">62,217.36</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-099</strong></td>
+<td>V00021–Amazon</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">15,911.52</td>
+<td>2026-10-01</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">441.99</td>
+<td style="text-align: right;">15,469.53</td>
+</tr>
+<tr class="even">
+<td><strong>FA-100</strong></td>
+<td>Other Expenses–Other Expenses for Ramp Users</td>
+<td style="text-align: right;">36</td>
+<td style="text-align: right;">3,674.73</td>
+<td>2026-10-01</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">102.08</td>
+<td style="text-align: right;">3,572.65</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>1,648,943.20</strong></td>
+<td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>601,941.39</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="leasehold-improvements" class="level2">
+<h2>Leasehold Improvements</h2>
+<p>4 assets.</p>
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 27%" />
+<col style="width: 9%" />
+<col style="width: 12%" />
+<col style="width: 11%" />
+<col style="width: 8%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Ref</strong></th>
+<th><strong>Name</strong></th>
+<th style="text-align: right;"><strong>Lifetime</strong></th>
+<th style="text-align: right;"><strong>Original Cost</strong></th>
+<th><strong>Start Date</strong></th>
+<th style="text-align: right;"><strong>Last Period</strong></th>
+<th style="text-align: right;"><strong>Last Amount</strong></th>
+<th style="text-align: right;"><strong>Current NBV</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FA-073</strong></td>
+<td>Contract: 241100 - 275 Shoreline/100/Minio Additional Power</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">29,933.00</td>
+<td>2024-04-30</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">498.88</td>
+<td style="text-align: right;">14,467.62</td>
+</tr>
+<tr class="even">
+<td><strong>FA-076</strong></td>
+<td>MinIO-Ste 100- TWA 1 - Tenant Overage</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">22,270.00</td>
+<td>2024-11-20</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">519.63</td>
+<td style="text-align: right;">10,392.67</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-082</strong></td>
+<td>TWA2_275 MinIO Suite 100_10220-24-t001 AST - Blinds</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">10,253.00</td>
+<td>2025-01-14</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">247.78</td>
+<td style="text-align: right;">4,955.62</td>
+</tr>
+<tr class="even">
+<td><strong>FA-088</strong></td>
+<td>TWA#3_MinIO_10220-24- t001 AST - Doors</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">12,732.00</td>
+<td>2025-03-25</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">318.30</td>
+<td style="text-align: right;">6,366.00</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>75,188.00</strong></td>
+<td></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><strong>36,181.91</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="depreciation-history-dhr" class="level1">
+<h1>Depreciation history (DHR)</h1>
+<p>Template <code>MINIO_ FAM_DHR.xlsx</code>, tab <strong>DHR Import
+Template</strong>, filled as SOA’s <strong>FAM_DHR_lumpsum</strong>
+example: one Depreciation row per asset for the depreciation taken to
+2026-10-31.</p>
+<table>
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 73%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Template column</strong></th>
+<th><strong>Value</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>DHR Name</strong></td>
+<td>Blank, as in the example (question 4)</td>
+</tr>
+<tr class="even">
+<td><strong>Asset Name</strong></td>
+<td>Name from the mid-life load</td>
+</tr>
+<tr class="odd">
+<td><strong>Subsidiary, Quantity, Asset Type, Asset
+Lifetime</strong></td>
+<td>As in the mid-life load</td>
+</tr>
+<tr class="even">
+<td><strong>Transaction Type</strong></td>
+<td>Depreciation</td>
+</tr>
+<tr class="odd">
+<td><strong>Transaction Date</strong></td>
+<td>2026-10-31</td>
+</tr>
+<tr class="even">
+<td><strong>Transaction Amount</strong></td>
+<td>Accumulated depreciation at 2026-10-31</td>
+</tr>
+<tr class="odd">
+<td><strong>Net Book Value (NBV)</strong></td>
+<td>Original Cost less Transaction Amount</td>
+</tr>
+<tr class="even">
+<td><strong>Depreciation Period, Period-1</strong></td>
+<td>1 and 0, as in the example (question 3)</td>
+</tr>
+<tr class="odd">
+<td><strong>Purchase Date</strong></td>
+<td>Register Purchase Date</td>
+</tr>
+<tr class="even">
+<td><strong>Original Cost</strong></td>
+<td>Register cost</td>
+</tr>
+</tbody>
+</table>
+<p>32 assets.</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 34%" />
+<col style="width: 12%" />
+<col style="width: 14%" />
+<col style="width: 15%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Ref</strong></th>
+<th><strong>Asset Name</strong></th>
+<th><strong>Purchase Date</strong></th>
+<th style="text-align: right;"><strong>Original Cost</strong></th>
+<th style="text-align: right;"><strong>Transaction Amount</strong></th>
+<th style="text-align: right;"><strong>NBV</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FA-069</strong></td>
+<td>Ordered Server - 1 Qty S/N: 311625572 - AceleMax NVIDIA GPU HPC</td>
+<td>2023-12-04</td>
+<td style="text-align: right;">319,888.57</td>
+<td style="text-align: right;">311,002.78</td>
+<td style="text-align: right;">8,885.79</td>
+</tr>
+<tr class="even">
+<td><strong>FA-070</strong></td>
+<td>Petr Kobalicek: Petr Kobalicek - report #R004ZpgHK6WQ - Laptop
+purchase</td>
+<td>2024-01-30</td>
+<td style="text-align: right;">3,537.82</td>
+<td style="text-align: right;">3,243.00</td>
+<td style="text-align: right;">294.82</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-071</strong></td>
+<td>Piotr Wyderski: Laptop purchase and 3 Yr Pro Support - DELL
+Precision 7680 16inch</td>
+<td>2024-01-11</td>
+<td style="text-align: right;">3,694.02</td>
+<td style="text-align: right;">3,386.18</td>
+<td style="text-align: right;">307.84</td>
+</tr>
+<tr class="even">
+<td><strong>FA-072</strong></td>
+<td>2 Servers for MinIO OPTIMIZED X13SET-G</td>
+<td>2024-02-23</td>
+<td style="text-align: right;">115,785.93</td>
+<td style="text-align: right;">106,137.10</td>
+<td style="text-align: right;">9,648.83</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-073</strong></td>
+<td>Contract: 241100 - 275 Shoreline/100/Minio Additional Power</td>
+<td>2024-04-15</td>
+<td style="text-align: right;">29,933.00</td>
+<td style="text-align: right;">15,465.38</td>
+<td style="text-align: right;">14,467.62</td>
+</tr>
+<tr class="even">
+<td><strong>FA-074</strong></td>
+<td>Computers &amp; Equipment</td>
+<td>2024-08-20</td>
+<td style="text-align: right;">6,981.19</td>
+<td style="text-align: right;">5,235.89</td>
+<td style="text-align: right;">1,745.30</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-075</strong></td>
+<td>Ordered Server - 1 Qty S/N: MT2413XZ089P - NVIDIA Spectrum-3 SN4700
+switch</td>
+<td>2024-08-07</td>
+<td style="text-align: right;">37,789.32</td>
+<td style="text-align: right;">27,292.29</td>
+<td style="text-align: right;">10,497.03</td>
+</tr>
+<tr class="even">
+<td><strong>FA-076</strong></td>
+<td>MinIO-Ste 100- TWA 1 - Tenant Overage</td>
+<td>2024-11-20</td>
+<td style="text-align: right;">22,270.00</td>
+<td style="text-align: right;">11,877.33</td>
+<td style="text-align: right;">10,392.67</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-077</strong></td>
+<td>PowerEdge R7615 server</td>
+<td>2024-12-06</td>
+<td style="text-align: right;">118,177.10</td>
+<td style="text-align: right;">75,502.04</td>
+<td style="text-align: right;">42,675.06</td>
+</tr>
+<tr class="even">
+<td><strong>FA-078</strong></td>
+<td>PowerEdge R7615 server</td>
+<td>2024-12-10</td>
+<td style="text-align: right;">210,220.56</td>
+<td style="text-align: right;">134,307.58</td>
+<td style="text-align: right;">75,912.98</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-079</strong></td>
+<td>PowerEdge XE968 server</td>
+<td>2024-12-12</td>
+<td style="text-align: right;">255,032.47</td>
+<td style="text-align: right;">162,937.41</td>
+<td style="text-align: right;">92,095.06</td>
+</tr>
+<tr class="even">
+<td><strong>FA-080</strong></td>
+<td>ENGINEERING CC 0349 - December 2024 - Center of Excellence
+Project</td>
+<td>2024-12-20</td>
+<td style="text-align: right;">6,088.27</td>
+<td style="text-align: right;">3,889.73</td>
+<td style="text-align: right;">2,198.54</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-081</strong></td>
+<td>100GB Switch with 28 cables</td>
+<td>2025-01-11</td>
+<td style="text-align: right;">8,984.28</td>
+<td style="text-align: right;">5,490.39</td>
+<td style="text-align: right;">3,493.89</td>
+</tr>
+<tr class="even">
+<td><strong>FA-082</strong></td>
+<td>TWA2_275 MinIO Suite 100_10220-24-t001 AST - Blinds</td>
+<td>2025-01-14</td>
+<td style="text-align: right;">10,253.00</td>
+<td style="text-align: right;">5,297.38</td>
+<td style="text-align: right;">4,955.62</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-083</strong></td>
+<td>Server Technology Smart PRO3X with PIPS</td>
+<td>2025-01-20</td>
+<td style="text-align: right;">5,777.72</td>
+<td style="text-align: right;">3,370.34</td>
+<td style="text-align: right;">2,407.38</td>
+</tr>
+<tr class="even">
+<td><strong>FA-084</strong></td>
+<td>Ordered Server - 18 qty-Nvidia CX-7 NIC Card PCIe 5.0x16 400Gb OSFP
+18 qty</td>
+<td>2025-01-22</td>
+<td style="text-align: right;">114,690.77</td>
+<td style="text-align: right;">70,088.80</td>
+<td style="text-align: right;">44,601.97</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-085</strong></td>
+<td>Ordered Server - 18 qty-Mellanox Support and Warranty 3 yrs for
+ADPTR-CX7 36 qty</td>
+<td>2025-01-23</td>
+<td style="text-align: right;">12,090.57</td>
+<td style="text-align: right;">7,388.68</td>
+<td style="text-align: right;">4,701.89</td>
+</tr>
+<tr class="even">
+<td><strong>FA-086</strong></td>
+<td>2- Nvidia Transceiver 400GBE 2- Nvidia Passive Fiber Cable SMF</td>
+<td>2025-02-24</td>
+<td style="text-align: right;">8,873.92</td>
+<td style="text-align: right;">5,176.45</td>
+<td style="text-align: right;">3,697.47</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-087</strong></td>
+<td>Hardware order for data center March 2025</td>
+<td>2025-03-10</td>
+<td style="text-align: right;">10,635.65</td>
+<td style="text-align: right;">5,908.69</td>
+<td style="text-align: right;">4,726.96</td>
+</tr>
+<tr class="even">
+<td><strong>FA-088</strong></td>
+<td>TWA#3_MinIO_10220-24- t001 AST - Doors</td>
+<td>2025-03-25</td>
+<td style="text-align: right;">12,732.00</td>
+<td style="text-align: right;">6,366.00</td>
+<td style="text-align: right;">6,366.00</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-089</strong></td>
+<td>Ali Yaldaz. Macbook Pro M4 Pro 14” 48 GB</td>
+<td>2025-04-02</td>
+<td style="text-align: right;">3,401.66</td>
+<td style="text-align: right;">1,795.32</td>
+<td style="text-align: right;">1,606.34</td>
+</tr>
+<tr class="even">
+<td><strong>FA-090</strong></td>
+<td>Transceiver</td>
+<td>2025-04-24</td>
+<td style="text-align: right;">2,196.18</td>
+<td style="text-align: right;">1,159.10</td>
+<td style="text-align: right;">1,037.08</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-091</strong></td>
+<td>Fiber optic jumper cables</td>
+<td>2025-04-30</td>
+<td style="text-align: right;">820.26</td>
+<td style="text-align: right;">432.92</td>
+<td style="text-align: right;">387.34</td>
+</tr>
+<tr class="even">
+<td><strong>FA-092</strong></td>
+<td>192 Storage Cards</td>
+<td>2025-05-15</td>
+<td style="text-align: right;">182,044.80</td>
+<td style="text-align: right;">91,022.40</td>
+<td style="text-align: right;">91,022.40</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-093</strong></td>
+<td>SUPERMICRO CUST 2XX550 480GB</td>
+<td>2025-03-05</td>
+<td style="text-align: right;">27,250.25</td>
+<td style="text-align: right;">6,055.61</td>
+<td style="text-align: right;">21,194.64</td>
+</tr>
+<tr class="even">
+<td><strong>FA-094</strong></td>
+<td>NVIDIA Spectrum-4 Switch and networking equipment</td>
+<td>2026-05-07</td>
+<td style="text-align: right;">63,995.00</td>
+<td style="text-align: right;">10,665.83</td>
+<td style="text-align: right;">53,329.17</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-095</strong></td>
+<td>Nvidia CX-7 NIC Card PCIe 5.0x16 400Gb OSFP- warrantly and
+shipping</td>
+<td>2026-07-06</td>
+<td style="text-align: right;">22,496.90</td>
+<td style="text-align: right;">2,499.66</td>
+<td style="text-align: right;">19,997.24</td>
+</tr>
+<tr class="even">
+<td><strong>FA-096</strong></td>
+<td>NADDOD Technology Inc - September 2026</td>
+<td>2026-09-22</td>
+<td style="text-align: right;">11,709.23</td>
+<td style="text-align: right;">325.26</td>
+<td style="text-align: right;">11,383.97</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-097</strong></td>
+<td>Ramp: Kiel Michael Mercado - Laptops are for new hires. 5x
+MacBooks</td>
+<td>2026-09-28</td>
+<td style="text-align: right;">13,199.51</td>
+<td style="text-align: right;">366.65</td>
+<td style="text-align: right;">12,832.86</td>
+</tr>
+<tr class="even">
+<td><strong>FA-098</strong></td>
+<td>V-00545–AMAX Information Technologies</td>
+<td>2022-10-19</td>
+<td style="text-align: right;">63,995.00</td>
+<td style="text-align: right;">1,777.64</td>
+<td style="text-align: right;">62,217.36</td>
+</tr>
+<tr class="odd">
+<td><strong>FA-099</strong></td>
+<td>V00021–Amazon</td>
+<td>2022-10-19</td>
+<td style="text-align: right;">15,911.52</td>
+<td style="text-align: right;">441.99</td>
+<td style="text-align: right;">15,469.53</td>
+</tr>
+<tr class="even">
+<td><strong>FA-100</strong></td>
+<td>Other Expenses–Other Expenses for Ramp Users</td>
+<td>2022-10-20</td>
+<td style="text-align: right;">3,674.73</td>
+<td style="text-align: right;">102.08</td>
+<td style="text-align: right;">3,572.65</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td></td>
+<td></td>
+<td style="text-align: right;"><strong>1,724,131.20</strong></td>
+<td style="text-align: right;"><strong>1,086,007.90</strong></td>
+<td style="text-align: right;"><strong>638,123.30</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="questions" class="level1">
+<h1>Questions</h1>
+<section id="for-soa" class="level2">
+<h2>For SOA</h2>
+<ol type="1">
+<li><strong>Are we reading the templates right?</strong> Mid-life Asset
+Record creates the assets; DHR loads the depreciation already
+taken.</li>
+<li><strong>Lump sum or monthly DHR?</strong> We filled the lump sum
+form. The register has monthly figures only from 2021-01, so a monthly
+DHR for older assets would have to be rebuilt.</li>
+<li><strong>Depreciation Period in the lump sum DHR.</strong> SOA’s
+example has Depreciation Period 1 and Period-1 0 for 18 months of
+depreciation. We did the same. Should it be the Last Depreciation Period
+instead?</li>
+<li><strong>DHR Name and load order.</strong> DHR Name is blank in the
+lump sum example, and ID plus Name in Sample Asset Records. Is it filled
+after the asset import, using the IDs NetSuite gives the assets? Assets
+first, then DHR? FA-077 and FA-078 are both named PowerEdge R7615
+server, so a match on Asset Name alone would not tell them apart.</li>
+<li><strong>Depreciation method for FA-076 and FA-082.</strong> Both
+were sped up to finish at the end of the lease, 2028-06. Straight Line,
+(CC-RV)/AL, would give 22,270.00/44 = 506.14 and 10,253.00/42 = 244.12 a
+month instead of 519.63 and 247.78. Use Straight Line Remaining,
+(NB-RV)/(AL-CP+1), for these two? The mid-life template has no method
+column.</li>
+<li><strong>Depreciation rule.</strong> SOA’s asset types use Disposal,
+so depreciation starts the month after an asset goes into service.
+MinIO’s register depreciates from the month it goes into service
+(Acquisition). This decides when depreciation starts on assets bought
+after go-live.</li>
+<li><strong>Default lifetimes.</strong> SOA’s asset types default to 36
+months. MinIO uses 60 months for furniture and leasehold improvements
+(36 for trade booths). Each loaded asset carries its own lifetime, so
+this only affects new assets.</li>
+<li><strong>Department, Class, Location, Asset Serial Number.</strong>
+SOA’s Sample Asset Records have them; the mid-life template does not.
+The register has a department on every asset (such as D-E420) and serial
+numbers for FA-069 and FA-075 only. Should we load them?</li>
+<li><strong>Disposal accounts.</strong> Gain or loss on disposal: 72400
+(Gain) / Loss on Sale of Asset, which replaces Sage 79200 (Ming Fu,
+2026-11-14). The write-off, write-down (Revaluation) and disposal cost
+(Sale or Donate) accounts are blank on the FAM_Asset Type tab.</li>
+<li><strong>Fully depreciated assets.</strong> Those still in use will
+go through the same templates with Asset Status Fully Depreciated, net
+book value 0 and the last depreciation as of the month they finished.
+The template’s Notes tab also lists Depreciation Active (FALSE for
+these), but the import tab has no such column. Is anything else
+needed?</li>
+<li><strong>Cutover date.</strong> Which month-end should the load be as
+of? We rebuild from the register for that month.</li>
+</ol>
+</section>
+<section id="being-confirmed-with-minio-accounting" class="level2">
+<h2>Being confirmed with MinIO accounting</h2>
+<p>These are in the draft as the register has them.</p>
+<ol type="1">
+<li><strong>FA-098 to FA-100</strong> have a GL date of 2022-10,
+depreciation from 2026-10, and a Sage vendor code as the description.
+FA-098 has the same cost and vendor as FA-094 (AMAX, 63,995.00), so it
+may be a duplicate.</li>
+<li><strong>FA-096 and FA-097</strong> have a Dep Date of 2027-10-01 but
+started depreciating in 2026-10. Loaded from 2026-10.</li>
+<li><strong>FA-093</strong> was bought on 2025-03-05 and depreciates
+from 2026-03.</li>
+<li><strong>FA-073</strong> finishes in 2029-03, after the lease ends in
+2028-06. It may be shortened like FA-076 and FA-082.</li>
+</ol>
+</section>
+</section>
+</main>
+
+<script>
+(function () {
+  const status = document.getElementById("status");
+
+  // Tables pandoc wrote without a header row are key/value tables.
+  document.querySelectorAll(".doc table").forEach((t) => {
+    if (!t.querySelector("thead")) t.classList.add("kv");
+    const wrap = document.createElement("div");
+    wrap.className = "table-wrap";
+    t.before(wrap);
+    wrap.append(t);
+  });
+
+  // Mark open questions so they stand out while reviewing.
+  const walker = document.createTreeWalker(document.querySelector(".doc"), NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while (walker.nextNode()) if (walker.currentNode.nodeValue.includes("[TBC")) hits.push(walker.currentNode);
+  hits.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.nodeValue.split(/(\[TBC[^\]]*\])/).forEach((part) => {
+      if (!part) return;
+      if (part.startsWith("[TBC")) {
+        const s = document.createElement("span");
+        s.className = "tbc";
+        s.textContent = part;
+        frag.append(s);
+      } else frag.append(part);
+    });
+    node.replaceWith(frag);
+  });
+
+  // Inline the look Google Docs keeps on paste; it ignores page stylesheets.
+  function forPaste(root) {
+    root.querySelectorAll("button.copy, .doc-meta").forEach((b) => b.remove());
+    root.querySelectorAll(".head-row").forEach((r) => r.replaceWith(...r.childNodes));
+    root.querySelectorAll(".table-wrap").forEach((w) => w.replaceWith(...w.childNodes));
+    root.querySelectorAll("h1, h2, h3").forEach((h) => (h.style.color = "#2E74B5"));
+    root.querySelectorAll("table").forEach((t) => {
+      t.setAttribute("style", "border-collapse:collapse;width:100%");
+      const kv = t.classList.contains("kv");
+      t.querySelectorAll("th, td").forEach((c) => {
+        c.setAttribute("style", "border:1px solid #BFC7D1;padding:4px 6px;vertical-align:top;font-size:10pt");
+      });
+      t.querySelectorAll("thead th").forEach((c) => {
+        c.style.background = "#1F3B5C";
+        c.style.color = "#FFFFFF";
+        c.style.fontWeight = "bold";
+      });
+      if (kv) t.querySelectorAll("tr > td:first-child").forEach((c) => {
+        c.style.background = "#F2F4F7";
+        c.style.fontWeight = "bold";
+      });
+    });
+    root.querySelectorAll("img").forEach((img) => {
+      const m = /([\d.]+)in/.exec(img.getAttribute("style") || "");
+      if (m) img.setAttribute("width", Math.round(parseFloat(m[1]) * 96));
+      img.removeAttribute("style");
+    });
+    root.querySelectorAll("figcaption").forEach((c) => c.setAttribute("style", "font-style:italic;color:#555555;font-size:9pt"));
+    root.querySelectorAll(".tbc").forEach((s) => s.setAttribute("style", "background:#FFF3D6"));
+    return root;
+  }
+
+  async function copy(source, label) {
+    const clone = forPaste(source.cloneNode(true));
+    const html = clone.outerHTML;
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([source.innerText], { type: "text/plain" }),
+        }),
+      ]);
+      status.textContent = "Copied " + label + ". Paste into Google Docs.";
+    } catch (e) {
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      status.textContent = label + " is selected. Press Ctrl+C (Cmd+C on a Mac) to copy it.";
+    }
+  }
+
+  document.querySelectorAll("section.level1, section.level2").forEach((sec) => {
+    const h = sec.querySelector(":scope > h1, :scope > h2");
+    if (!h) return;
+    const row = document.createElement("div");
+    row.className = "head-row";
+    h.before(row);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "copy";
+    b.textContent = "Copy section";
+    const label = h.textContent.trim();
+    b.addEventListener("click", () => copy(sec, "“" + label + "”"));
+    row.append(h, b);
+  });
+
+  document.getElementById("copy-all").addEventListener("click", () => copy(document.querySelector(".doc"), "the whole document"));
+})();
+</script>
