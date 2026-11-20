@@ -8,7 +8,7 @@
 4. **Added columns.** Cumulative Depreciation, Accounting Method and Department are added at the end of the mid-life import tab. They are fields on the NetSuite asset record, but Oracle's list of import fields does not show Accounting Method. Do all three import?
 5. **Straight Line Remaining.** FA-076 and FA-082 use it, to finish at the end of the lease: (NB-RV)/(AL-CP+1) gives 10,392.67/20 = 519.63 and 4,955.62/20 = 247.78 a month. Oracle describes it as a method linked after another method. Does it work as an asset's only method?
 6. **Server scripts on CSV import.** Oracle: with **Run Server SuiteScript and Trigger Workflows** and FAM's **Run Server Scripts on CSV Import** both on, Cumulative Depreciation, Last Depreciation Date and Last Depreciation Period import as 0. Please check both settings before the import.
-7. **Name mapping.** Oracle: delete the default Name = ID mapping, because a Name over 30 characters in ID causes an error. 22 of the 32 names are longer than 30 characters (the longest is 81).
+7. **Name mapping.** Oracle: delete the default Name = ID mapping, because a Name over 30 characters in ID causes an error. 17 of the 32 names are still longer than 30 characters after shortening (the longest is 41). Is there a length limit on Asset Description? The longest here is 295 characters.
 8. **Sample Asset Records.** The DHR file's Sample Asset Records tab looks like the full list of asset record fields. Is it a load, or an example? It is not filled.
 
 ## For MinIO accounting
@@ -24,6 +24,7 @@ These are in the draft as the register has them.
 
 - **DHR:** lump sum, one row per asset. Depreciation Period is the asset's Last Depreciation Period. DHR Name is filled.
 - **Added to the mid-life load:** Cumulative Depreciation, Accounting Method and Department.
+- **Names:** shortened for brevity and clarity; the register Description is kept at the end of Asset Description after "Original name:".
 - **Asset types:** Depreciation Rules Acquisition. Write Off, Write Down and Disposal Cost Account 72400 (Gain) / Loss on Sale of Asset (Ming Fu, 2026-11-13). Default lifetimes stay at 36 months for now; MinIO accounting sets them once NetSuite is in use.
 - **As of:** 2026-10-31 for this load.
 - **Department for the sales laptops:** FA-070, FA-071 and FA-089, on D110 in the register, go to 2100 Sales - Leadership.

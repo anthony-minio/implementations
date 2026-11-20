@@ -22,8 +22,8 @@ Template `MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx`, tab **FAM_Mid-life 
 
 | **Template column** | **Value** |
 |----------------------|-------------------------------------------------------------|
-| **Name** | Register Description |
-| **Asset Description** | Register Vendor, then the register Comment when it differs from the Description. Blank for FA-098 to FA-100, which have neither |
+| **Name** | Shortened for brevity and clarity from the register Description (Names, below). FA-081, FA-083 and FA-091 are unchanged |
+| **Asset Description** | Register Vendor, then the register Comment when it differs from the Description. Then, for a shortened name, "Original name:" and the register Description |
 | **Quantity** | 1 |
 | **Subsidiary** | MinIO, Inc. |
 | **Asset Type** | Computer Hardware to Equipment, Lease Improvement to Leasehold Improvements |
@@ -92,7 +92,10 @@ def load_table(path, tab, name_col, cost_col, widths, totals):
     rows = [r for r in t[1:] if any(v is not None for v in r)]
     assert len(rows) == len(assets), (path, len(rows), len(assets))
     for r, a in zip(rows, assets):  # same order as the build writes them
-        assert r[hdr.index(name_col)] == a["description"] and abs(r[hdr.index(cost_col)] - a["cost"]) < 0.005, (a["ref"], r)
+        # Same asset: cost matches, and the name is the register Description, or the row keeps it as "Original name:", or the DHR Name has the Ref.
+        same = (r[hdr.index(name_col)] == a["description"] or any(str(v).endswith("Original name: " + a["description"]) for v in r)
+                or str(r[0]).startswith(a["ref"] + " "))
+        assert same and abs(r[hdr.index(cost_col)] - a["cost"]) < 0.005, (a["ref"], r)
     right = [k + 1 for k, h in enumerate(hdr) if any(x in h for x in ("Cost", "Amount", "Value", "NBV", "Lifetime", "Period", "Quantity", "Percentage", "Cumulative"))]
     out = ["| **Ref** | " + " | ".join(f"**{esc(h)}**" for h in hdr) + " |", sep(*widths, right=right)]
     for r, a in zip(rows, assets):
@@ -100,7 +103,12 @@ def load_table(path, tab, name_col, cost_col, widths, totals):
     out.append("| **Total** | " + " | ".join(f"**{money(sum(r[k] or 0 for r in rows))}**" if h in totals else "" for k, h in enumerate(hdr)) + " |")
     return out
 
-ml = [MIDLIFE_INTRO, f"{len(assets)} assets, in the order of the load file.", ""]
+ml = [MIDLIFE_INTRO, "## Names", "", "Name as loaded, and the register Description it replaces.", "",
+      "| **Ref** | **Name** | **Original name** |", sep(8, 30, 50)]
+draft = [r for r in openpyxl.load_workbook("data/MINIO_FAM_CSVTemplate_Mid-life Asset Record - DRAFT 20261117.xlsx")["FAM_Mid-life Asset "].iter_rows(min_row=2, values_only=True) if r[0]]
+for r, a in zip(draft, assets):
+    ml.append(f"| **{a['ref']}** | {esc(r[0])} | " + (esc(a["description"]) if r[0] != a["description"] else "Unchanged") + " |")
+ml += ["", "## Load file", "", f"{len(assets)} assets, in the order of the load file.", ""]
 ml += load_table("data/MINIO_FAM_CSVTemplate_Mid-life Asset Record - DRAFT 20261117.xlsx", "FAM_Mid-life Asset ", "Name", "Asset Original Cost",
                  (6, 18, 14, 4, 7, 9, 9, 5, 9, 9, 4, 4, 8, 8, 5, 8, 9, 9, 10, 14),
                  ("Asset Original Cost", "Asset Current Cost", "Current Net Book Value", "Cumulative Depreciation"))

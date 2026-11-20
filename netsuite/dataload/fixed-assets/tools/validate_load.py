@@ -88,7 +88,10 @@ ml = rows(MIDLIFE, "FAM_Mid-life Asset ")
 loaded = {ref for ref, w in work.items() if w["Treatment"] == "Load"}
 matched = []
 for r in ml:
-    cands = [ref for ref in loaded if src[ref]["desc"] == r["Name"] and close(src[ref]["cost"], r["Asset Original Cost"]) and ref not in matched]
+    # A renamed asset carries its register Description at the end of Asset Description, after "Original name: ".
+    desc = str(r["Asset Description"] or "")
+    cands = [ref for ref in loaded if close(src[ref]["cost"], r["Asset Original Cost"]) and ref not in matched
+             and (src[ref]["desc"] == r["Name"] or desc.endswith("Original name: " + src[ref]["desc"]))]
     if not cands: bad(f"mid-life row {r['Name']!r} {r['Asset Original Cost']} not found among loaded register rows"); continue
     ref = cands[0]; matched.append(ref); s = src[ref]
     if r["Subsidiary"] != "MinIO, Inc." or r["Quantity"] != 1: bad(f"{ref} subsidiary or quantity")
@@ -117,6 +120,10 @@ for r in ml:
     if r["Accounting Method"] != want_m or r["Accounting Method"] not in methods: bad(f"{ref} method {r['Accounting Method']}, expected {want_m}")
     if r["Department"] != ns_dept(s["dept"]): bad(f"{ref} department {r['Department']!r}, expected {ns_dept(s['dept'])!r} for {s['dept']}")
 if set(matched) != loaded: bad(f"loaded register rows missing from mid-life: {loaded - set(matched)}")
+names = [r["Name"] for r in ml]
+if len(set(names)) != len(names): bad(f"duplicate asset names: {[n for n in names if names.count(n) > 1]}")
+for r in ml:
+    if "Original name: " in str(r["Asset Description"] or "") and r["Name"] == str(r["Asset Description"]).split("Original name: ")[-1]: bad(f"{r['Name']!r} unchanged but has an original name")
 
 # DHR: one lump sum row per mid-life row, same order, amounts tie.
 dh = rows(DHR, "DHR Import Template")

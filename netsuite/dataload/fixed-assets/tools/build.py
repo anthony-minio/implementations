@@ -193,12 +193,51 @@ def load_rows():
         elif a["status"] == "Fully Depreciated" and IN_USE.get(a["ref"]) == "Yes":
             out.append(a)
     return out
+# Asset names shortened for brevity and clarity (Anthony, 2026-11-20), from the register's own words; acronyms are not expanded.
+# The register Description is kept in Asset Description after the existing text, prefixed "Original name:".
+# Assets not listed keep the register Description as the name.
+NAMES = {
+    "FA-069": "AMAX AceleMax NVIDIA GPU server",
+    "FA-070": "Laptop - Petr Kobalicek",
+    "FA-071": "Laptop - Piotr Wyderski",
+    "FA-072": "SuperMicro X13SET-G servers (2)",
+    "FA-073": "Additional power, 275 Shoreline Ste 100",
+    "FA-074": "Computers & equipment - MIRAPATH",
+    "FA-075": "NVIDIA Spectrum-3 SN4700 switch",
+    "FA-076": "Suite 100 tenant overage (TWA 1)",
+    "FA-077": "Dell PowerEdge R7615 server 2024-12-06",
+    "FA-078": "Dell PowerEdge R7615 server 2024-12-10",
+    "FA-079": "Dell PowerEdge XE968 server",
+    "FA-080": "Dell hardware - Center of Excellence",
+    "FA-082": "Suite 100 blinds (TWA 2)",
+    "FA-084": "NVIDIA CX-7 400Gb NIC cards (18)",
+    "FA-085": "Mellanox CX-7 support and warranty, 3 yrs",
+    "FA-086": "NVIDIA 400GbE transceivers and cables",
+    "FA-087": "Rahi data center hardware, March 2025",
+    "FA-088": "Suite 100 doors (TWA 3)",
+    "FA-089": "Laptop - Ali Yaldaz",
+    "FA-090": "FS.COM transceiver",
+    "FA-092": "SanDisk storage cards (192)",
+    "FA-093": "Supermicro CUST 2XX550 480GB",
+    "FA-094": "NVIDIA Spectrum-4 switch and networking",
+    "FA-095": "NVIDIA CX-7 NIC card with warranty",
+    "FA-096": "NADDOD purchase, September 2026",
+    "FA-097": "MacBooks for new hires (5)",
+    "FA-098": "AMAX purchase (Sage V-00545)",
+    "FA-099": "Amazon purchase (Sage V00021)",
+    "FA-100": "Ramp users - other expenses",
+}
+def asset_name(a):
+    return NAMES.get(a["ref"], a["description"])
 def asset_description(a):
     parts = [a["vendor"]] + [x for x in (a["comment"],) if x and x != a["description"]]
-    return " - ".join(p for p in parts if p)
+    text = " - ".join(p for p in parts if p)
+    if asset_name(a) != a["description"]:
+        text = (text + ". " if text else "") + "Original name: " + a["description"]
+    return text
 def midlife(a):
     fd = a["status"] == "Fully Depreciated"
-    return [a["description"], asset_description(a), 1, SUBSIDIARY, ASSET_TYPE[a["category"]], a["status"],
+    return [asset_name(a), asset_description(a), 1, SUBSIDIARY, ASSET_TYPE[a["category"]], a["status"],
             a["life"] if fd else a["lifetime"], a["cost"], a["cost"], 0, 0,
             a["dep_date"] if fd else a["start"], a["fd_month"] if fd else AS_OF,
             a["life"] if fd else a["periods"], a["last_dep_amt"] if fd else a["dep_last"], 0 if fd else a["nbv"],
@@ -210,7 +249,7 @@ def dhr(a):
     fd = a["status"] == "Fully Depreciated"
     period = a["life"] if fd else a["periods"]
     when = a["fd_month"] if fd else AS_OF
-    return [f"{a['ref']} Depreciation to {when:%Y-%m-%d}", a["description"], SUBSIDIARY, 1, ASSET_TYPE[a["category"]], "Depreciation",
+    return [f"{a['ref']} Depreciation to {when:%Y-%m-%d}", asset_name(a), SUBSIDIARY, 1, ASSET_TYPE[a["category"]], "Depreciation",
             when, a["cost"] if fd else a["accum"], 0 if fd else a["nbv"], period, period - 1,
             a["life"] if fd else a["lifetime"], a["purchase"], a["cost"]]
 
@@ -365,7 +404,7 @@ QUESTIONS = [
     ("SOA", "Added columns", "Cumulative Depreciation, Accounting Method and Department were added to the mid-life import tab (Anthony, 2026-11-20). They are NetSuite asset record fields; Oracle's import field list does not show Accounting Method. Confirm they import."),
     ("SOA", "Straight Line Remaining", "Used for FA-076 and FA-082, shortened to the lease term: (NB-RV)/(AL-CP+1) gives 519.63 and 247.78. Oracle describes it as a method linked after another. Confirm it works as an asset's own method."),
     ("SOA", "Server scripts on CSV import", "Oracle: with Run Server SuiteScript and Trigger Workflows and FAM's Run Server Scripts on CSV Import both on, Cumulative Depreciation, Last Depreciation Date and Last Depreciation Period import as 0. Check the settings."),
-    ("SOA", "Name mapping", "Oracle: delete the default Name = ID mapping; a Name over 30 characters in ID errors. 22 of the 32 names are over 30 characters (longest 81)."),
+    ("SOA", "Name mapping", "Oracle: delete the default Name = ID mapping; a Name over 30 characters in ID errors. 17 of the 32 names are still over 30 characters after shortening (longest 41). Is there a length limit on Asset Description? The longest here is 295 characters."),
     ("SOA", "Sample Asset Records", "The DHR file's Sample Asset Records tab looks like the full asset record field list. Is it a load, or an example? Not filled."),
     ("Richard / Ming", "FA-098 to FA-101", "GL date 2022-10, depreciation from 2026-10 (FA-101 none), Sage vendor string as description. What are they? FA-098 has the same cost and vendor as FA-094 (AMAX, 63,995.00): duplicate? FA-101 is held until its start date is known."),
     ("Richard / Ming", "FA-096, FA-097 Dep Date", "Dep Date 2027-10-01 but depreciation started 2026-10. Loaded from 2026-10."),
@@ -374,7 +413,7 @@ QUESTIONS = [
     ("Sendhil Mandala", "Disposed assets", "Per the Asana task: which assets have been disposed of."),
 ]
 DECISIONS = [
-    "2026-11-20 (Anthony): lump sum DHR; DHR Depreciation Period is the asset's Last Depreciation Period; DHR Name filled; Accounting Method, Department and Cumulative Depreciation columns added; Depreciation Rules Acquisition; Write Down Account 72400; load as of 2026-10-31 for now; D110 sales laptops (FA-070, FA-071, FA-089) to 2100 Sales - Leadership; fully depreciated assets a separate load; asset type default lifetimes left to Ming once NetSuite is in use.",
+    "2026-11-20 (Anthony): lump sum DHR; DHR Depreciation Period is the asset's Last Depreciation Period; DHR Name filled; Accounting Method, Department and Cumulative Depreciation columns added; Depreciation Rules Acquisition; Write Down Account 72400; load as of 2026-10-31 for now; D110 sales laptops (FA-070, FA-071, FA-089) to 2100 Sales - Leadership; asset names shortened, register Description kept in Asset Description after \"Original name:\"; fully depreciated assets a separate load; asset type default lifetimes left to Ming once NetSuite is in use.",
     "2026-11-13 (Ming, Slack): write-off and gain/loss on disposal use 79200 (Gain) / Loss on Sale of Asset, 72400 in NetSuite.",
 ]
 q = w.create_sheet("Questions")

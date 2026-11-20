@@ -72,6 +72,7 @@ Without the 13 leasehold improvements, the cost ties to Sage 15000-15300 (2,391,
     - Accounting Method is Straight Line, not SOA's Straightline.
   - Default lifetimes are left for Ming once NetSuite is in use.
   - The load is as of 2026-10-31.
+  - Asset names are shortened for brevity and clarity, using only the register's words; acronyms are not expanded. The register Description goes at the end of Asset Description, after "Original name:". FA-081, FA-083 and FA-091 are unchanged. The names are in `NAMES` in `tools/build.py`.
   - The sales laptops on D110 (FA-070, FA-071, FA-089), which is not on Departments Draft v1, go to 2100 Sales - Leadership.
   - Fully depreciated assets still in use are a separate load, by the same process.
 
