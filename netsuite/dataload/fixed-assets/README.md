@@ -72,6 +72,7 @@ Without the 13 leasehold improvements, the cost ties to Sage 15000-15300 (2,391,
     - Accounting Method is Straight Line, not SOA's Straightline.
   - Default lifetimes are left for Ming once NetSuite is in use.
   - The load is as of 2026-10-31.
+  - The sales laptops on D110 (FA-070, FA-071, FA-089), which is not on Departments Draft v1, go to 2100 Sales - Leadership.
   - Fully depreciated assets still in use are a separate load, by the same process.
 
 ## Open questions
@@ -91,7 +92,6 @@ The current list is the Questions section of the SOA document (https://claude.ai
   - FA-096 and FA-097 Dep Date.
   - FA-093 start date.
   - FA-073 lease term.
-  - Department for FA-070, FA-071 and FA-089 (D110).
 - Sendhil Mandala: which assets have been disposed of.
 
 ## Load log

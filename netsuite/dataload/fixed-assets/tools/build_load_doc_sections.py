@@ -38,7 +38,7 @@ Template `MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx`, tab **FAM_Mid-life 
 | **Current Net Book Value** | Register NBV at 2026-10-31 |
 | **Cumulative Depreciation** | Added. Register accumulated depreciation at 2026-10-31 |
 | **Accounting Method** | Added. Straight Line, (CC-RV)/AL. FA-076 and FA-082: Straight Line Remaining, (NB-RV)/(AL-CP+1), which spreads the remaining value over the months to the end of the lease. Names as on SOA's Dep Method tab |
-| **Department** | Added. Register department mapped through Departments Draft v1 to the NetSuite department, parent : child. Blank for FA-070, FA-071 and FA-089: D110 is not on the tab |
+| **Department** | Added. Register department mapped through Departments Draft v1 to the NetSuite department, parent : child. FA-070, FA-071 and FA-089 are on D110 (Sales, historic), which is not on the tab: 2100 Sales - Leadership |
 
 Ref is the row on the register's ALL FA tab (FA-069 is row 69). It is not in the load.
 """

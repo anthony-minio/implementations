@@ -38,6 +38,7 @@ for r in range(6, ws.max_row + 1):
 # Departments: the row of Departments Draft v1 whose Sage# cell names the code, with its parents above it.
 dw = list(openpyxl.load_workbook("data/MINIO-Dimensions-from-sage-20260825.xlsx", read_only=True, data_only=True)["Departments Draft v1"].iter_rows(values_only=True))
 def ns_dept(code):
+    if code == "D110": code = "D-S110"  # sales laptops to 2100 Sales - Leadership (Anthony, 2026-11-20)
     for i, row in enumerate(dw):
         if row[0] and code in [c.strip().split(" ")[0] for c in str(row[0]).replace("(", "").split(",")] and isinstance(row[1], (int, float)):
             names, level = [f"{int(row[2])} {str(row[3]).strip()}"], int(row[1])

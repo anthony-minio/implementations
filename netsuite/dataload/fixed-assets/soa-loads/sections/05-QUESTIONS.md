@@ -19,7 +19,6 @@ These are in the draft as the register has them.
 2. **FA-096 and FA-097** have a Dep Date of 2027-10-01 but started depreciating in 2026-10. Loaded from 2026-10.
 3. **FA-093** was bought on 2025-03-05 and depreciates from 2026-03.
 4. **FA-073** finishes in 2029-03, after the lease ends in 2028-06. ASC 842 has leasehold improvements depreciated over the shorter of their useful life and the remaining lease term. Shorten it like FA-076 and FA-082?
-5. **FA-070, FA-071 and FA-089** are on department D110 (Sales, historic), which is not on Departments Draft v1. Which NetSuite department?
 
 ## Decided
 
@@ -27,4 +26,5 @@ These are in the draft as the register has them.
 - **Added to the mid-life load:** Cumulative Depreciation, Accounting Method and Department.
 - **Asset types:** Depreciation Rules Acquisition. Write Off, Write Down and Disposal Cost Account 72400 (Gain) / Loss on Sale of Asset (Ming Fu, 2026-11-13). Default lifetimes stay at 36 months for now; MinIO accounting sets them once NetSuite is in use.
 - **As of:** 2026-10-31 for this load.
+- **Department for the sales laptops:** FA-070, FA-071 and FA-089, on D110 in the register, go to 2100 Sales - Leadership.
 - **Fully depreciated assets:** a separate load, by the same process: net book value 0, last depreciation as of the month they finished.

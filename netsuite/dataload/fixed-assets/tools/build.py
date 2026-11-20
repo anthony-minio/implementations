@@ -173,6 +173,9 @@ def dept_map():
             if c: out[c] = full
     return out
 DEPT = dept_map()
+# D110 (Sales, historic) is not on the tab: the sales laptops go to 2100 Sales - Leadership (Anthony, 2026-11-20).
+DEPT["D110"] = DEPT["D-S110"]
+assert DEPT["D110"].endswith("2100 Sales - Leadership"), DEPT["D110"]
 for a in assets:
     if a["status"] == "Depreciating":
         a["method"] = SLR if a["lifetime"] != a["life"] else SL
@@ -368,11 +371,10 @@ QUESTIONS = [
     ("Richard / Ming", "FA-096, FA-097 Dep Date", "Dep Date 2027-10-01 but depreciation started 2026-10. Loaded from 2026-10."),
     ("Richard / Ming", "FA-093 start", "Bought 2025-03-05, depreciation from 2026-03. Loaded as in the register."),
     ("Richard / Ming", "FA-073 lease term", "Finishes 2029-03, after the lease ends 2028-06. ASC 842 has leasehold improvements depreciated over the shorter of useful life and remaining lease term. Shorten it like FA-076 and FA-082?"),
-    ("Richard / Ming", "D110 department", "FA-070, FA-071 and FA-089 are on D110 (Sales, historic), which is not on Departments Draft v1. Which NetSuite department? Department is blank until then."),
     ("Sendhil Mandala", "Disposed assets", "Per the Asana task: which assets have been disposed of."),
 ]
 DECISIONS = [
-    "2026-11-20 (Anthony): lump sum DHR; DHR Depreciation Period is the asset's Last Depreciation Period; DHR Name filled; Accounting Method, Department and Cumulative Depreciation columns added; Depreciation Rules Acquisition; Write Down Account 72400; load as of 2026-10-31 for now; fully depreciated assets a separate load; asset type default lifetimes left to Ming once NetSuite is in use.",
+    "2026-11-20 (Anthony): lump sum DHR; DHR Depreciation Period is the asset's Last Depreciation Period; DHR Name filled; Accounting Method, Department and Cumulative Depreciation columns added; Depreciation Rules Acquisition; Write Down Account 72400; load as of 2026-10-31 for now; D110 sales laptops (FA-070, FA-071, FA-089) to 2100 Sales - Leadership; fully depreciated assets a separate load; asset type default lifetimes left to Ming once NetSuite is in use.",
     "2026-11-13 (Ming, Slack): write-off and gain/loss on disposal use 79200 (Gain) / Loss on Sale of Asset, 72400 in NetSuite.",
 ]
 q = w.create_sheet("Questions")
