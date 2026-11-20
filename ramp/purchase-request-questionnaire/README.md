@@ -41,6 +41,8 @@ Agreed with Anthony 2026-11-20.
 Order of work:
 
 1. Questions and program descriptions, for all programs in both groups. Starting with General Procurement Request.
+   1. Capture every program first.
+   2. Then discuss, across all of them: optimized question flow, question logic, optimizing the questions themselves, and anything else that comes up.
 2. Approval workflows, after the questions are settled.
 
 The final draft proposal also covers, for each program:
