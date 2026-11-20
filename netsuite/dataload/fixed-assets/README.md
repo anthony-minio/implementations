@@ -20,7 +20,7 @@ The register goes in `data/`, which is not committed.
 | `tools/validate_load.py` | Checks the outputs against the register, independently of the build |
 | `sections/`, `doc.env`, `tools/build.sh` and the other create-doc tools | Fully depreciated assets document. `tools/build_doc_sections.py` writes sections 02 to 04 from `data/assets.json` (written by `tools/build.py`). `tools/style_docx.py` keeps the column widths set by the dashes under a table's header |
 | `output/` | Generated document: `fully-depreciated-assets.html` (published as an Artifact: https://claude.ai/artifact/D2FuHC2TkGemAzD25wwp7V), `.docx` and `-preview.pdf`. Never edit by hand |
-| `soa-loads/` | Document for SOA walking through the two draft loads (32 depreciating assets) and the questions. `tools/build_load_doc_sections.py` writes sections 02 and 03 from `data/assets.json`; `soa-loads/tools/build.sh` builds `soa-loads/output/fixed-asset-loads-soa.html` (published as an Artifact: https://claude.ai/artifact/6nnyN1dQ3cAX9KQiGfyvEo), `.docx` (landscape, `ORIENTATION` in `soa-loads/doc.env`) and `-preview.pdf` |
+| `soa-loads/` | Document for SOA walking through the asset types (FAM_Asset Type) and the two draft loads, every template column for the 32 depreciating assets, and the questions. `tools/build_load_doc_sections.py` writes sections 02 to 04 from the draft workbooks; `soa-loads/tools/build.sh` builds `soa-loads/output/fixed-asset-loads-soa.html` (published as an Artifact: https://claude.ai/artifact/6nnyN1dQ3cAX9KQiGfyvEo), `.docx` (landscape, `ORIENTATION` in `soa-loads/doc.env`) and `-preview.pdf` |
 
 ## The two SOA templates
 
@@ -56,7 +56,7 @@ Without the 13 leasehold improvements, the cost ties to Sage 15000-15300 (2,391,
 
 ## Decisions
 
-- 2026-11-14 (Ming): Sage 79200 (Gain) / Loss on Sale of Asset maps to 72400 in NetSuite.
+- 2026-11-13 (Ming, Slack, asked which accounts to use for write-off and gain/loss on disposal): 79200 (Gain) / Loss on Sale of Asset, which maps to 72400 in NetSuite. On SOA's FAM_Asset Type tab, 72400 goes in Write Off Account and, proposed, Disposal Cost Account. No account yet for Write Down Account.
 - 2026-11-17: the 13 leasehold improvements from 2017 to 2019 are not loaded. The leadsheet leaves them out of 15300 and 16300. To confirm with Richard and Ming.
 - 2026-11-17: Subsidiary MinIO, Inc. Quantity 1. Residual 0. Asset types: Computer Hardware to Equipment, Furniture to Furniture & Fixtures, Lease Improvement to Leasehold Improvements.
 - 2026-11-17: each month's depreciation is the change in accumulated depreciation, not the Dep column. FA-087 has Dep formulas from 2024-08 that are not added to its total. It was bought in 2025-03.

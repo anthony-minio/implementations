@@ -112,16 +112,18 @@ def style_table(table):
     # Keep the widths pandoc took from the dashes under a wide table's header; it writes equal widths otherwise.
     grid = [int(g.get(qn("w:w"))) for g in table._tbl.tblGrid.findall(qn("w:gridCol"))]
     set_widths(table, [w / sum(grid) for w in grid] if not kv and len(set(grid)) > 1 else column_fractions(table, kv))
+    # Load tables with every template column: a smaller font so they fit across the page.
+    size = Pt(7) if len(table.columns) > 10 else Pt(10)
     for i, row in enumerate(table.rows):
         for j, cell in enumerate(row.cells):
             if not kv and i == 0:
                 set_cell_fill(cell, NAVY)
-                style_runs(cell, bold=True, color="FFFFFF")
+                style_runs(cell, size=size, bold=True, color="FFFFFF")
             elif kv and j == 0:
                 set_cell_fill(cell, LABEL_GREY)
-                style_runs(cell, bold=True)
+                style_runs(cell, size=size, bold=True)
             else:
-                style_runs(cell)
+                style_runs(cell, size=size)
 
 
 def style_fonts(doc):

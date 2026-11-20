@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-# Write the asset tables of the SOA loads document (soa-loads/sections/02 and 03) from data/assets.json.
+# Write sections 02 to 04 of the SOA loads document: asset types from the draft mid-life workbook, assets from data/assets.json.
 #   python3 tools/build.py && python3 tools/build_load_doc_sections.py && bash soa-loads/tools/build.sh
 # Rows are the assets in the draft loads: still depreciating. Fully depreciated assets are added after the review.
 import json, re
+import openpyxl
 
 assets = [a for a in json.load(open("data/assets.json"))["assets"] if a["status"] == "Depreciating"]
 TYPE = {"Computer Hardware": "Equipment", "Lease Improvement": "Leasehold Improvements"}
@@ -22,7 +23,7 @@ Template `MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx`, tab **FAM_Mid-life 
 | **Template column** | **Value** |
 |----------------------|-------------------------------------------------------------|
 | **Name** | Register Description |
-| **Asset Description** | Register Vendor, then the register Comment when it differs from the Description |
+| **Asset Description** | Register Vendor, then the register Comment when it differs from the Description. Blank for FA-098 to FA-100, which have neither |
 | **Quantity** | 1 |
 | **Subsidiary** | MinIO, Inc. |
 | **Asset Type** | Computer Hardware to Equipment, Lease Improvement to Leasehold Improvements |
@@ -57,25 +58,57 @@ Template `MINIO_ FAM_DHR.xlsx`, tab **DHR Import Template**, filled as SOA's **F
 | **Original Cost** | Register cost |
 """
 
-ml = [MIDLIFE_INTRO]
-for cat, typ in TYPE.items():
-    rows = [a for a in assets if a["category"] == cat]
-    ml += [f"## {typ}", "",
-           f"{len(rows)} assets.", "",
-           "| **Ref** | **Name** | **Lifetime** | **Original Cost** | **Start Date** | **Last Period** | **Last Amount** | **Current NBV** |",
-           sep(9, 30, 9, 13, 12, 8, 11, 12, right=(2, 3, 5, 6, 7))]
-    for a in rows:
-        ml.append(f"| **{a['ref']}** | {esc(a['description'])} | {a['lifetime']} | {money(a['cost'])} | {a['start']} | "
-                  f"{a['periods']} | {money(a['dep_last'])} | {money(a['nbv'])} |")
-    ml.append(f"| **Total** | | | **{money(sum(a['cost'] for a in rows))}** | | | | **{money(sum(a['nbv'] for a in rows))}** |")
-    ml.append("")
-open("soa-loads/sections/02-MID-LIFE-ASSET-RECORD.md", "w").write("\n".join(ml))
+# Asset types: SOA's FAM_Asset Type tab as filled in the draft, one column per type.
+at = openpyxl.load_workbook("data/MINIO_FAM_CSVTemplate_Mid-life Asset Record - DRAFT 20261117.xlsx")["FAM_Asset Type"]
+fields = [" ".join(str(c.value).split()).title().replace("-Default", "") for c in at[1]]
+types = [r for r in at.iter_rows(min_row=3, values_only=True) if r[0]]
+cell = lambda v: "TBC" if v in (None, "") else esc(str(v)).replace("TRUE", "True") if not isinstance(v, bool) else str(v).upper()
+AT = ["# Asset types", "",
+      "Tab **FAM_Asset Type** of the mid-life template. SOA filled everything except Description and the last three accounts. "
+      "**Write Off Account** is 72400 (Gain) / Loss on Sale of Asset. Asked which accounts to use for write-off and gain/loss on disposal, "
+      "Ming Fu answered Sage 79200 on 2026-11-13; 79200 is 72400 in NetSuite. "
+      "**Disposal Cost Account** has the same account [TBC: Ming to confirm 72400 for disposal costs]. "
+      "The COA has no write-down or impairment account [TBC: which account for Write Down Account (Revaluation)]. Description is left blank.", "",
+      "| **Field** | " + " | ".join(f"**{esc(t[0])}**" for t in types) + " |",
+      sep(18, *[16] * len(types))]
+for k, f in enumerate(fields[1:], 1):
+    if f == "Description": continue
+    AT.append(f"| **{f}** | " + " | ".join(cell(t[k]) for t in types) + " |")
+AT += ["", "Lifetime and depreciation rules: questions 6 and 7. SOA's tab names 69100 Depreciation Expense; the COA names it 69100 Depreciation.", ""]
+open("soa-loads/sections/02-ASSET-TYPES.md", "w").write("\n".join(AT))
 
-dh = [DHR_INTRO, f"{len(assets)} assets.", "",
-      "| **Ref** | **Asset Name** | **Purchase Date** | **Original Cost** | **Transaction Amount** | **NBV** |",
-      sep(9, 36, 13, 14, 15, 13, right=(3, 4, 5))]
-for a in assets:
-    dh.append(f"| **{a['ref']}** | {esc(a['description'])} | {a['purchase']} | {money(a['cost'])} | {money(a['accum'])} | {money(a['nbv'])} |")
-dh.append(f"| **Total** | | | **{money(sum(a['cost'] for a in assets))}** | **{money(sum(a['accum'] for a in assets))}** | **{money(sum(a['nbv'] for a in assets))}** |")
-open("soa-loads/sections/03-DHR.md", "w").write("\n".join(dh) + "\n")
+# Load tables: every column of SOA's import tab, read from the filled draft workbooks, in file order.
+# Ref (the register row) is added in front; it is not in the load.
+import datetime as dt
+def fmt(v, h):
+    if v is None or v == "": return ""
+    if isinstance(v, dt.datetime): return v.date().isoformat()
+    if isinstance(v, float) or (isinstance(v, int) and ("Cost" in h or "Amount" in h or "Value" in h or "NBV" in h)):
+        return money(v) if "Percentage" not in h else str(v)
+    return esc(str(v))
+def load_table(path, tab, name_col, cost_col, widths, totals):
+    t = list(openpyxl.load_workbook(path)[tab].iter_rows(values_only=True))
+    hdr = [" ".join(str(h).split()) for h in t[0]]
+    rows = [r for r in t[1:] if any(v is not None for v in r)]
+    assert len(rows) == len(assets), (path, len(rows), len(assets))
+    for r, a in zip(rows, assets):  # same order as the build writes them
+        assert r[hdr.index(name_col)] == a["description"] and abs(r[hdr.index(cost_col)] - a["cost"]) < 0.005, (a["ref"], r)
+    right = [k + 1 for k, h in enumerate(hdr) if any(x in h for x in ("Cost", "Amount", "Value", "NBV", "Lifetime", "Period", "Quantity", "Percentage"))]
+    out = ["| **Ref** | " + " | ".join(f"**{esc(h)}**" for h in hdr) + " |", sep(*widths, right=right)]
+    for r, a in zip(rows, assets):
+        out.append(f"| **{a['ref']}** | " + " | ".join(fmt(v, h) for v, h in zip(r, hdr)) + " |")
+    out.append("| **Total** | " + " | ".join(f"**{money(sum(r[k] or 0 for r in rows))}**" if h in totals else "" for k, h in enumerate(hdr)) + " |")
+    return out
+
+ml = [MIDLIFE_INTRO, f"{len(assets)} assets, in the order of the load file.", ""]
+ml += load_table("data/MINIO_FAM_CSVTemplate_Mid-life Asset Record - DRAFT 20261117.xlsx", "FAM_Mid-life Asset ", "Name", "Asset Original Cost",
+                 (6, 20, 16, 4, 7, 9, 9, 5, 9, 9, 4, 4, 8, 8, 5, 8, 9),
+                 ("Asset Original Cost", "Asset Current Cost", "Current Net Book Value"))
+open("soa-loads/sections/03-MID-LIFE-ASSET-RECORD.md", "w").write("\n".join(ml) + "\n")
+
+dh = [DHR_INTRO, f"{len(assets)} assets, in the order of the load file.", ""]
+dh += load_table("data/MINIO_ FAM_DHR - DRAFT 20261117.xlsx", "DHR Import Template", "Asset Name", "Original Cost",
+                 (6, 5, 22, 7, 4, 9, 9, 8, 9, 9, 5, 4, 5, 8, 9),
+                 ("Transaction Amount", "Net Book Value (NBV)", "Original Cost"))
+open("soa-loads/sections/04-DHR.md", "w").write("\n".join(dh) + "\n")
 print(f"{len(assets)} assets; cost {sum(a['cost'] for a in assets):,.2f}, accumulated {sum(a['accum'] for a in assets):,.2f}, NBV {sum(a['nbv'] for a in assets):,.2f}")

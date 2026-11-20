@@ -120,6 +120,20 @@ for path, tpl in ((MIDLIFE, "MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx"),
         if name in ("FAM_Mid-life Asset ", "DHR Import Template"):
             if [c.value for c in a[name][1]] != [c.value for c in b[name][1]]: bad(f"{path} {name} header changed")
             continue
+        if name == "FAM_Asset Type":
+            # Only Write Off and Disposal Cost may change, on the depreciating types, and only from blank to 72400.
+            hd = {str(c.value).strip(): c.column for c in b[name][1] if c.value}
+            for r in range(1, b[name].max_row + 1):
+                for k in range(1, b[name].max_column + 1):
+                    va, vb = a[name].cell(r, k).value, b[name].cell(r, k).value
+                    if va == vb: continue
+                    ok = k in (hd["WRITE OFF ACCOUNT"], hd["DISPOSAL COST ACCOUNT"]) and r >= 3 and vb is None and str(va).startswith("72400 ")
+                    if not ok: bad(f"{path} FAM_Asset Type {a[name].cell(r, k).coordinate} changed: {vb!r} to {va!r}")
+            for r in range(3, a[name].max_row + 1):
+                if a[name].cell(r, hd["DEPRECIATION ACCOUNT"]).value not in (None, "N/A"):
+                    for col in ("WRITE OFF ACCOUNT", "DISPOSAL COST ACCOUNT"):
+                        if not str(a[name].cell(r, hd[col]).value or "").startswith("72400 "): bad(f"{path} FAM_Asset Type row {r} {col} not filled")
+            continue
         if [[c.value for c in r] for r in a[name].iter_rows()] != [[c.value for c in r] for r in b[name].iter_rows()]: bad(f"{path} tab {name} changed")
 
 print(f"register {len(src)} rows; review {len(review)}; mid-life {len(ml)}; DHR {len(dh)}; as of {as_of}")

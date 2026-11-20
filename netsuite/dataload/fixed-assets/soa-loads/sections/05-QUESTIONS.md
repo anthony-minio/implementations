@@ -10,9 +10,10 @@
 6. **Depreciation rule.** SOA's asset types use Disposal, so depreciation starts the month after an asset goes into service. MinIO's register depreciates from the month it goes into service (Acquisition). This decides when depreciation starts on assets bought after go-live.
 7. **Default lifetimes.** SOA's asset types default to 36 months. MinIO uses 60 months for furniture and leasehold improvements (36 for trade booths). Each loaded asset carries its own lifetime, so this only affects new assets.
 8. **Department, Class, Location, Asset Serial Number.** SOA's Sample Asset Records have them; the mid-life template does not. The register has a department on every asset (such as D-E420) and serial numbers for FA-069 and FA-075 only. Should we load them?
-9. **Disposal accounts.** Gain or loss on disposal: 72400 (Gain) / Loss on Sale of Asset, which replaces Sage 79200 (Ming Fu, 2026-11-14). The write-off, write-down (Revaluation) and disposal cost (Sale or Donate) accounts are blank on the FAM_Asset Type tab.
+9. **Disposal accounts.** Write Off Account is 72400 (Gain) / Loss on Sale of Asset (Ming Fu, 2026-11-13; Sage 79200). Disposal Cost Account is filled with the same account, to confirm with Ming. Write Down Account (Revaluation) is blank: the COA has no write-down or impairment account. Which account?
 10. **Fully depreciated assets.** Those still in use will go through the same templates with Asset Status Fully Depreciated, net book value 0 and the last depreciation as of the month they finished. The template's Notes tab also lists Depreciation Active (FALSE for these), but the import tab has no such column. Is anything else needed?
 11. **Cutover date.** Which month-end should the load be as of? We rebuild from the register for that month.
+12. **Sample Asset Records.** This tab of the DHR file has 29 fields, more than the mid-life import, including Depreciation Active, Depreciation Rules, Depreciation Method and Target Depreciation Date. Is it a load, or an example of the records the mid-life import creates? It is not filled.
 
 ## Being confirmed with MinIO accounting
 

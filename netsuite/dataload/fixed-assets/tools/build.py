@@ -22,6 +22,10 @@ OUT_DHR = f"data/MINIO_ FAM_DHR - DRAFT {DATE}.xlsx"
 ASANA = "https://app.asana.com/1/163565154279805/project/1219443754801875/task/1220361265682450"  # FS-140
 
 SUBSIDIARY = "MinIO, Inc."  # E100; name as in ../README.md reference values
+# FAM_Asset Type tab: SOA left Write Off, Write Down and Disposal Cost blank. Ming, 2026-11-13 (Slack, asked for write-off and gain/loss on disposal):
+# 79200 (Gain) / Loss on Sale of Asset, 72400 in NetSuite. Write Off: confirmed. Disposal Cost: same account, proposed. Write Down: no account in the COA yet.
+GAIN_LOSS = "72400 - (Gain) / Loss on Sale of Asset"
+ASSET_TYPE_ACCOUNTS = {"WRITE OFF ACCOUNT": GAIN_LOSS, "DISPOSAL COST ACCOUNT": GAIN_LOSS}
 # MinIO category (column A) -> SOA asset type (tab FAM_Asset Type of the mid-life template)
 ASSET_TYPE = {"Computer Hardware": "Equipment", "Furniture": "Furniture & Fixtures",
               "Lease Improvement": "Leasehold Improvements", "Software": "TBC"}
@@ -240,6 +244,12 @@ for i, a in enumerate(loads, 2):
     for k, v in enumerate(midlife(a), 1):
         c = t.cell(row=i, column=k, value=v)
         if isinstance(v, dt.date): c.number_format = "mm/dd/yyyy"
+t = m["FAM_Asset Type"]
+cols = {str(c.value).strip(): c.column for c in t[1] if c.value}
+for r in range(3, t.max_row + 1):
+    if t.cell(r, 1).value and t.cell(r, cols["ASSET ACCOUNT"]).value and t.cell(r, cols["DEPRECIATION ACCOUNT"]).value != "N/A":
+        for col, acct in ASSET_TYPE_ACCOUNTS.items():
+            t.cell(r, cols[col], value=acct)
 m.save(OUT_MIDLIFE)
 
 shutil.copy(DHR_TPL, OUT_DHR)
@@ -308,8 +318,9 @@ QUESTIONS = [
     ("SOA", "Depreciation rule", "SOA's asset types use Disposal (first depreciation the month after the asset is in service). MinIO's register depreciates from the month the asset is put in service, which is the Acquisition rule. This decides when depreciation starts on assets bought after go-live."),
     ("SOA", "Default lifetimes", "SOA's asset types default to 36 months. MinIO uses 60 for furniture and leasehold improvements (36 for trade booths). The load gives each asset its own lifetime, so this only affects new assets."),
     ("SOA", "Shortened leasehold improvements", "FA-076 and FA-082 were sped up to finish at the end of the lease (2028-06). Straight Line, (CC-RV)/AL, would give 22,270/44 = 506.14 and 10,253/42 = 244.12 a month instead of 519.63 and 247.78. Use Straight Line Remaining, (NB-RV)/(AL-CP+1), for these two? The mid-life template has no method column."),
+    ("SOA", "Sample Asset Records", "The DHR file's Sample Asset Records tab has 29 fields, more than the mid-life import (Depreciation Active, Depreciation Rules, Depreciation Method, Department, Class, Location, Asset Serial Number). Is it a load, or an example of the records the mid-life import creates? Not filled."),
     ("SOA", "Department, Class, Location", "SOA's Sample Asset Records have Department, Class and Location; the mid-life template does not. The register has a department (D-E420 and so on). Load it?"),
-    ("SOA / Ming", "Disposal accounts", "Gain or loss on disposal: Ming, 2026-11-14: Sage 79200 (Gain) / Loss on Sale of Asset is 72400 in NetSuite. Write-off, write-down (Revaluation) and disposal cost (Sale or Donate) accounts are still blank on SOA's asset type tab."),
+    ("SOA / Ming", "Disposal accounts", "FAM_Asset Type: Write Off is 72400 (Gain) / Loss on Sale of Asset: Ming, 2026-11-13, answering which accounts to use for write-off and gain/loss on disposal (Sage 79200). Disposal Cost filled with the same account: proposed, Ming to confirm. Write Down (Revaluation): no write-down or impairment account in the COA; which account?"),
     ("SOA", "Software asset type", "FA-036 accounting software (15100) has no matching type; SOA's list has Internally Developed Software only. Only matters if the review says it is still in use."),
     ("Richard / Ming", "FA-098 to FA-101", "GL date 2022-10, depreciation started 2026-10 (FA-101 none), description is a Sage vendor string with no vendor, comment or Dep Date. What are they? FA-098 has the same cost and vendor as FA-094 (AMAX, 63,995.00): duplicate? FA-101 (Apple, 12,100.76) is held until its start date is known."),
     ("Richard / Ming", "FA-096, FA-097 Dep Date", "Dep Date 2027-10-01 but depreciation started 2026-10. Loaded from 2026-10."),
