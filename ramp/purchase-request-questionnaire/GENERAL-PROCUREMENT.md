@@ -48,12 +48,12 @@ In the order shown. Ramp field type is the tag on the question. Required: `Locke
 | 6 | NEGOTIATIONS – If yes, provide justification and describe what was discussed or negotiated w... | Paragraph | Provide a brief summary of any prior negotiations you personally conducted with this vendor. Include the negotiated pricing, terms, discounts, or special considerations, and indicate whether Procurement participated or assisted. | Always required | Shown if #5 is "Yes — I have already discussed or negotiated with the vendor (please provide details in the justification field)" |
 | 7 | BUSINESS PURPOSE – Describe the business purpose | Paragraph | Briefly describe the business purpose (e.g., customer engagement, pipeline advancement, brand awareness). One–two sentences is sufficient. | Always required | None shown |
 | 8 | REQUEST TYPE – What best describes this request? | Multi select | None | Always required | Drives #9 |
-| 9 | REQUEST TYPE – If other, please explain | Paragraph | None | Always required | Shown with 1 condition. Rule not opened; presumably #8 is "Other" |
-| 10 | BUSINESS IMPACT – What is the primary expected o... | Multi select (blurred) | Not captured | Not captured | Branch icon (blurred) |
-| 11 | BUSINESS IMPACT – What is the expected business imp... | Paragraph (blurred) | Not captured | Not captured | Shown with 1 condition (blurred) |
-| 12 | BUSINESS IMPACT – What positive impact is expected f... | Paragraph (blurred) | Not captured | Not captured | Not captured |
+| 9 | REQUEST TYPE – If other, please explain | Paragraph | None | Always required | Shown if #8 is "Other" |
+| 10 | BUSINESS IMPACT – What is the primary expected outcome? | Multi select | None | Always required | Branch icon shown; drives a later question, not confirmed which (likely #12) |
+| 11 | BUSINESS IMPACT – What is the expected business impact of this request? | Paragraph | (Examples: efficiency gains, cost savings or avoidance, risk reduction, revenue enablement, compliance, or scalability.) | Always required | Shown if #8 is "Other" (condition screenshot sent after #11; confirm it is #11's and not a second capture of #9's) |
+| 12 | BUSINESS IMPACT – What pipeline impact is expected (net-new, expansion, or renewal)? | Paragraph | (Include current active pipeline with this partner, expected incremental pipeline $, and expected number of deal registrations or influenced deals. | Always required | Shown with 1 condition. Rule not opened |
 
-Questions 10 to 12 are read from the blurred background of the condition panel screenshot; titles and types are best guesses. That screenshot also confirms nothing sits between #4 and #5.
+The blurred background of the #6 condition panel confirms nothing sits between #4 and #5. The #12 description has an opening bracket with no closing one, as in Ramp.
 
 ### Options
 
@@ -71,11 +71,20 @@ Questions 10 to 12 are read from the blurred background of the condition panel s
 5. Training / enablement
 6. Other
 
+#10 BUSINESS IMPACT - primary expected outcome:
+
+1. Relationship building / customer engagement
+2. Pipeline progression / sales follow-up
+3. Lead generation
+4. Brand awareness
+5. Internal alignment
+6. Not applicable (routine activity)
+
 ## Not yet captured
 
-- #10 to #12 in full: titles, descriptions, options, conditions.
+- What #10 drives, and the #12 condition.
+- Confirm the #11 condition.
 - Anything after #12.
 - Full text of #5 option 2.
-- The #9 condition (assumed #8 is "Other").
 - Options for #2 Frequency.
 - Page 2 of the program editor (the dots at the top show 2 pages; likely approvals).

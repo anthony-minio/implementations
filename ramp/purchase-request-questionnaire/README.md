@@ -65,3 +65,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-20 | Professional Services Purchase Request added to group A |
 | 2026-11-20 | General Procurement Request: description, form settings and questions 1 to 5 captured |
 | 2026-11-20 | General Procurement Request: questions 6 to 9 and the #6 condition captured, 10 to 12 seen blurred |
+| 2026-11-20 | General Procurement Request: questions 10 to 12, #9 and #11 conditions captured |
