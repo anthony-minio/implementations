@@ -60,8 +60,11 @@ In the order shown. Ramp field type is the tag on the question. Required: `Locke
 | 18 | TIMELINE – Is there a target date or deadline by which this purchase or contract needs to be co... | Date | None | No | None shown |
 | 19 | REQUESTER – Who is the internal business owner/requester? | Text | None | Always required | None shown |
 | 20 | DEPARTMENT – Which department is this request for? | Department | None | Always required | None shown |
-| 21 | PURCHASE METHOD – How will this purchase be made? | Multi select | None | Always required | Branch icon shown, plus a second icon not yet identified. Drives #22 at least |
-| 22 | CONTRACTS / DOCUMENTATION – Please upload all contracts and documents | File upload | None | Always required | Shown with 1 condition. Rule not opened; presumably on #21 |
+| 21 | PURCHASE METHOD – How will this purchase be made? | Multi select | None | Always required | Branch icon shown, plus a second icon not yet identified. Drives #22 and #23 |
+| 22 | CONTRACTS / DOCUMENTATION – Please upload all contracts and documents | File upload | None | Always required | Shown if #21 is "Signed Contract" |
+| 23 | CONTRACTS / DOCUMENTATION – Include relevant links (such as terms or pricing) | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #21 is "Online click-through agreement" |
+| 24 | CONTRACTS / DOCUMENTATION- Include relevant links (such as terms or pricing) Continued | Link | None | No | None shown |
+| 25 | PAYMENT TERMS – What are the net payment terms? | Net payment terms | Number of days | No | None shown |
 
 The blurred background of the #6 condition panel confirms nothing sits between #4 and #5. The #12 description has an opening bracket with no closing one, and the #13 title has no space after the first dash, both as in Ramp. A condition listing several answers is read as "any of these". The #12 and #14 condition screenshots are identical; they are matched to questions by the order they were sent.
 
@@ -100,8 +103,8 @@ The blurred background of the #6 condition panel confirms nothing sits between #
 
 - Confirm the #11 condition.
 - Full titles of #13, #14, #15 and #18, and #21 option 3 (cut off).
-- #22 condition, what else #21 drives, and the second icon on #21.
-- Confirm #18 to #22 belong to this program (sent without the program header) and whether anything follows #22.
+- The second icon on #21.
+- Confirm #18 to #22 belong to this program (sent without the program header) and whether anything follows #25.
 - Full text of #5 option 2.
 - Options for #2 Frequency.
 - Page 2 of the program editor (the dots at the top show 2 pages; likely approvals).
