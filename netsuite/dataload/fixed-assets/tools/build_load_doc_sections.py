@@ -58,23 +58,20 @@ Template `MINIO_ FAM_DHR.xlsx`, tab **DHR Import Template**, filled as SOA's **F
 | **Original Cost** | Register cost |
 """
 
-# Asset types: SOA's FAM_Asset Type tab as filled in the draft, one column per type.
+# Asset types: SOA's FAM_Asset Type tab as filled in the draft, laid out as the load: the header and one row per type.
+# Row 2 of the tab is SOA's guidance (Months, True/ False, ...), not an asset type, so it is left out.
 at = openpyxl.load_workbook("data/MINIO_FAM_CSVTemplate_Mid-life Asset Record - DRAFT 20261117.xlsx")["FAM_Asset Type"]
-fields = [" ".join(str(c.value).split()).title().replace("-Default", "") for c in at[1]]
+hdr = [" ".join(str(c.value).split()) for c in at[1]]
 types = [r for r in at.iter_rows(min_row=3, values_only=True) if r[0]]
-cell = lambda v: "TBC" if v in (None, "") else esc(str(v)).replace("TRUE", "True") if not isinstance(v, bool) else str(v).upper()
+assert len(types) == 5, types
+cell = lambda v: "" if v in (None, "") else str(v).upper() if isinstance(v, bool) else esc(str(v))
 AT = ["# Asset types", "",
-      "Tab **FAM_Asset Type** of the mid-life template. SOA filled everything except Description and the last three accounts. "
-      "**Write Off Account** is 72400 (Gain) / Loss on Sale of Asset. Asked which accounts to use for write-off and gain/loss on disposal, "
-      "Ming Fu answered Sage 79200 on 2026-11-13; 79200 is 72400 in NetSuite. "
-      "**Disposal Cost Account** has the same account [TBC: Ming to confirm 72400 for disposal costs]. "
-      "The COA has no write-down or impairment account [TBC: which account for Write Down Account (Revaluation)]. Description is left blank.", "",
-      "| **Field** | " + " | ".join(f"**{esc(t[0])}**" for t in types) + " |",
-      sep(18, *[16] * len(types))]
-for k, f in enumerate(fields[1:], 1):
-    if f == "Description": continue
-    AT.append(f"| **{f}** | " + " | ".join(cell(t[k]) for t in types) + " |")
-AT += ["", "Lifetime and depreciation rules: questions 6 and 7. SOA's tab names 69100 Depreciation Expense; the COA names it 69100 Depreciation.", ""]
+      "Tab **FAM_Asset Type** of the mid-life template, filled as it will load. Write Off and Disposal Cost Account: question 9.", "",
+      "| " + " | ".join(f"**{esc(h)}**" for h in hdr) + " |",
+      sep(14, 8, 6, 6, 9, 7, 9, 9, 8, 13, 15, 11, 12, 7, 12, right=(2, 3))]
+for t in types:
+    AT.append("| **" + cell(t[0]) + "** | " + " | ".join(cell(v) for v in t[1:]) + " |")
+AT.append("")
 open("soa-loads/sections/02-ASSET-TYPES.md", "w").write("\n".join(AT))
 
 # Load tables: every column of SOA's import tab, read from the filled draft workbooks, in file order.

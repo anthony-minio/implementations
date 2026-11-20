@@ -138,143 +138,133 @@ NetSuite’s asset reports show it.</li>
 </section>
 <section id="asset-types" class="level1">
 <h1>Asset types</h1>
-<p>Tab <strong>FAM_Asset Type</strong> of the mid-life template. SOA
-filled everything except Description and the last three accounts.
-<strong>Write Off Account</strong> is 72400 (Gain) / Loss on Sale of
-Asset. Asked which accounts to use for write-off and gain/loss on
-disposal, Ming Fu answered Sage 79200 on 2026-11-13; 79200 is 72400 in
-NetSuite. <strong>Disposal Cost Account</strong> has the same account
-[TBC: Ming to confirm 72400 for disposal costs]. The COA has no
-write-down or impairment account [TBC: which account for Write Down
-Account (Revaluation)]. Description is left blank.</p>
+<p>Tab <strong>FAM_Asset Type</strong> of the mid-life template, filled
+as it will load. Write Off and Disposal Cost Account: question 9.</p>
 <table style="width:100%;">
 <colgroup>
-<col style="width: 18%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
-<col style="width: 16%" />
+<col style="width: 9%" />
+<col style="width: 5%" />
+<col style="width: 4%" />
+<col style="width: 4%" />
+<col style="width: 6%" />
+<col style="width: 4%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 5%" />
+<col style="width: 8%" />
+<col style="width: 10%" />
+<col style="width: 7%" />
+<col style="width: 8%" />
+<col style="width: 4%" />
+<col style="width: 8%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th><strong>Field</strong></th>
-<th><strong>Equipment</strong></th>
-<th><strong>Furniture &amp; Fixtures</strong></th>
-<th><strong>Leasehold Improvements</strong></th>
-<th><strong>Internally Developed Software</strong></th>
-<th><strong>Software in Development in Progress</strong></th>
+<th><strong>NAME</strong></th>
+<th><strong>DESCRIPTION</strong></th>
+<th style="text-align: right;"><strong>RESIDUAL PERCENTAGE</strong></th>
+<th style="text-align: right;"><strong>ASSET LIFETIME</strong></th>
+<th><strong>ACCOUNTING METHOD</strong></th>
+<th><strong>DEPRECIATION ACTIVE</strong></th>
+<th><strong>REVISION RULES</strong></th>
+<th><strong>DEPRECIATION RULES</strong></th>
+<th><strong>DEPRECIATION PERIOD-default</strong></th>
+<th><strong>ASSET ACCOUNT</strong></th>
+<th><strong>DEPRECIATION ACCOUNT</strong></th>
+<th><strong>DEPRECIATION CHARGE ACCOUNT</strong></th>
+<th><strong>WRITE OFF ACCOUNT</strong></th>
+<th><strong>WRITE DOWN ACCOUNT</strong></th>
+<th><strong>DISPOSAL COST ACCOUNT</strong></th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Residual Percentage</strong></td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>N/A</td>
-</tr>
-<tr class="even">
-<td><strong>Asset Lifetime</strong></td>
-<td>36</td>
-<td>36</td>
-<td>36</td>
-<td>36</td>
-<td>N/A</td>
-</tr>
-<tr class="odd">
-<td><strong>Accounting Method</strong></td>
+<td><strong>Equipment</strong></td>
+<td></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">36</td>
 <td>Straightline</td>
-<td>Straightline</td>
-<td>Straightline</td>
-<td>Straightline</td>
-<td>N/A</td>
-</tr>
-<tr class="even">
-<td><strong>Depreciation Active</strong></td>
 <td>TRUE</td>
-<td>TRUE</td>
-<td>TRUE</td>
-<td>TRUE</td>
-<td>FALSE</td>
-</tr>
-<tr class="odd">
-<td><strong>Revision Rules</strong></td>
 <td>Remaining Life</td>
-<td>Remaining Life</td>
-<td>Remaining Life</td>
-<td>Remaining Life</td>
-<td>N/A</td>
-</tr>
-<tr class="even">
-<td><strong>Depreciation Rules</strong></td>
 <td>Disposal</td>
-<td>Disposal</td>
-<td>Disposal</td>
-<td>Disposal</td>
-<td>N/A</td>
-</tr>
-<tr class="odd">
-<td><strong>Depreciation Period</strong></td>
 <td>Monthly</td>
-<td>Monthly</td>
-<td>Monthly</td>
-<td>Monthly</td>
-<td>N/A</td>
-</tr>
-<tr class="even">
-<td><strong>Asset Account</strong></td>
 <td>15110-Equipment</td>
-<td>15120-Furniture &amp; Fixtures</td>
-<td>15130-Leasehold Improvements</td>
-<td>15140-Internally Developed Software</td>
-<td>15145-Software in Development in Progress</td>
-</tr>
-<tr class="odd">
-<td><strong>Depreciation Account</strong></td>
 <td>15510 -Accum. Depreciation - Equipment</td>
+<td>69100 - Depreciation Expense</td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
+<td></td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
+</tr>
+<tr class="even">
+<td><strong>Furniture &amp; Fixtures</strong></td>
+<td></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">36</td>
+<td>Straightline</td>
+<td>TRUE</td>
+<td>Remaining Life</td>
+<td>Disposal</td>
+<td>Monthly</td>
+<td>15120-Furniture &amp; Fixtures</td>
 <td>15520 - Accum. Depreciation - Furniture &amp; Fixtures</td>
+<td>69100 - Depreciation Expense</td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
+<td></td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
+</tr>
+<tr class="odd">
+<td><strong>Leasehold Improvements</strong></td>
+<td></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">36</td>
+<td>Straightline</td>
+<td>TRUE</td>
+<td>Remaining Life</td>
+<td>Disposal</td>
+<td>Monthly</td>
+<td>15130-Leasehold Improvements</td>
 <td>15530 - Accum. Depreciation - Leasehold Improvements</td>
+<td>69100 - Depreciation Expense</td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
+<td></td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
+</tr>
+<tr class="even">
+<td><strong>Internally Developed Software</strong></td>
+<td></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">36</td>
+<td>Straightline</td>
+<td>TRUE</td>
+<td>Remaining Life</td>
+<td>Disposal</td>
+<td>Monthly</td>
+<td>15140-Internally Developed Software</td>
 <td>15540 - Accum. Amortization - Internally Dev. Software</td>
-<td>N/A</td>
-</tr>
-<tr class="even">
-<td><strong>Depreciation Charge Account</strong></td>
 <td>69100 - Depreciation Expense</td>
-<td>69100 - Depreciation Expense</td>
-<td>69100 - Depreciation Expense</td>
-<td>69100 - Depreciation Expense</td>
-<td>N/A</td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
+<td></td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
 </tr>
 <tr class="odd">
-<td><strong>Write Off Account</strong></td>
-<td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td>72400 - (Gain) / Loss on Sale of Asset</td>
+<td><strong>Software in Development in Progress</strong></td>
+<td></td>
+<td style="text-align: right;">N/A</td>
+<td style="text-align: right;">N/A</td>
 <td>N/A</td>
-</tr>
-<tr class="even">
-<td><strong>Write Down Account</strong></td>
-<td>TBC</td>
-<td>TBC</td>
-<td>TBC</td>
-<td>TBC</td>
+<td>FALSE</td>
 <td>N/A</td>
-</tr>
-<tr class="odd">
-<td><strong>Disposal Cost Account</strong></td>
-<td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td>72400 - (Gain) / Loss on Sale of Asset</td>
+<td>N/A</td>
+<td>N/A</td>
+<td>15145-Software in Development in Progress</td>
+<td>N/A</td>
+<td>N/A</td>
+<td>N/A</td>
+<td>N/A</td>
 <td>N/A</td>
 </tr>
 </tbody>
 </table>
-<p>Lifetime and depreciation rules: questions 6 and 7. SOA’s tab names
-69100 Depreciation Expense; the COA names it 69100 Depreciation.</p>
 </section>
 <section id="mid-life-asset-record" class="level1">
 <h1>Mid-life Asset Record</h1>
