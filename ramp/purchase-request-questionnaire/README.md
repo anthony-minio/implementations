@@ -48,11 +48,12 @@ Order of work:
 | File | Purpose |
 |---|---|
 | `PROGRAMS.md` | Current Ramp procurement programs: the paths being combined |
+| `GENERAL-PROCUREMENT.md` | General Procurement Request as it is set up in Ramp today |
 | `screenshots/` | Source screenshots from Ramp, named `YYYYMMDD-<what>` |
 
 ## Status
 
-Step 1 in progress. Program list captured 2026-11-20. Questions for each program not yet captured.
+Step 1 in progress. Program list captured 2026-11-20. General Procurement Request partly captured 2026-11-20.
 
 ## Log
 
@@ -62,3 +63,4 @@ Step 1 in progress. Program list captured 2026-11-20. Questions for each program
 | 2026-11-20 | Program list captured from Ramp (Procurement > Programs, All tab) |
 | 2026-11-20 | Plan agreed: group A and group B, questions and descriptions before approval workflows |
 | 2026-11-20 | Professional Services Purchase Request added to group A |
+| 2026-11-20 | General Procurement Request: description, form settings and questions 1 to 5 captured |
