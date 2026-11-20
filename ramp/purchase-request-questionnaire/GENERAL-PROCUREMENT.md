@@ -57,6 +57,11 @@ In the order shown. Ramp field type is the tag on the question. Required: `Locke
 | 15 | GTM ALIGNMENT – How does this request support current GTM priorities or revenue objective... | Paragraph | None | Always required | Shown if #8 is "Customer-facing sales meeting / dinner", "Marketing event / sponsorship", "Conference / trade show", "Internal meeting / team event" or "Training / enablement" (every option except "Other") |
 | 16 | VENDOR RELATIONSHIP – What is the current status of our relationship with this vendor? | Paragraph | None | No | Shown if #8 is "Customer-facing sales meeting / dinner", "Marketing event / sponsorship", "Conference / trade show", "Internal meeting / team event" or "Training / enablement" (every option except "Other") |
 | 17 | SERVICES / GOODS – Please describe the nature of the goods or services being requested | Paragraph | None | Always required | None shown |
+| 18 | TIMELINE – Is there a target date or deadline by which this purchase or contract needs to be co... | Date | None | No | None shown |
+| 19 | REQUESTER – Who is the internal business owner/requester? | Text | None | Always required | None shown |
+| 20 | DEPARTMENT – Which department is this request for? | Department | None | Always required | None shown |
+| 21 | PURCHASE METHOD – How will this purchase be made? | Multi select | None | Always required | Branch icon shown, plus a second icon not yet identified. Drives #22 at least |
+| 22 | CONTRACTS / DOCUMENTATION – Please upload all contracts and documents | File upload | None | Always required | Shown with 1 condition. Rule not opened; presumably on #21 |
 
 The blurred background of the #6 condition panel confirms nothing sits between #4 and #5. The #12 description has an opening bracket with no closing one, and the #13 title has no space after the first dash, both as in Ramp. A condition listing several answers is read as "any of these". The #12 and #14 condition screenshots are identical; they are matched to questions by the order they were sent.
 
@@ -85,11 +90,18 @@ The blurred background of the #6 condition panel confirms nothing sits between #
 5. Internal alignment
 6. Not applicable (routine activity)
 
+#21 PURCHASE METHOD (option 3 cut off):
+
+1. Online click-through agreement
+2. Signed Contract
+3. No contract required (PO / invoice-based purchase; no vendor terms, no data acce...
+
 ## Not yet captured
 
 - Confirm the #11 condition.
-- Full titles of #13, #14 and #15 (cut off).
-- Confirm #17 is the last question.
+- Full titles of #13, #14, #15 and #18, and #21 option 3 (cut off).
+- #22 condition, what else #21 drives, and the second icon on #21.
+- Confirm #18 to #22 belong to this program (sent without the program header) and whether anything follows #22.
 - Full text of #5 option 2.
 - Options for #2 Frequency.
 - Page 2 of the program editor (the dots at the top show 2 pages; likely approvals).
