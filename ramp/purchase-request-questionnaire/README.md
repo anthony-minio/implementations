@@ -43,6 +43,11 @@ Order of work:
 1. Questions and program descriptions, for all programs in both groups. Starting with General Procurement Request.
 2. Approval workflows, after the questions are settled.
 
+The final draft proposal also covers, for each program:
+
+- Change order form questions (Ramp has a separate change order form per program)
+- AI instructions (Ramp's "Guide how AI prefills requests from uploaded documents", up to 2,000 characters)
+
 ## Files
 
 | File | Purpose |
@@ -71,3 +76,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-20 | General Procurement Request: questions 18 to 22 captured |
 | 2026-11-20 | General Procurement Request: questions 23 to 25, #22 and #23 conditions captured |
 | 2026-11-20 | General Procurement Request: questions 26 to 28 and their conditions captured |
+| 2026-11-20 | General Procurement Request: change order form and AI instructions captured, both empty. Both added to the final draft scope |

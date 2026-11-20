@@ -102,12 +102,20 @@ The blurred background of the #6 condition panel confirms nothing sits between #
 2. Signed Contract
 3. No contract required (PO / invoice-based purchase; no vendor terms, no data acce...
 
+## Change order form
+
+Section "What's on the change order form?". No questions set up (empty state: "Add questions - Upload a list of existing questions or add new ones here").
+
+## AI instructions
+
+Section "AI instructions - Guide how AI prefills requests from uploaded documents". Ramp's help text: "Guide how AI prefills requests from uploaded documents and helps requesters complete this program's form, including what to look up". Empty (0/2000 characters). Note under the box: "Requesters can review and edit prefilled values".
+
 ## Not yet captured
 
 - Confirm the #11 condition.
 - Full titles of #13, #14, #15 and #18, and #21 option 3 (cut off).
 - The second icon on #21.
-- Confirm #18 to #22 belong to this program (sent without the program header) and whether anything follows #28.
+- Confirm #18 to #22 belong to this program (sent without the program header). #28 is taken as the last question; the change order section was sent next.
 - Full text of #5 option 2.
 - Options for #2 Frequency.
 - Page 2 of the program editor (the dots at the top show 2 pages; likely approvals).
