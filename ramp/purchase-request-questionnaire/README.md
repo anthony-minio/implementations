@@ -67,3 +67,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-20 | General Procurement Request: questions 6 to 9 and the #6 condition captured, 10 to 12 seen blurred |
 | 2026-11-20 | General Procurement Request: questions 10 to 12, #9 and #11 conditions captured |
 | 2026-11-20 | General Procurement Request: questions 13 and 14, conditions on #12 to #14 captured |
+| 2026-11-20 | General Procurement Request: questions 15 to 17 captured |

@@ -54,6 +54,9 @@ In the order shown. Ramp field type is the tag on the question. Required: `Locke
 | 12 | BUSINESS IMPACT – What pipeline impact is expected (net-new, expansion, or renewal)? | Paragraph | (Include current active pipeline with this partner, expected incremental pipeline $, and expected number of deal registrations or influenced deals. | Always required | Shown if #8 is "Customer-facing sales meeting / dinner", "Marketing event / sponsorship", "Conference / trade show", "Internal meeting / team event" or "Training / enablement" (every option except "Other") |
 | 13 | BUSINESS IMPACT –EXPECTED ROI / PIPELINE IMPACT – What is the anticipated financial retu... | Paragraph | For revenue-generating activities, include projected pipeline value, expected opportunities, conversion assumptions, and historical or comparable performance. If financial ROI cannot be quantified, describe the expected measurable business value and how success will be evaluated. | No | Shown if #8 is "Customer-facing sales meeting / dinner", "Marketing event / sponsorship" or "Conference / trade show", or #10 is "Relationship building / customer engagement", "Pipeline progression / sales follow-up", "Lead generation" or "Brand awareness" |
 | 14 | CUSTOMERS / TARGET ACCOUNTS – Which priority customers or target accounts are expect... | Paragraph | None | Always required | Shown if #8 is "Customer-facing sales meeting / dinner", "Marketing event / sponsorship", "Conference / trade show", "Internal meeting / team event" or "Training / enablement" (every option except "Other") |
+| 15 | GTM ALIGNMENT – How does this request support current GTM priorities or revenue objective... | Paragraph | None | Always required | Shown if #8 is "Customer-facing sales meeting / dinner", "Marketing event / sponsorship", "Conference / trade show", "Internal meeting / team event" or "Training / enablement" (every option except "Other") |
+| 16 | VENDOR RELATIONSHIP – What is the current status of our relationship with this vendor? | Paragraph | None | No | Shown if #8 is "Customer-facing sales meeting / dinner", "Marketing event / sponsorship", "Conference / trade show", "Internal meeting / team event" or "Training / enablement" (every option except "Other") |
+| 17 | SERVICES / GOODS – Please describe the nature of the goods or services being requested | Paragraph | None | Always required | None shown |
 
 The blurred background of the #6 condition panel confirms nothing sits between #4 and #5. The #12 description has an opening bracket with no closing one, and the #13 title has no space after the first dash, both as in Ramp. A condition listing several answers is read as "any of these". The #12 and #14 condition screenshots are identical; they are matched to questions by the order they were sent.
 
@@ -85,8 +88,8 @@ The blurred background of the #6 condition panel confirms nothing sits between #
 ## Not yet captured
 
 - Confirm the #11 condition.
-- Full titles of #13 and #14 (cut off).
-- Anything after #14.
+- Full titles of #13, #14 and #15 (cut off).
+- Confirm #17 is the last question.
 - Full text of #5 option 2.
 - Options for #2 Frequency.
 - Page 2 of the program editor (the dots at the top show 2 pages; likely approvals).
