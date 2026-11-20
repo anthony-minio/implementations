@@ -28,7 +28,7 @@ Template `MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx`, tab **FAM_Mid-life 
 | **Subsidiary** | MinIO, Inc. |
 | **Asset Type** | Computer Hardware to Equipment, Lease Improvement to Leasehold Improvements |
 | **Asset Status** | Depreciating |
-| **Asset Lifetime** | Register useful life in months. FA-076 and FA-082: months done plus months left (question 5) |
+| **Asset Lifetime** | Register useful life in months. FA-076 and FA-082, shortened to the lease term: months done plus months left |
 | **Asset Original Cost, Asset Current Cost** | Register cost. No write-downs |
 | **Residual Value Percentage, Residual Value** | 0 |
 | **Depreciation Start Date** | Register Dep Date when it falls in the first month depreciated, else the 1st of that month |
@@ -36,6 +36,9 @@ Template `MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx`, tab **FAM_Mid-life 
 | **Last Depreciation Period** | Months depreciated, first month to 2026-10 |
 | **Last Depreciation Amount** | 2026-10 depreciation |
 | **Current Net Book Value** | Register NBV at 2026-10-31 |
+| **Cumulative Depreciation** | Added. Register accumulated depreciation at 2026-10-31 |
+| **Accounting Method** | Added. Straight Line, (CC-RV)/AL. FA-076 and FA-082: Straight Line Remaining, (NB-RV)/(AL-CP+1), which spreads the remaining value over the months to the end of the lease. Names as on SOA's Dep Method tab |
+| **Department** | Added. Register department mapped through Departments Draft v1 to the NetSuite department, parent : child. Blank for FA-070, FA-071 and FA-089: D110 is not on the tab |
 
 Ref is the row on the register's ALL FA tab (FA-069 is row 69). It is not in the load.
 """
@@ -46,14 +49,14 @@ Template `MINIO_ FAM_DHR.xlsx`, tab **DHR Import Template**, filled as SOA's **F
 
 | **Template column** | **Value** |
 |----------------------|-------------------------------------------------------------|
-| **DHR Name** | Blank, as in the example (question 4) |
-| **Asset Name** | Name from the mid-life load |
+| **DHR Name** | Ref and date, such as FA-069 Depreciation to 2026-10-31 |
+| **Asset Name** | Name from the mid-life load. NetSuite's format is the asset ID plus the name (FAM00001 Chairs), so the ID is added once the assets are imported |
 | **Subsidiary, Quantity, Asset Type, Asset Lifetime** | As in the mid-life load |
 | **Transaction Type** | Depreciation |
 | **Transaction Date** | 2026-10-31 |
 | **Transaction Amount** | Accumulated depreciation at 2026-10-31 |
 | **Net Book Value (NBV)** | Original Cost less Transaction Amount |
-| **Depreciation Period, Period-1** | 1 and 0, as in the example (question 3) |
+| **Depreciation Period, Period-1** | The asset's Last Depreciation Period, and that less 1 |
 | **Purchase Date** | Register Purchase Date |
 | **Original Cost** | Register cost |
 """
@@ -66,7 +69,7 @@ types = [r for r in at.iter_rows(min_row=3, values_only=True) if r[0]]
 assert len(types) == 5, types
 cell = lambda v: "" if v in (None, "") else str(v).upper() if isinstance(v, bool) else esc(str(v))
 AT = ["# Asset types", "",
-      "Tab **FAM_Asset Type** of the mid-life template, filled as it will load. Write Off and Disposal Cost Account: question 9.", "",
+      "Tab **FAM_Asset Type** of the mid-life template, filled as it will load. Changed from SOA's version: Write Off, Write Down and Disposal Cost Account set to 72400 (Ming Fu, 2026-11-13); Depreciation Rules from Disposal to Acquisition, MinIO's practice of depreciating from the month an asset goes into service; Accounting Method from Straightline to Straight Line, the name on SOA's Dep Method tab.", "",
       "| " + " | ".join(f"**{esc(h)}**" for h in hdr) + " |",
       sep(14, 8, 6, 6, 9, 7, 9, 9, 8, 13, 15, 11, 12, 7, 12, right=(2, 3))]
 for t in types:
@@ -80,7 +83,7 @@ import datetime as dt
 def fmt(v, h):
     if v is None or v == "": return ""
     if isinstance(v, dt.datetime): return v.date().isoformat()
-    if isinstance(v, float) or (isinstance(v, int) and ("Cost" in h or "Amount" in h or "Value" in h or "NBV" in h)):
+    if isinstance(v, float) or (isinstance(v, int) and ("Cost" in h or "Amount" in h or "Value" in h or "NBV" in h or "Cumulative" in h)):
         return money(v) if "Percentage" not in h else str(v)
     return esc(str(v))
 def load_table(path, tab, name_col, cost_col, widths, totals):
@@ -90,7 +93,7 @@ def load_table(path, tab, name_col, cost_col, widths, totals):
     assert len(rows) == len(assets), (path, len(rows), len(assets))
     for r, a in zip(rows, assets):  # same order as the build writes them
         assert r[hdr.index(name_col)] == a["description"] and abs(r[hdr.index(cost_col)] - a["cost"]) < 0.005, (a["ref"], r)
-    right = [k + 1 for k, h in enumerate(hdr) if any(x in h for x in ("Cost", "Amount", "Value", "NBV", "Lifetime", "Period", "Quantity", "Percentage"))]
+    right = [k + 1 for k, h in enumerate(hdr) if any(x in h for x in ("Cost", "Amount", "Value", "NBV", "Lifetime", "Period", "Quantity", "Percentage", "Cumulative"))]
     out = ["| **Ref** | " + " | ".join(f"**{esc(h)}**" for h in hdr) + " |", sep(*widths, right=right)]
     for r, a in zip(rows, assets):
         out.append(f"| **{a['ref']}** | " + " | ".join(fmt(v, h) for v, h in zip(r, hdr)) + " |")
@@ -99,8 +102,8 @@ def load_table(path, tab, name_col, cost_col, widths, totals):
 
 ml = [MIDLIFE_INTRO, f"{len(assets)} assets, in the order of the load file.", ""]
 ml += load_table("data/MINIO_FAM_CSVTemplate_Mid-life Asset Record - DRAFT 20261117.xlsx", "FAM_Mid-life Asset ", "Name", "Asset Original Cost",
-                 (6, 20, 16, 4, 7, 9, 9, 5, 9, 9, 4, 4, 8, 8, 5, 8, 9),
-                 ("Asset Original Cost", "Asset Current Cost", "Current Net Book Value"))
+                 (6, 18, 14, 4, 7, 9, 9, 5, 9, 9, 4, 4, 8, 8, 5, 8, 9, 9, 10, 14),
+                 ("Asset Original Cost", "Asset Current Cost", "Current Net Book Value", "Cumulative Depreciation"))
 open("soa-loads/sections/03-MID-LIFE-ASSET-RECORD.md", "w").write("\n".join(ml) + "\n")
 
 dh = [DHR_INTRO, f"{len(assets)} assets, in the order of the load file.", ""]

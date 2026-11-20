@@ -96,8 +96,7 @@ net book value 638,123.30</td>
 </tr>
 <tr class="even">
 <td><strong>As of</strong></td>
-<td>2026-10-31, the last month depreciated in Sage. Rebuilt for the
-month before go-live (question 11)</td>
+<td>2026-10-31, the last month depreciated in the register</td>
 </tr>
 <tr class="odd">
 <td><strong>Source</strong></td>
@@ -133,13 +132,17 @@ from the Last Depreciation Period.</li>
 <li><strong>DHR</strong> records the depreciation already taken, so
 NetSuite’s asset reports show it.</li>
 </ul>
-<p>[TBC: SOA to confirm this reading (question 1)]</p>
+<p>[TBC: SOA to confirm this reading (question 1 for SOA)]</p>
 </section>
 </section>
 <section id="asset-types" class="level1">
 <h1>Asset types</h1>
 <p>Tab <strong>FAM_Asset Type</strong> of the mid-life template, filled
-as it will load. Write Off and Disposal Cost Account: question 9.</p>
+as it will load. Changed from SOA’s version: Write Off, Write Down and
+Disposal Cost Account set to 72400 (Ming Fu, 2026-11-13); Depreciation
+Rules from Disposal to Acquisition, MinIO’s practice of depreciating
+from the month an asset goes into service; Accounting Method from
+Straightline to Straight Line, the name on SOA’s Dep Method tab.</p>
 <table style="width:100%;">
 <colgroup>
 <col style="width: 9%" />
@@ -183,16 +186,16 @@ as it will load. Write Off and Disposal Cost Account: question 9.</p>
 <td></td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">36</td>
-<td>Straightline</td>
+<td>Straight Line</td>
 <td>TRUE</td>
 <td>Remaining Life</td>
-<td>Disposal</td>
+<td>Acquisition</td>
 <td>Monthly</td>
 <td>15110-Equipment</td>
 <td>15510 -Accum. Depreciation - Equipment</td>
 <td>69100 - Depreciation Expense</td>
 <td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td></td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
 <td>72400 - (Gain) / Loss on Sale of Asset</td>
 </tr>
 <tr class="even">
@@ -200,16 +203,16 @@ as it will load. Write Off and Disposal Cost Account: question 9.</p>
 <td></td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">36</td>
-<td>Straightline</td>
+<td>Straight Line</td>
 <td>TRUE</td>
 <td>Remaining Life</td>
-<td>Disposal</td>
+<td>Acquisition</td>
 <td>Monthly</td>
 <td>15120-Furniture &amp; Fixtures</td>
 <td>15520 - Accum. Depreciation - Furniture &amp; Fixtures</td>
 <td>69100 - Depreciation Expense</td>
 <td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td></td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
 <td>72400 - (Gain) / Loss on Sale of Asset</td>
 </tr>
 <tr class="odd">
@@ -217,16 +220,16 @@ as it will load. Write Off and Disposal Cost Account: question 9.</p>
 <td></td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">36</td>
-<td>Straightline</td>
+<td>Straight Line</td>
 <td>TRUE</td>
 <td>Remaining Life</td>
-<td>Disposal</td>
+<td>Acquisition</td>
 <td>Monthly</td>
 <td>15130-Leasehold Improvements</td>
 <td>15530 - Accum. Depreciation - Leasehold Improvements</td>
 <td>69100 - Depreciation Expense</td>
 <td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td></td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
 <td>72400 - (Gain) / Loss on Sale of Asset</td>
 </tr>
 <tr class="even">
@@ -234,16 +237,16 @@ as it will load. Write Off and Disposal Cost Account: question 9.</p>
 <td></td>
 <td style="text-align: right;">0</td>
 <td style="text-align: right;">36</td>
-<td>Straightline</td>
+<td>Straight Line</td>
 <td>TRUE</td>
 <td>Remaining Life</td>
-<td>Disposal</td>
+<td>Acquisition</td>
 <td>Monthly</td>
 <td>15140-Internally Developed Software</td>
 <td>15540 - Accum. Amortization - Internally Dev. Software</td>
 <td>69100 - Depreciation Expense</td>
 <td>72400 - (Gain) / Loss on Sale of Asset</td>
-<td></td>
+<td>72400 - (Gain) / Loss on Sale of Asset</td>
 <td>72400 - (Gain) / Loss on Sale of Asset</td>
 </tr>
 <tr class="odd">
@@ -311,8 +314,8 @@ Improvements</td>
 </tr>
 <tr class="odd">
 <td><strong>Asset Lifetime</strong></td>
-<td>Register useful life in months. FA-076 and FA-082: months done plus
-months left (question 5)</td>
+<td>Register useful life in months. FA-076 and FA-082, shortened to the
+lease term: months done plus months left</td>
 </tr>
 <tr class="even">
 <td><strong>Asset Original Cost, Asset Current Cost</strong></td>
@@ -343,6 +346,22 @@ the 1st of that month</td>
 <td><strong>Current Net Book Value</strong></td>
 <td>Register NBV at 2026-10-31</td>
 </tr>
+<tr class="odd">
+<td><strong>Cumulative Depreciation</strong></td>
+<td>Added. Register accumulated depreciation at 2026-10-31</td>
+</tr>
+<tr class="even">
+<td><strong>Accounting Method</strong></td>
+<td>Added. Straight Line, (CC-RV)/AL. FA-076 and FA-082: Straight Line
+Remaining, (NB-RV)/(AL-CP+1), which spreads the remaining value over the
+months to the end of the lease. Names as on SOA’s Dep Method tab</td>
+</tr>
+<tr class="odd">
+<td><strong>Department</strong></td>
+<td>Added. Register department mapped through Departments Draft v1 to
+the NetSuite department, parent : child. Blank for FA-070, FA-071 and
+FA-089: D110 is not on the tab</td>
+</tr>
 </tbody>
 </table>
 <p>Ref is the row on the register’s ALL FA tab (FA-069 is row 69). It is
@@ -350,23 +369,26 @@ not in the load.</p>
 <p>32 assets, in the order of the load file.</p>
 <table>
 <colgroup>
-<col style="width: 4%" />
-<col style="width: 13%" />
+<col style="width: 3%" />
 <col style="width: 10%" />
-<col style="width: 3%" />
-<col style="width: 4%" />
-<col style="width: 6%" />
-<col style="width: 6%" />
-<col style="width: 4%" />
-<col style="width: 6%" />
-<col style="width: 6%" />
-<col style="width: 3%" />
+<col style="width: 7%" />
+<col style="width: 2%" />
 <col style="width: 3%" />
 <col style="width: 5%" />
 <col style="width: 5%" />
+<col style="width: 3%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 2%" />
+<col style="width: 2%" />
 <col style="width: 4%" />
-<col style="width: 6%" />
-<col style="width: 6%" />
+<col style="width: 4%" />
+<col style="width: 3%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 7%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -391,6 +413,10 @@ Period</strong></th>
 Amount</strong></th>
 <th style="text-align: right;"><strong>Current Net Book
 Value</strong></th>
+<th style="text-align: right;"><strong>Cumulative
+Depreciation</strong></th>
+<th><strong>Accounting Method</strong></th>
+<th><strong>Department</strong></th>
 </tr>
 </thead>
 <tbody>
@@ -412,6 +438,9 @@ Value</strong></th>
 <td style="text-align: right;">35</td>
 <td style="text-align: right;">8,885.80</td>
 <td style="text-align: right;">8,885.79</td>
+<td style="text-align: right;">311,002.78</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-070</strong></td>
@@ -433,6 +462,9 @@ purchase</td>
 <td style="text-align: right;">33</td>
 <td style="text-align: right;">98.27</td>
 <td style="text-align: right;">294.82</td>
+<td style="text-align: right;">3,243.00</td>
+<td>Straight Line</td>
+<td></td>
 </tr>
 <tr class="odd">
 <td><strong>FA-071</strong></td>
@@ -456,6 +488,9 @@ ProSupport</td>
 <td style="text-align: right;">33</td>
 <td style="text-align: right;">102.61</td>
 <td style="text-align: right;">307.84</td>
+<td style="text-align: right;">3,386.18</td>
+<td>Straight Line</td>
+<td></td>
 </tr>
 <tr class="even">
 <td><strong>FA-072</strong></td>
@@ -475,6 +510,9 @@ ProSupport</td>
 <td style="text-align: right;">33</td>
 <td style="text-align: right;">3,216.27</td>
 <td style="text-align: right;">9,648.83</td>
+<td style="text-align: right;">106,137.10</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-073</strong></td>
@@ -494,6 +532,9 @@ ProSupport</td>
 <td style="text-align: right;">31</td>
 <td style="text-align: right;">498.88</td>
 <td style="text-align: right;">14,467.62</td>
+<td style="text-align: right;">15,465.38</td>
+<td>Straight Line</td>
+<td>1000 G&amp;A : 1250 G&amp;A - Accounting</td>
 </tr>
 <tr class="even">
 <td><strong>FA-074</strong></td>
@@ -513,6 +554,9 @@ ProSupport</td>
 <td style="text-align: right;">27</td>
 <td style="text-align: right;">193.92</td>
 <td style="text-align: right;">1,745.30</td>
+<td style="text-align: right;">5,235.89</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-075</strong></td>
@@ -535,6 +579,9 @@ No: 2695571 Customer PO: MI00630U00 Customer No: 00MIN82</td>
 <td style="text-align: right;">26</td>
 <td style="text-align: right;">1,049.71</td>
 <td style="text-align: right;">10,497.03</td>
+<td style="text-align: right;">27,292.29</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-076</strong></td>
@@ -555,6 +602,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">24</td>
 <td style="text-align: right;">519.63</td>
 <td style="text-align: right;">10,392.67</td>
+<td style="text-align: right;">11,877.33</td>
+<td>Straight Line Remaining</td>
+<td>1000 G&amp;A : 1250 G&amp;A - Accounting</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-077</strong></td>
@@ -574,6 +624,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">23</td>
 <td style="text-align: right;">3,282.70</td>
 <td style="text-align: right;">42,675.06</td>
+<td style="text-align: right;">75,502.04</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-078</strong></td>
@@ -593,6 +646,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">23</td>
 <td style="text-align: right;">5,839.46</td>
 <td style="text-align: right;">75,912.98</td>
+<td style="text-align: right;">134,307.58</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-079</strong></td>
@@ -612,6 +668,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">23</td>
 <td style="text-align: right;">7,084.23</td>
 <td style="text-align: right;">92,095.06</td>
+<td style="text-align: right;">162,937.41</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-080</strong></td>
@@ -632,6 +691,9 @@ Project</td>
 <td style="text-align: right;">23</td>
 <td style="text-align: right;">169.12</td>
 <td style="text-align: right;">2,198.54</td>
+<td style="text-align: right;">3,889.73</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-081</strong></td>
@@ -651,6 +713,9 @@ Project</td>
 <td style="text-align: right;">22</td>
 <td style="text-align: right;">249.56</td>
 <td style="text-align: right;">3,493.89</td>
+<td style="text-align: right;">5,490.39</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-082</strong></td>
@@ -671,6 +736,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">22</td>
 <td style="text-align: right;">247.78</td>
 <td style="text-align: right;">4,955.62</td>
+<td style="text-align: right;">5,297.38</td>
+<td>Straight Line Remaining</td>
+<td>1000 G&amp;A : 1250 G&amp;A - Accounting</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-083</strong></td>
@@ -690,6 +758,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">21</td>
 <td style="text-align: right;">160.50</td>
 <td style="text-align: right;">2,407.38</td>
+<td style="text-align: right;">3,370.34</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-084</strong></td>
@@ -710,6 +781,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">22</td>
 <td style="text-align: right;">3,185.85</td>
 <td style="text-align: right;">44,601.97</td>
+<td style="text-align: right;">70,088.80</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-085</strong></td>
@@ -730,6 +804,9 @@ ADPTR-CX7 36 qty</td>
 <td style="text-align: right;">22</td>
 <td style="text-align: right;">335.85</td>
 <td style="text-align: right;">4,701.89</td>
+<td style="text-align: right;">7,388.68</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-086</strong></td>
@@ -749,6 +826,9 @@ ADPTR-CX7 36 qty</td>
 <td style="text-align: right;">21</td>
 <td style="text-align: right;">246.49</td>
 <td style="text-align: right;">3,697.47</td>
+<td style="text-align: right;">5,176.45</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-087</strong></td>
@@ -768,6 +848,9 @@ ADPTR-CX7 36 qty</td>
 <td style="text-align: right;">20</td>
 <td style="text-align: right;">295.43</td>
 <td style="text-align: right;">4,726.96</td>
+<td style="text-align: right;">5,908.69</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-088</strong></td>
@@ -788,6 +871,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">20</td>
 <td style="text-align: right;">318.30</td>
 <td style="text-align: right;">6,366.00</td>
+<td style="text-align: right;">6,366.00</td>
+<td>Straight Line</td>
+<td>1000 G&amp;A : 1250 G&amp;A - Accounting</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-089</strong></td>
@@ -807,6 +893,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">19</td>
 <td style="text-align: right;">94.49</td>
 <td style="text-align: right;">1,606.34</td>
+<td style="text-align: right;">1,795.32</td>
+<td>Straight Line</td>
+<td></td>
 </tr>
 <tr class="even">
 <td><strong>FA-090</strong></td>
@@ -826,6 +915,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">19</td>
 <td style="text-align: right;">61.01</td>
 <td style="text-align: right;">1,037.08</td>
+<td style="text-align: right;">1,159.10</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-091</strong></td>
@@ -845,6 +937,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">19</td>
 <td style="text-align: right;">22.79</td>
 <td style="text-align: right;">387.34</td>
+<td style="text-align: right;">432.92</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-092</strong></td>
@@ -864,6 +959,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">18</td>
 <td style="text-align: right;">5,056.80</td>
 <td style="text-align: right;">91,022.40</td>
+<td style="text-align: right;">91,022.40</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-093</strong></td>
@@ -883,6 +981,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">8</td>
 <td style="text-align: right;">756.95</td>
 <td style="text-align: right;">21,194.64</td>
+<td style="text-align: right;">6,055.61</td>
+<td>Straight Line</td>
+<td>1000 G&amp;A : 1150 G&amp;A - Corporate Development</td>
 </tr>
 <tr class="even">
 <td><strong>FA-094</strong></td>
@@ -902,6 +1003,9 @@ depreciated until end of lease term</td>
 <td style="text-align: right;">6</td>
 <td style="text-align: right;">1,777.64</td>
 <td style="text-align: right;">53,329.17</td>
+<td style="text-align: right;">10,665.83</td>
+<td>Straight Line</td>
+<td>1000 G&amp;A : 1150 G&amp;A - Corporate Development</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-095</strong></td>
@@ -922,6 +1026,9 @@ shipping</td>
 <td style="text-align: right;">4</td>
 <td style="text-align: right;">624.92</td>
 <td style="text-align: right;">19,997.24</td>
+<td style="text-align: right;">2,499.66</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="even">
 <td><strong>FA-096</strong></td>
@@ -941,6 +1048,9 @@ shipping</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">325.26</td>
 <td style="text-align: right;">11,383.97</td>
+<td style="text-align: right;">325.26</td>
+<td>Straight Line</td>
+<td>1000 G&amp;A : 1250 G&amp;A - Accounting</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-097</strong></td>
@@ -962,6 +1072,9 @@ MacBooks</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">366.65</td>
 <td style="text-align: right;">12,832.86</td>
+<td style="text-align: right;">366.65</td>
+<td>Straight Line</td>
+<td>1000 G&amp;A : 1250 G&amp;A - Accounting</td>
 </tr>
 <tr class="even">
 <td><strong>FA-098</strong></td>
@@ -981,6 +1094,9 @@ MacBooks</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">1,777.64</td>
 <td style="text-align: right;">62,217.36</td>
+<td style="text-align: right;">1,777.64</td>
+<td>Straight Line</td>
+<td>5000 R&amp;D : 5300 R&amp;D - Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-099</strong></td>
@@ -1000,6 +1116,9 @@ MacBooks</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">441.99</td>
 <td style="text-align: right;">15,469.53</td>
+<td style="text-align: right;">441.99</td>
+<td>Straight Line</td>
+<td>1000 G&amp;A : 9150 G&amp;A - Information Technology</td>
 </tr>
 <tr class="even">
 <td><strong>FA-100</strong></td>
@@ -1019,6 +1138,10 @@ MacBooks</td>
 <td style="text-align: right;">1</td>
 <td style="text-align: right;">102.08</td>
 <td style="text-align: right;">3,572.65</td>
+<td style="text-align: right;">102.08</td>
+<td>Straight Line</td>
+<td>4000 Cost of Revenue (COR) : 4100 COR - Customer Success
+Engineering</td>
 </tr>
 <tr class="odd">
 <td><strong>Total</strong></td>
@@ -1038,6 +1161,9 @@ MacBooks</td>
 <td style="text-align: right;"></td>
 <td style="text-align: right;"></td>
 <td style="text-align: right;"><strong>638,123.30</strong></td>
+<td style="text-align: right;"><strong>1,086,007.90</strong></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -1062,11 +1188,13 @@ example: one Depreciation row per asset for the depreciation taken to
 <tbody>
 <tr class="odd">
 <td><strong>DHR Name</strong></td>
-<td>Blank, as in the example (question 4)</td>
+<td>Ref and date, such as FA-069 Depreciation to 2026-10-31</td>
 </tr>
 <tr class="even">
 <td><strong>Asset Name</strong></td>
-<td>Name from the mid-life load</td>
+<td>Name from the mid-life load. NetSuite’s format is the asset ID plus
+the name (FAM00001 Chairs), so the ID is added once the assets are
+imported</td>
 </tr>
 <tr class="odd">
 <td><strong>Subsidiary, Quantity, Asset Type, Asset
@@ -1091,7 +1219,7 @@ Lifetime</strong></td>
 </tr>
 <tr class="even">
 <td><strong>Depreciation Period, Period-1</strong></td>
-<td>1 and 0, as in the example (question 3)</td>
+<td>The asset’s Last Depreciation Period, and that less 1</td>
 </tr>
 <tr class="odd">
 <td><strong>Purchase Date</strong></td>
@@ -1145,7 +1273,7 @@ Lifetime</strong></td>
 <tbody>
 <tr class="odd">
 <td><strong>FA-069</strong></td>
-<td></td>
+<td>FA-069 Depreciation to 2026-10-31</td>
 <td>Ordered Server - 1 Qty S/N: 311625572 - AceleMax NVIDIA GPU HPC</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1154,15 +1282,15 @@ Lifetime</strong></td>
 <td>2026-10-31</td>
 <td style="text-align: right;">311,002.78</td>
 <td style="text-align: right;">8,885.79</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">34</td>
 <td style="text-align: right;">36</td>
 <td>2023-12-04</td>
 <td style="text-align: right;">319,888.57</td>
 </tr>
 <tr class="even">
 <td><strong>FA-070</strong></td>
-<td></td>
+<td>FA-070 Depreciation to 2026-10-31</td>
 <td>Petr Kobalicek: Petr Kobalicek - report #R004ZpgHK6WQ - Laptop
 purchase</td>
 <td>MinIO, Inc.</td>
@@ -1172,15 +1300,15 @@ purchase</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">3,243.00</td>
 <td style="text-align: right;">294.82</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">32</td>
 <td style="text-align: right;">36</td>
 <td>2024-01-30</td>
 <td style="text-align: right;">3,537.82</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-071</strong></td>
-<td></td>
+<td>FA-071 Depreciation to 2026-10-31</td>
 <td>Piotr Wyderski: Laptop purchase and 3 Yr Pro Support - DELL
 Precision 7680 16inch</td>
 <td>MinIO, Inc.</td>
@@ -1190,15 +1318,15 @@ Precision 7680 16inch</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">3,386.18</td>
 <td style="text-align: right;">307.84</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">32</td>
 <td style="text-align: right;">36</td>
 <td>2024-01-11</td>
 <td style="text-align: right;">3,694.02</td>
 </tr>
 <tr class="even">
 <td><strong>FA-072</strong></td>
-<td></td>
+<td>FA-072 Depreciation to 2026-10-31</td>
 <td>2 Servers for MinIO OPTIMIZED X13SET-G</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1207,15 +1335,15 @@ Precision 7680 16inch</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">106,137.10</td>
 <td style="text-align: right;">9,648.83</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">33</td>
+<td style="text-align: right;">32</td>
 <td style="text-align: right;">36</td>
 <td>2024-02-23</td>
 <td style="text-align: right;">115,785.93</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-073</strong></td>
-<td></td>
+<td>FA-073 Depreciation to 2026-10-31</td>
 <td>Contract: 241100 - 275 Shoreline/100/Minio Additional Power</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1224,15 +1352,15 @@ Precision 7680 16inch</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">15,465.38</td>
 <td style="text-align: right;">14,467.62</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">30</td>
 <td style="text-align: right;">60</td>
 <td>2024-04-15</td>
 <td style="text-align: right;">29,933.00</td>
 </tr>
 <tr class="even">
 <td><strong>FA-074</strong></td>
-<td></td>
+<td>FA-074 Depreciation to 2026-10-31</td>
 <td>Computers &amp; Equipment</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1241,15 +1369,15 @@ Precision 7680 16inch</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">5,235.89</td>
 <td style="text-align: right;">1,745.30</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">27</td>
+<td style="text-align: right;">26</td>
 <td style="text-align: right;">36</td>
 <td>2024-08-20</td>
 <td style="text-align: right;">6,981.19</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-075</strong></td>
-<td></td>
+<td>FA-075 Depreciation to 2026-10-31</td>
 <td>Ordered Server - 1 Qty S/N: MT2413XZ089P - NVIDIA Spectrum-3 SN4700
 switch</td>
 <td>MinIO, Inc.</td>
@@ -1259,15 +1387,15 @@ switch</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">27,292.29</td>
 <td style="text-align: right;">10,497.03</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">26</td>
+<td style="text-align: right;">25</td>
 <td style="text-align: right;">36</td>
 <td>2024-08-07</td>
 <td style="text-align: right;">37,789.32</td>
 </tr>
 <tr class="even">
 <td><strong>FA-076</strong></td>
-<td></td>
+<td>FA-076 Depreciation to 2026-10-31</td>
 <td>MinIO-Ste 100- TWA 1 - Tenant Overage</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1276,15 +1404,15 @@ switch</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">11,877.33</td>
 <td style="text-align: right;">10,392.67</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">24</td>
+<td style="text-align: right;">23</td>
 <td style="text-align: right;">44</td>
 <td>2024-11-20</td>
 <td style="text-align: right;">22,270.00</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-077</strong></td>
-<td></td>
+<td>FA-077 Depreciation to 2026-10-31</td>
 <td>PowerEdge R7615 server</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1293,15 +1421,15 @@ switch</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">75,502.04</td>
 <td style="text-align: right;">42,675.06</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">22</td>
 <td style="text-align: right;">36</td>
 <td>2024-12-06</td>
 <td style="text-align: right;">118,177.10</td>
 </tr>
 <tr class="even">
 <td><strong>FA-078</strong></td>
-<td></td>
+<td>FA-078 Depreciation to 2026-10-31</td>
 <td>PowerEdge R7615 server</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1310,15 +1438,15 @@ switch</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">134,307.58</td>
 <td style="text-align: right;">75,912.98</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">22</td>
 <td style="text-align: right;">36</td>
 <td>2024-12-10</td>
 <td style="text-align: right;">210,220.56</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-079</strong></td>
-<td></td>
+<td>FA-079 Depreciation to 2026-10-31</td>
 <td>PowerEdge XE968 server</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1327,15 +1455,15 @@ switch</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">162,937.41</td>
 <td style="text-align: right;">92,095.06</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">22</td>
 <td style="text-align: right;">36</td>
 <td>2024-12-12</td>
 <td style="text-align: right;">255,032.47</td>
 </tr>
 <tr class="even">
 <td><strong>FA-080</strong></td>
-<td></td>
+<td>FA-080 Depreciation to 2026-10-31</td>
 <td>ENGINEERING CC 0349 - December 2024 - Center of Excellence
 Project</td>
 <td>MinIO, Inc.</td>
@@ -1345,15 +1473,15 @@ Project</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">3,889.73</td>
 <td style="text-align: right;">2,198.54</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">22</td>
 <td style="text-align: right;">36</td>
 <td>2024-12-20</td>
 <td style="text-align: right;">6,088.27</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-081</strong></td>
-<td></td>
+<td>FA-081 Depreciation to 2026-10-31</td>
 <td>100GB Switch with 28 cables</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1362,15 +1490,15 @@ Project</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">5,490.39</td>
 <td style="text-align: right;">3,493.89</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">21</td>
 <td style="text-align: right;">36</td>
 <td>2025-01-11</td>
 <td style="text-align: right;">8,984.28</td>
 </tr>
 <tr class="even">
 <td><strong>FA-082</strong></td>
-<td></td>
+<td>FA-082 Depreciation to 2026-10-31</td>
 <td>TWA2_275 MinIO Suite 100_10220-24-t001 AST - Blinds</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1379,15 +1507,15 @@ Project</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">5,297.38</td>
 <td style="text-align: right;">4,955.62</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">21</td>
 <td style="text-align: right;">42</td>
 <td>2025-01-14</td>
 <td style="text-align: right;">10,253.00</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-083</strong></td>
-<td></td>
+<td>FA-083 Depreciation to 2026-10-31</td>
 <td>Server Technology Smart PRO3X with PIPS</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1396,15 +1524,15 @@ Project</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">3,370.34</td>
 <td style="text-align: right;">2,407.38</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">20</td>
 <td style="text-align: right;">36</td>
 <td>2025-01-20</td>
 <td style="text-align: right;">5,777.72</td>
 </tr>
 <tr class="even">
 <td><strong>FA-084</strong></td>
-<td></td>
+<td>FA-084 Depreciation to 2026-10-31</td>
 <td>Ordered Server - 18 qty-Nvidia CX-7 NIC Card PCIe 5.0x16 400Gb OSFP
 18 qty</td>
 <td>MinIO, Inc.</td>
@@ -1414,15 +1542,15 @@ Project</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">70,088.80</td>
 <td style="text-align: right;">44,601.97</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">21</td>
 <td style="text-align: right;">36</td>
 <td>2025-01-22</td>
 <td style="text-align: right;">114,690.77</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-085</strong></td>
-<td></td>
+<td>FA-085 Depreciation to 2026-10-31</td>
 <td>Ordered Server - 18 qty-Mellanox Support and Warranty 3 yrs for
 ADPTR-CX7 36 qty</td>
 <td>MinIO, Inc.</td>
@@ -1432,15 +1560,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">7,388.68</td>
 <td style="text-align: right;">4,701.89</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">22</td>
+<td style="text-align: right;">21</td>
 <td style="text-align: right;">36</td>
 <td>2025-01-23</td>
 <td style="text-align: right;">12,090.57</td>
 </tr>
 <tr class="even">
 <td><strong>FA-086</strong></td>
-<td></td>
+<td>FA-086 Depreciation to 2026-10-31</td>
 <td>2- Nvidia Transceiver 400GBE 2- Nvidia Passive Fiber Cable SMF</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1449,15 +1577,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">5,176.45</td>
 <td style="text-align: right;">3,697.47</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">20</td>
 <td style="text-align: right;">36</td>
 <td>2025-02-24</td>
 <td style="text-align: right;">8,873.92</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-087</strong></td>
-<td></td>
+<td>FA-087 Depreciation to 2026-10-31</td>
 <td>Hardware order for data center March 2025</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1466,15 +1594,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">5,908.69</td>
 <td style="text-align: right;">4,726.96</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">19</td>
 <td style="text-align: right;">36</td>
 <td>2025-03-10</td>
 <td style="text-align: right;">10,635.65</td>
 </tr>
 <tr class="even">
 <td><strong>FA-088</strong></td>
-<td></td>
+<td>FA-088 Depreciation to 2026-10-31</td>
 <td>TWA#3_MinIO_10220-24- t001 AST - Doors</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1483,15 +1611,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">6,366.00</td>
 <td style="text-align: right;">6,366.00</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">19</td>
 <td style="text-align: right;">40</td>
 <td>2025-03-25</td>
 <td style="text-align: right;">12,732.00</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-089</strong></td>
-<td></td>
+<td>FA-089 Depreciation to 2026-10-31</td>
 <td>Ali Yaldaz. Macbook Pro M4 Pro 14” 48 GB</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1500,15 +1628,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">1,795.32</td>
 <td style="text-align: right;">1,606.34</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">18</td>
 <td style="text-align: right;">36</td>
 <td>2025-04-02</td>
 <td style="text-align: right;">3,401.66</td>
 </tr>
 <tr class="even">
 <td><strong>FA-090</strong></td>
-<td></td>
+<td>FA-090 Depreciation to 2026-10-31</td>
 <td>Transceiver</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1517,15 +1645,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">1,159.10</td>
 <td style="text-align: right;">1,037.08</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">18</td>
 <td style="text-align: right;">36</td>
 <td>2025-04-24</td>
 <td style="text-align: right;">2,196.18</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-091</strong></td>
-<td></td>
+<td>FA-091 Depreciation to 2026-10-31</td>
 <td>Fiber optic jumper cables</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1534,15 +1662,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">432.92</td>
 <td style="text-align: right;">387.34</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">18</td>
 <td style="text-align: right;">36</td>
 <td>2025-04-30</td>
 <td style="text-align: right;">820.26</td>
 </tr>
 <tr class="even">
 <td><strong>FA-092</strong></td>
-<td></td>
+<td>FA-092 Depreciation to 2026-10-31</td>
 <td>192 Storage Cards</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1551,15 +1679,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">91,022.40</td>
 <td style="text-align: right;">91,022.40</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">18</td>
+<td style="text-align: right;">17</td>
 <td style="text-align: right;">36</td>
 <td>2025-05-15</td>
 <td style="text-align: right;">182,044.80</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-093</strong></td>
-<td></td>
+<td>FA-093 Depreciation to 2026-10-31</td>
 <td>SUPERMICRO CUST 2XX550 480GB</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1568,15 +1696,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">6,055.61</td>
 <td style="text-align: right;">21,194.64</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">7</td>
 <td style="text-align: right;">36</td>
 <td>2025-03-05</td>
 <td style="text-align: right;">27,250.25</td>
 </tr>
 <tr class="even">
 <td><strong>FA-094</strong></td>
-<td></td>
+<td>FA-094 Depreciation to 2026-10-31</td>
 <td>NVIDIA Spectrum-4 Switch and networking equipment</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1585,15 +1713,15 @@ ADPTR-CX7 36 qty</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">10,665.83</td>
 <td style="text-align: right;">53,329.17</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">5</td>
 <td style="text-align: right;">36</td>
 <td>2026-05-07</td>
 <td style="text-align: right;">63,995.00</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-095</strong></td>
-<td></td>
+<td>FA-095 Depreciation to 2026-10-31</td>
 <td>Nvidia CX-7 NIC Card PCIe 5.0x16 400Gb OSFP- warrantly and
 shipping</td>
 <td>MinIO, Inc.</td>
@@ -1603,15 +1731,15 @@ shipping</td>
 <td>2026-10-31</td>
 <td style="text-align: right;">2,499.66</td>
 <td style="text-align: right;">19,997.24</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3</td>
 <td style="text-align: right;">36</td>
 <td>2026-07-06</td>
 <td style="text-align: right;">22,496.90</td>
 </tr>
 <tr class="even">
 <td><strong>FA-096</strong></td>
-<td></td>
+<td>FA-096 Depreciation to 2026-10-31</td>
 <td>NADDOD Technology Inc - September 2026</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1628,7 +1756,7 @@ shipping</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-097</strong></td>
-<td></td>
+<td>FA-097 Depreciation to 2026-10-31</td>
 <td>Ramp: Kiel Michael Mercado - Laptops are for new hires. 5x
 MacBooks</td>
 <td>MinIO, Inc.</td>
@@ -1646,7 +1774,7 @@ MacBooks</td>
 </tr>
 <tr class="even">
 <td><strong>FA-098</strong></td>
-<td></td>
+<td>FA-098 Depreciation to 2026-10-31</td>
 <td>V-00545–AMAX Information Technologies</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1663,7 +1791,7 @@ MacBooks</td>
 </tr>
 <tr class="odd">
 <td><strong>FA-099</strong></td>
-<td></td>
+<td>FA-099 Depreciation to 2026-10-31</td>
 <td>V00021–Amazon</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1680,7 +1808,7 @@ MacBooks</td>
 </tr>
 <tr class="even">
 <td><strong>FA-100</strong></td>
-<td></td>
+<td>FA-100 Depreciation to 2026-10-31</td>
 <td>Other Expenses–Other Expenses for Ramp Users</td>
 <td>MinIO, Inc.</td>
 <td style="text-align: right;">1</td>
@@ -1723,59 +1851,39 @@ MacBooks</td>
 <li><strong>Are we reading the templates right?</strong> Mid-life Asset
 Record creates the assets; DHR loads the depreciation already
 taken.</li>
-<li><strong>Lump sum or monthly DHR?</strong> We filled the lump sum
-form. The register has monthly figures only from 2021-01, so a monthly
-DHR for older assets would have to be rebuilt.</li>
-<li><strong>Depreciation Period in the lump sum DHR.</strong> SOA’s
-example has Depreciation Period 1 and Period-1 0 for 18 months of
-depreciation. We did the same. Should it be the Last Depreciation Period
-instead?</li>
-<li><strong>DHR Name and load order.</strong> DHR Name is blank in the
-lump sum example, and ID plus Name in Sample Asset Records. Is it filled
-after the asset import, using the IDs NetSuite gives the assets? Assets
-first, then DHR? FA-077 and FA-078 are both named PowerEdge R7615
-server, so a match on Asset Name alone would not tell them apart.</li>
-<li><strong>Depreciation method for FA-076 and FA-082.</strong> Both
-were sped up to finish at the end of the lease, 2028-06. Straight Line,
-(CC-RV)/AL, would give 22,270.00/44 = 506.14 and 10,253.00/42 = 244.12 a
-month instead of 519.63 and 247.78. Use Straight Line Remaining,
-(NB-RV)/(AL-CP+1), for these two? The mid-life template has no method
-column.</li>
-<li><strong>Depreciation rule.</strong> SOA’s asset types use Disposal,
-so depreciation starts the month after an asset goes into service.
-MinIO’s register depreciates from the month it goes into service
-(Acquisition). This decides when depreciation starts on assets bought
-after go-live.</li>
-<li><strong>Default lifetimes.</strong> SOA’s asset types default to 36
-months. MinIO uses 60 months for furniture and leasehold improvements
-(36 for trade booths). Each loaded asset carries its own lifetime, so
-this only affects new assets.</li>
-<li><strong>Department, Class, Location, Asset Serial Number.</strong>
-SOA’s Sample Asset Records have them; the mid-life template does not.
-The register has a department on every asset (such as D-E420) and serial
-numbers for FA-069 and FA-075 only. Should we load them?</li>
-<li><strong>Disposal accounts.</strong> Write Off Account is 72400
-(Gain) / Loss on Sale of Asset (Ming Fu, 2026-11-13; Sage 79200).
-Disposal Cost Account is filled with the same account, to confirm with
-Ming. Write Down Account (Revaluation) is blank: the COA has no
-write-down or impairment account. Which account?</li>
-<li><strong>Fully depreciated assets.</strong> Those still in use will
-go through the same templates with Asset Status Fully Depreciated, net
-book value 0 and the last depreciation as of the month they finished.
-The template’s Notes tab also lists Depreciation Active (FALSE for
-these), but the import tab has no such column. Is anything else
-needed?</li>
-<li><strong>Cutover date.</strong> Which month-end should the load be as
-of? We rebuild from the register for that month.</li>
-<li><strong>Sample Asset Records.</strong> This tab of the DHR file has
-29 fields, more than the mid-life import, including Depreciation Active,
-Depreciation Rules, Depreciation Method and Target Depreciation Date. Is
-it a load, or an example of the records the mid-life import creates? It
-is not filled.</li>
+<li><strong>Will a lump sum DHR load?</strong> Oracle’s current help
+says to create a DHR for every depreciation entry, monthly, quarterly or
+annually. Older Oracle help and practitioners use one catch-up record
+per asset.</li>
+<li><strong>DHR Asset Name and load order.</strong> Oracle’s format for
+Asset Name is the NetSuite asset ID plus the name (FAM00001 Chairs), and
+assets are imported before DHRs. Our plan: import the assets, export
+their IDs, complete Asset Name, then import the DHRs. Does that match
+yours?</li>
+<li><strong>Added columns.</strong> Cumulative Depreciation, Accounting
+Method and Department are added at the end of the mid-life import tab.
+They are fields on the NetSuite asset record, but Oracle’s list of
+import fields does not show Accounting Method. Do all three import?</li>
+<li><strong>Straight Line Remaining.</strong> FA-076 and FA-082 use it,
+to finish at the end of the lease: (NB-RV)/(AL-CP+1) gives 10,392.67/20
+= 519.63 and 4,955.62/20 = 247.78 a month. Oracle describes it as a
+method linked after another method. Does it work as an asset’s only
+method?</li>
+<li><strong>Server scripts on CSV import.</strong> Oracle: with
+<strong>Run Server SuiteScript and Trigger Workflows</strong> and FAM’s
+<strong>Run Server Scripts on CSV Import</strong> both on, Cumulative
+Depreciation, Last Depreciation Date and Last Depreciation Period import
+as 0. Please check both settings before the import.</li>
+<li><strong>Name mapping.</strong> Oracle: delete the default Name = ID
+mapping, because a Name over 30 characters in ID causes an error. 22 of
+the 32 names are longer than 30 characters (the longest is 81).</li>
+<li><strong>Sample Asset Records.</strong> The DHR file’s Sample Asset
+Records tab looks like the full list of asset record fields. Is it a
+load, or an example? It is not filled.</li>
 </ol>
 </section>
-<section id="being-confirmed-with-minio-accounting" class="level2">
-<h2>Being confirmed with MinIO accounting</h2>
+<section id="for-minio-accounting" class="level2">
+<h2>For MinIO accounting</h2>
 <p>These are in the draft as the register has them.</p>
 <ol type="1">
 <li><strong>FA-098 to FA-100</strong> have a GL date of 2022-10,
@@ -1787,8 +1895,30 @@ started depreciating in 2026-10. Loaded from 2026-10.</li>
 <li><strong>FA-093</strong> was bought on 2025-03-05 and depreciates
 from 2026-03.</li>
 <li><strong>FA-073</strong> finishes in 2029-03, after the lease ends in
-2028-06. It may be shortened like FA-076 and FA-082.</li>
+2028-06. ASC 842 has leasehold improvements depreciated over the shorter
+of their useful life and the remaining lease term. Shorten it like
+FA-076 and FA-082?</li>
+<li><strong>FA-070, FA-071 and FA-089</strong> are on department D110
+(Sales, historic), which is not on Departments Draft v1. Which NetSuite
+department?</li>
 </ol>
+</section>
+<section id="decided" class="level2">
+<h2>Decided</h2>
+<ul>
+<li><strong>DHR:</strong> lump sum, one row per asset. Depreciation
+Period is the asset’s Last Depreciation Period. DHR Name is filled.</li>
+<li><strong>Added to the mid-life load:</strong> Cumulative
+Depreciation, Accounting Method and Department.</li>
+<li><strong>Asset types:</strong> Depreciation Rules Acquisition. Write
+Off, Write Down and Disposal Cost Account 72400 (Gain) / Loss on Sale of
+Asset (Ming Fu, 2026-11-13). Default lifetimes stay at 36 months for
+now; MinIO accounting sets them once NetSuite is in use.</li>
+<li><strong>As of:</strong> 2026-10-31 for this load.</li>
+<li><strong>Fully depreciated assets:</strong> a separate load, by the
+same process: net book value 0, last depreciation as of the month they
+finished.</li>
+</ul>
 </section>
 </section>
 </main>

@@ -32,9 +32,21 @@ for r in range(6, ws.max_row + 1):
         src[f"FA-{r:03d}"] = dict(row=r, cat=ws.cell(r, C("Category")).value.strip(), cost=cost, acc=acc,
                                   nbv=ws.cell(r, acc_c + 1).value, last=acc - (ws.cell(r, prev_c).value or 0),
                                   desc=" ".join(str(ws.cell(r, C("Description")).value or "").split()),
-                                  gl=day(ws.cell(r, C("GL Date")).value), life=ws.cell(r, C("Useful life in Months")).value,
+                                  gl=day(ws.cell(r, C("GL Date")).value), dept=str(ws.cell(r, C("DEPT_ID")).value or "").strip(), life=ws.cell(r, C("Useful life in Months")).value,
                                   purchase=day(ws.cell(r, C("Purchase Date")).value),
                                   accs=[ws.cell(r, c).value or 0 for _, c in acc_cols])
+# Departments: the row of Departments Draft v1 whose Sage# cell names the code, with its parents above it.
+dw = list(openpyxl.load_workbook("data/MINIO-Dimensions-from-sage-20260825.xlsx", read_only=True, data_only=True)["Departments Draft v1"].iter_rows(values_only=True))
+def ns_dept(code):
+    for i, row in enumerate(dw):
+        if row[0] and code in [c.strip().split(" ")[0] for c in str(row[0]).replace("(", "").split(",")] and isinstance(row[1], (int, float)):
+            names, level = [f"{int(row[2])} {str(row[3]).strip()}"], int(row[1])
+            for up in reversed(dw[:i]):
+                if isinstance(up[1], (int, float)) and int(up[1]) < level and up[2] is not None:
+                    names.insert(0, f"{int(up[2])} {str(up[3]).strip()}"); level = int(up[1])
+            return " : ".join(names)
+    return None
+methods = {r[0] for r in openpyxl.load_workbook("MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx", read_only=True)["Dep Method"].iter_rows(min_row=2, values_only=True) if r[0]}
 ls = wb["15000-16300 Leadsheet - E100"]
 gl_cost, gl_ad = ls["E7"].value, ls["E15"].value
 
@@ -99,6 +111,10 @@ for r in ml:
     if left <= 0 or not close(left * r["Last Depreciation Amount"], r["Current Net Book Value"], 0.02 * left + 0.05):
         bad(f"{ref} lifetime {r['Asset Lifetime']} leaves {left} months for NBV {r['Current Net Book Value']} at {r['Last Depreciation Amount']}")
     if r["Asset Lifetime"] != s["life"] and s["cat"] != "Lease Improvement": bad(f"{ref} lifetime {r['Asset Lifetime']} vs useful life {s['life']}")
+    if not close(r["Cumulative Depreciation"], s["acc"]) or not close(r["Cumulative Depreciation"] + r["Current Net Book Value"], s["cost"]): bad(f"{ref} cumulative depreciation {r['Cumulative Depreciation']}")
+    want_m = "Straight Line" if r["Asset Lifetime"] == s["life"] else "Straight Line Remaining"
+    if r["Accounting Method"] != want_m or r["Accounting Method"] not in methods: bad(f"{ref} method {r['Accounting Method']}, expected {want_m}")
+    if r["Department"] != ns_dept(s["dept"]): bad(f"{ref} department {r['Department']!r}, expected {ns_dept(s['dept'])!r} for {s['dept']}")
 if set(matched) != loaded: bad(f"loaded register rows missing from mid-life: {loaded - set(matched)}")
 
 # DHR: one lump sum row per mid-life row, same order, amounts tie.
@@ -111,6 +127,8 @@ for r, m, ref in zip(dh, ml, matched):
     if not close(r["Transaction Amount"], s["acc"]): bad(f"{ref} DHR amount {r['Transaction Amount']} vs accumulated {s['acc']}")
     if not close(r["Transaction Amount"] + r["Net Book Value (NBV)"], r["Original Cost"]): bad(f"{ref} DHR amount plus NBV is not cost")
     if r["Asset Lifetime"] != m["Asset Lifetime"] or day(r["Purchase Date"]) != s["purchase"]: bad(f"{ref} DHR lifetime or purchase date")
+    if r["Depreciation Period"] != m["Last Depreciation Period"] or r["Period-1"] != m["Last Depreciation Period"] - 1: bad(f"{ref} DHR period {r['Depreciation Period']}/{r['Period-1']}")
+    if r["DHR Name"] != f"{ref} Depreciation to {as_of:%Y-%m-%d}" or "|" in r["DHR Name"]: bad(f"{ref} DHR Name {r['DHR Name']!r}")
 
 # SOA's reference tabs survive untouched.
 for path, tpl in ((MIDLIFE, "MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx"), (DHR, "MINIO_ FAM_DHR.xlsx")):
@@ -118,7 +136,9 @@ for path, tpl in ((MIDLIFE, "MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx"),
     if a.sheetnames != b.sheetnames: bad(f"{path} tabs changed")
     for name in b.sheetnames:
         if name in ("FAM_Mid-life Asset ", "DHR Import Template"):
-            if [c.value for c in a[name][1]] != [c.value for c in b[name][1]]: bad(f"{path} {name} header changed")
+            ha, hb = [c.value for c in a[name][1]], [c.value for c in b[name][1]]
+            extra = ["Cumulative Depreciation", "Accounting Method", "Department"] if name == "FAM_Mid-life Asset " else []
+            if ha != hb + extra: bad(f"{path} {name} header changed: {ha}")
             continue
         if name == "FAM_Asset Type":
             # Only Write Off and Disposal Cost may change, on the depreciating types, and only from blank to 72400.
@@ -127,12 +147,15 @@ for path, tpl in ((MIDLIFE, "MINIO_FAM_CSVTemplate_Mid-life Asset Record.xlsx"),
                 for k in range(1, b[name].max_column + 1):
                     va, vb = a[name].cell(r, k).value, b[name].cell(r, k).value
                     if va == vb: continue
-                    ok = k in (hd["WRITE OFF ACCOUNT"], hd["DISPOSAL COST ACCOUNT"]) and r >= 3 and vb is None and str(va).startswith("72400 ")
+                    ok = r >= 3 and ((k in (hd["WRITE OFF ACCOUNT"], hd["WRITE DOWN ACCOUNT"], hd["DISPOSAL COST ACCOUNT"]) and vb is None and str(va).startswith("72400 "))
+                                     or (k == hd["DEPRECIATION RULES"] and (vb, va) == ("Disposal", "Acquisition"))
+                                     or (k == hd["ACCOUNTING METHOD"] and (vb, va) == ("Straightline", "Straight Line")))
                     if not ok: bad(f"{path} FAM_Asset Type {a[name].cell(r, k).coordinate} changed: {vb!r} to {va!r}")
             for r in range(3, a[name].max_row + 1):
                 if a[name].cell(r, hd["DEPRECIATION ACCOUNT"]).value not in (None, "N/A"):
-                    for col in ("WRITE OFF ACCOUNT", "DISPOSAL COST ACCOUNT"):
+                    for col in ("WRITE OFF ACCOUNT", "WRITE DOWN ACCOUNT", "DISPOSAL COST ACCOUNT"):
                         if not str(a[name].cell(r, hd[col]).value or "").startswith("72400 "): bad(f"{path} FAM_Asset Type row {r} {col} not filled")
+                    if a[name].cell(r, hd["DEPRECIATION RULES"]).value != "Acquisition" or a[name].cell(r, hd["ACCOUNTING METHOD"]).value not in methods: bad(f"{path} FAM_Asset Type row {r} rules or method")
             continue
         if [[c.value for c in r] for r in a[name].iter_rows()] != [[c.value for c in r] for r in b[name].iter_rows()]: bad(f"{path} tab {name} changed")
 

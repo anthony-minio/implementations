@@ -6,7 +6,7 @@
 #   MinIO_Fixed_Asset_Load_Working_<DATE>.xlsx              every asset, its treatment, flags, and the open questions
 #   MINIO_FAM_CSVTemplate_Mid-life Asset Record - DRAFT <DATE>.xlsx   SOA's template, import tab filled
 #   MINIO_ FAM_DHR - DRAFT <DATE>.xlsx                               SOA's template, DHR Import Template tab filled (lump sum)
-import calendar, datetime as dt, json, shutil
+import calendar, copy, datetime as dt, json, shutil
 import openpyxl
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
@@ -25,7 +25,17 @@ SUBSIDIARY = "MinIO, Inc."  # E100; name as in ../README.md reference values
 # FAM_Asset Type tab: SOA left Write Off, Write Down and Disposal Cost blank. Ming, 2026-11-13 (Slack, asked for write-off and gain/loss on disposal):
 # 79200 (Gain) / Loss on Sale of Asset, 72400 in NetSuite. Write Off: confirmed. Disposal Cost: same account, proposed. Write Down: no account in the COA yet.
 GAIN_LOSS = "72400 - (Gain) / Loss on Sale of Asset"
-ASSET_TYPE_ACCOUNTS = {"WRITE OFF ACCOUNT": GAIN_LOSS, "DISPOSAL COST ACCOUNT": GAIN_LOSS}
+# Write Down: 72400 too (Anthony, 2026-11-20; Ming has the Slack thread).
+ASSET_TYPE_ACCOUNTS = {"WRITE OFF ACCOUNT": GAIN_LOSS, "WRITE DOWN ACCOUNT": GAIN_LOSS, "DISPOSAL COST ACCOUNT": GAIN_LOSS}
+# Other asset type settings (Anthony, 2026-11-20): Acquisition, the register's practice of depreciating from the month an asset goes
+# into service; and the method name exactly as NetSuite lists it (SOA's Dep Method tab: "Straight Line", not "Straightline").
+ASSET_TYPE_SETTINGS = {"DEPRECIATION RULES": "Acquisition", "ACCOUNTING METHOD": "Straight Line"}
+# Columns added to the mid-life import tab (Anthony, 2026-11-20), named as the NetSuite asset record fields.
+MIDLIFE_EXTRA = ["Cumulative Depreciation", "Accounting Method", "Department"]
+# Accounting Method per asset, names as on SOA's Dep Method tab. Straight Line is (CC-RV)/AL. The leasehold improvements
+# shortened to the lease term need the remaining value over the remaining months: Straight Line Remaining, (NB-RV)/(AL-CP+1).
+SL, SLR = "Straight Line", "Straight Line Remaining"
+DIMENSIONS = "data/MINIO-Dimensions-from-sage-20260825.xlsx"  # tab Departments Draft v1: Sage code to NetSuite department
 # MinIO category (column A) -> SOA asset type (tab FAM_Asset Type of the mid-life template)
 ASSET_TYPE = {"Computer Hardware": "Equipment", "Furniture": "Furniture & Fixtures",
               "Lease Improvement": "Leasehold Improvements", "Software": "TBC"}
@@ -148,6 +158,29 @@ for a in assets:
     if a["category"] == "Software":
         a["flags"].append("No matching NetSuite asset type: SOA's types have Internally Developed Software only (this is purchased software, account 15100)")
 
+# Department: Sage code to the NetSuite department's full name (parent : child), from Departments Draft v1.
+def dept_map():
+    ws = openpyxl.load_workbook(DIMENSIONS, read_only=True, data_only=True)["Departments Draft v1"]
+    out, parents = {}, {}
+    for row in ws.iter_rows(min_row=4, values_only=True):
+        sage, level, code, desc = row[:4]
+        if not isinstance(level, (int, float)) or code is None: continue
+        level, name = int(level), f"{int(code)} {str(desc).strip()}"
+        parents[level] = name
+        full = " : ".join([parents[l] for l in range(1, level)] + [name])
+        for c in str(sage or "").replace(" historic only", "").replace(" historic", "").replace("(", "").replace(")", "").split(","):
+            c = c.strip()
+            if c: out[c] = full
+    return out
+DEPT = dept_map()
+for a in assets:
+    if a["status"] == "Depreciating":
+        a["method"] = SLR if a["lifetime"] != a["life"] else SL
+        if a["dept"] not in DEPT:
+            a["flags"].append(f"Department {a['dept']} is not on Departments Draft v1; Department left blank")
+    else:
+        a["method"] = SL
+
 def load_rows():
     """Assets that go to NetSuite: still depreciating, plus fully depreciated assets confirmed in use."""
     out = []
@@ -165,11 +198,17 @@ def midlife(a):
     return [a["description"], asset_description(a), 1, SUBSIDIARY, ASSET_TYPE[a["category"]], a["status"],
             a["life"] if fd else a["lifetime"], a["cost"], a["cost"], 0, 0,
             a["dep_date"] if fd else a["start"], a["fd_month"] if fd else AS_OF,
-            a["life"] if fd else a["periods"], a["last_dep_amt"] if fd else a["dep_last"], 0 if fd else a["nbv"]]
+            a["life"] if fd else a["periods"], a["last_dep_amt"] if fd else a["dep_last"], 0 if fd else a["nbv"],
+            a["cost"] if fd else a["accum"], a["method"], DEPT.get(a["dept"])]
 def dhr(a):
+    # Depreciation Period: the asset's Last Depreciation Period (Anthony, 2026-11-20); Period-1 as SOA's formula, J-1.
+    # DHR Name: any value without "|" (Oracle). Asset Name: Oracle's format is the NetSuite asset ID plus the name
+    # (FAM00001 Chairs), so it is completed once the assets are imported and have IDs.
     fd = a["status"] == "Fully Depreciated"
-    return [None, a["description"], SUBSIDIARY, 1, ASSET_TYPE[a["category"]], "Depreciation",
-            a["fd_month"] if fd else AS_OF, a["cost"] if fd else a["accum"], 0 if fd else a["nbv"], 1, 0,
+    period = a["life"] if fd else a["periods"]
+    when = a["fd_month"] if fd else AS_OF
+    return [f"{a['ref']} Depreciation to {when:%Y-%m-%d}", a["description"], SUBSIDIARY, 1, ASSET_TYPE[a["category"]], "Depreciation",
+            when, a["cost"] if fd else a["accum"], 0 if fd else a["nbv"], period, period - 1,
             a["life"] if fd else a["lifetime"], a["purchase"], a["cost"]]
 
 # ---------- styling ----------
@@ -240,6 +279,11 @@ shutil.copy(MIDLIFE_TPL, OUT_MIDLIFE)
 m = openpyxl.load_workbook(OUT_MIDLIFE)
 t = m["FAM_Mid-life Asset "]
 t.delete_rows(2, t.max_row)
+last = t.max_column
+for k, h in enumerate(MIDLIFE_EXTRA, last + 1):
+    c = t.cell(row=1, column=k, value=h)
+    c._style = copy.copy(t.cell(row=1, column=last)._style)
+    t.column_dimensions[get_column_letter(k)].width = t.column_dimensions[get_column_letter(last)].width or 14
 for i, a in enumerate(loads, 2):
     for k, v in enumerate(midlife(a), 1):
         c = t.cell(row=i, column=k, value=v)
@@ -248,7 +292,7 @@ t = m["FAM_Asset Type"]
 cols = {str(c.value).strip(): c.column for c in t[1] if c.value}
 for r in range(3, t.max_row + 1):
     if t.cell(r, 1).value and t.cell(r, cols["ASSET ACCOUNT"]).value and t.cell(r, cols["DEPRECIATION ACCOUNT"]).value != "N/A":
-        for col, acct in ASSET_TYPE_ACCOUNTS.items():
+        for col, acct in {**ASSET_TYPE_ACCOUNTS, **ASSET_TYPE_SETTINGS}.items():
             t.cell(r, cols[col], value=acct)
 m.save(OUT_MIDLIFE)
 
@@ -312,27 +356,31 @@ for a in assets:
                  ASSET_TYPE[a["category"]], a.get("lifetime"), a.get("periods"), a.get("remaining"), "\n".join(a["flags"])])
 table(w.create_sheet("All Assets"), wh, rows, {"Description": 40, "Vendor": 24, "Comment": 30, "Flags": 70, "Basis": 24})
 QUESTIONS = [
-    ("SOA", "DHR form", "Lump sum (one Depreciation row per asset, as filled) or monthly? The register has monthly figures only from 2021-01."),
-    ("SOA", "DHR Depreciation Period", "SOA's lump sum example has Depreciation Period 1 and Period-1 0 for 18 months of depreciation. Filled the same way: confirm, or should it be the Last Depreciation Period?"),
-    ("SOA", "DHR Name and order", "DHR Name is blank in the example and is ID plus Name in Sample Asset Records. Is it filled after the asset import, with the IDs NetSuite gives the assets? Assets first, then DHR?"),
-    ("SOA", "Depreciation rule", "SOA's asset types use Disposal (first depreciation the month after the asset is in service). MinIO's register depreciates from the month the asset is put in service, which is the Acquisition rule. This decides when depreciation starts on assets bought after go-live."),
-    ("SOA", "Default lifetimes", "SOA's asset types default to 36 months. MinIO uses 60 for furniture and leasehold improvements (36 for trade booths). The load gives each asset its own lifetime, so this only affects new assets."),
-    ("SOA", "Shortened leasehold improvements", "FA-076 and FA-082 were sped up to finish at the end of the lease (2028-06). Straight Line, (CC-RV)/AL, would give 22,270/44 = 506.14 and 10,253/42 = 244.12 a month instead of 519.63 and 247.78. Use Straight Line Remaining, (NB-RV)/(AL-CP+1), for these two? The mid-life template has no method column."),
-    ("SOA", "Sample Asset Records", "The DHR file's Sample Asset Records tab has 29 fields, more than the mid-life import (Depreciation Active, Depreciation Rules, Depreciation Method, Department, Class, Location, Asset Serial Number). Is it a load, or an example of the records the mid-life import creates? Not filled."),
-    ("SOA", "Department, Class, Location", "SOA's Sample Asset Records have Department, Class and Location; the mid-life template does not. The register has a department (D-E420 and so on). Load it?"),
-    ("SOA / Ming", "Disposal accounts", "FAM_Asset Type: Write Off is 72400 (Gain) / Loss on Sale of Asset: Ming, 2026-11-13, answering which accounts to use for write-off and gain/loss on disposal (Sage 79200). Disposal Cost filled with the same account: proposed, Ming to confirm. Write Down (Revaluation): no write-down or impairment account in the COA; which account?"),
-    ("SOA", "Software asset type", "FA-036 accounting software (15100) has no matching type; SOA's list has Internally Developed Software only. Only matters if the review says it is still in use."),
-    ("Richard / Ming", "FA-098 to FA-101", "GL date 2022-10, depreciation started 2026-10 (FA-101 none), description is a Sage vendor string with no vendor, comment or Dep Date. What are they? FA-098 has the same cost and vendor as FA-094 (AMAX, 63,995.00): duplicate? FA-101 (Apple, 12,100.76) is held until its start date is known."),
+    ("SOA", "Reading of the templates", "Mid-life Asset Record creates the assets; DHR loads the depreciation already taken. Confirm."),
+    ("SOA", "Lump sum DHR", "Decided: lump sum (Anthony, 2026-11-20). Oracle's current help says to create a DHR for every depreciation entry (monthly, quarterly or annually); older Oracle help and practitioners use one catch-up record. Confirm it loads."),
+    ("SOA", "DHR Asset Name and load order", "Oracle: Asset Name is the NetSuite asset ID plus the name (FAM00001 Chairs), and assets are imported before DHRs. Plan: import assets, export their IDs, complete Asset Name, import DHRs. Confirm."),
+    ("SOA", "Added columns", "Cumulative Depreciation, Accounting Method and Department were added to the mid-life import tab (Anthony, 2026-11-20). They are NetSuite asset record fields; Oracle's import field list does not show Accounting Method. Confirm they import."),
+    ("SOA", "Straight Line Remaining", "Used for FA-076 and FA-082, shortened to the lease term: (NB-RV)/(AL-CP+1) gives 519.63 and 247.78. Oracle describes it as a method linked after another. Confirm it works as an asset's own method."),
+    ("SOA", "Server scripts on CSV import", "Oracle: with Run Server SuiteScript and Trigger Workflows and FAM's Run Server Scripts on CSV Import both on, Cumulative Depreciation, Last Depreciation Date and Last Depreciation Period import as 0. Check the settings."),
+    ("SOA", "Name mapping", "Oracle: delete the default Name = ID mapping; a Name over 30 characters in ID errors. 22 of the 32 names are over 30 characters (longest 81)."),
+    ("SOA", "Sample Asset Records", "The DHR file's Sample Asset Records tab looks like the full asset record field list. Is it a load, or an example? Not filled."),
+    ("Richard / Ming", "FA-098 to FA-101", "GL date 2022-10, depreciation from 2026-10 (FA-101 none), Sage vendor string as description. What are they? FA-098 has the same cost and vendor as FA-094 (AMAX, 63,995.00): duplicate? FA-101 is held until its start date is known."),
     ("Richard / Ming", "FA-096, FA-097 Dep Date", "Dep Date 2027-10-01 but depreciation started 2026-10. Loaded from 2026-10."),
-    ("Richard / Ming", "FA-093 start", "Bought 2025-03-05, depreciation from 2026-03. Put in service then? Loaded as in the register."),
-    ("Richard / Ming", "FA-073 lease term", "McMillan Electric leasehold improvement finishes 2029-03; the Hudson Pacific items were shortened to finish 2028-06. Shorten this one too?"),
-    ("Richard / Ming", "FA-077, FA-078 names", "Both named PowerEdge R7615 server. Make the names unique (for example with the invoice or serial number)?"),
-    ("Richard / Ming", "Leasehold not in the GL", "13 leasehold improvements from 2017 to 2019 (121,238.22) are on the register but not in 15300 or 16300. Confirm they were written off and should not be loaded."),
+    ("Richard / Ming", "FA-093 start", "Bought 2025-03-05, depreciation from 2026-03. Loaded as in the register."),
+    ("Richard / Ming", "FA-073 lease term", "Finishes 2029-03, after the lease ends 2028-06. ASC 842 has leasehold improvements depreciated over the shorter of useful life and remaining lease term. Shorten it like FA-076 and FA-082?"),
+    ("Richard / Ming", "D110 department", "FA-070, FA-071 and FA-089 are on D110 (Sales, historic), which is not on Departments Draft v1. Which NetSuite department? Department is blank until then."),
     ("Sendhil Mandala", "Disposed assets", "Per the Asana task: which assets have been disposed of."),
-    ("Anthony", "Cutover month", f"The register is as of {AS_OF}. The load is rebuilt from the register for the month before go-live."),
-    ("Anthony", "Asset Description", "Filled with the vendor, then the register's Comment when it differs from the Description. Fine?"),
 ]
-table(w.create_sheet("Questions"), ["For", "Topic", "Question"], [list(q) for q in QUESTIONS], {"For": 16, "Topic": 28, "Question": 110})
+DECISIONS = [
+    "2026-11-20 (Anthony): lump sum DHR; DHR Depreciation Period is the asset's Last Depreciation Period; DHR Name filled; Accounting Method, Department and Cumulative Depreciation columns added; Depreciation Rules Acquisition; Write Down Account 72400; load as of 2026-10-31 for now; fully depreciated assets a separate load; asset type default lifetimes left to Ming once NetSuite is in use.",
+    "2026-11-13 (Ming, Slack): write-off and gain/loss on disposal use 79200 (Gain) / Loss on Sale of Asset, 72400 in NetSuite.",
+]
+q = w.create_sheet("Questions")
+table(q, ["For", "Topic", "Question"], [list(x) for x in QUESTIONS], {"For": 16, "Topic": 28, "Question": 110})
+r0 = len(QUESTIONS) + 3
+q.cell(row=r0, column=1, value="Decided").font = Font(bold=True)
+for k, d in enumerate(DECISIONS, r0 + 1):
+    q.cell(row=k, column=1, value=d).alignment = Alignment(wrap_text=False)
 w.save(OUT_WORK)
 
 json.dump({"assets": [{k: (v.isoformat() if isinstance(v, dt.date) else v) for k, v in a.items()} for a in assets]},

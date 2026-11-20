@@ -56,39 +56,43 @@ Without the 13 leasehold improvements, the cost ties to Sage 15000-15300 (2,391,
 
 ## Decisions
 
-- 2026-11-13 (Ming, Slack, asked which accounts to use for write-off and gain/loss on disposal): 79200 (Gain) / Loss on Sale of Asset, which maps to 72400 in NetSuite. On SOA's FAM_Asset Type tab, 72400 goes in Write Off Account and, proposed, Disposal Cost Account. No account yet for Write Down Account.
+- 2026-11-13 (Ming, Slack, asked which accounts to use for write-off and gain/loss on disposal): 79200 (Gain) / Loss on Sale of Asset, which maps to 72400 in NetSuite.
 - 2026-11-17: the 13 leasehold improvements from 2017 to 2019 are not loaded. The leadsheet leaves them out of 15300 and 16300. To confirm with Richard and Ming.
 - 2026-11-17: Subsidiary MinIO, Inc. Quantity 1. Residual 0. Asset types: Computer Hardware to Equipment, Furniture to Furniture & Fixtures, Lease Improvement to Leasehold Improvements.
 - 2026-11-17: each month's depreciation is the change in accumulated depreciation, not the Dep column. FA-087 has Dep formulas from 2024-08 that are not added to its total. It was bought in 2025-03.
 - 2026-11-17: FA-076 and FA-082 were sped up to finish at the end of the lease (2028-06). Their lifetime is months done plus months left (44 and 42), not 60.
+- 2026-11-20 (Anthony):
+  - Lump sum DHR, one row per asset. Depreciation Period is the asset's Last Depreciation Period, and Period-1 is that less 1. DHR Name is filled, for example `FA-069 Depreciation to 2026-10-31`.
+  - Added to the mid-life import tab: Cumulative Depreciation, Accounting Method and Department.
+    - Accounting Method is Straight Line, and Straight Line Remaining for FA-076 and FA-082. The names are as on SOA's Dep Method tab.
+    - Department maps the register code through Departments Draft v1 (`data/MINIO-Dimensions-from-sage-20260825.xlsx`) to the NetSuite name, parent : child.
+  - FAM_Asset Type:
+    - Write Off, Write Down and Disposal Cost Account are 72400.
+    - Depreciation Rules is Acquisition, not SOA's Disposal, matching the register's practice of depreciating from the month an asset goes into service.
+    - Accounting Method is Straight Line, not SOA's Straightline.
+  - Default lifetimes are left for Ming once NetSuite is in use.
+  - The load is as of 2026-10-31.
+  - Fully depreciated assets still in use are a separate load, by the same process.
 
 ## Open questions
 
-The full list is on the Questions tab of the working workbook.
+The current list is the Questions section of the SOA document (https://claude.ai/artifact/6nnyN1dQ3cAX9KQiGfyvEo) and the Questions tab of the working workbook.
 
-For SOA:
-
-- Lump sum or monthly DHR?
-- In the lump sum example, Depreciation Period is 1. Is that right?
-- Is DHR Name filled after the asset import?
-- SOA's asset types use the Disposal rule, but MinIO depreciates from the month an asset goes into service (the Acquisition rule).
-- What depreciation method for FA-076 and FA-082? Straight Line Remaining?
-- Should we load Department, Class and Location?
-- Which accounts for write-off, write-down and disposal cost?
-- What asset type for FA-036, the purchased software?
-
-For Richard and Ming:
-
-- What are FA-098 to FA-101? They have a GL date of 2022-10 and depreciation from 2026-10. FA-098 may duplicate FA-094.
-- FA-096 and FA-097 have a Dep Date of 2027-10. Typo?
-- FA-093 was bought in 2025-03 but depreciates from 2026-03. Confirm.
-- FA-073 finishes in 2029-03, after the lease ends. Shorten it?
-- FA-077 and FA-078 have the same name. Make them unique?
-
-Others:
-
+- For SOA:
+  - Will a lump sum DHR load?
+  - DHR Asset Name needs the NetSuite asset ID, so the assets are imported first.
+  - Do the added columns import?
+  - Does Straight Line Remaining work as an asset's only method?
+  - Server script settings on CSV import.
+  - The Name = ID mapping.
+  - What is the Sample Asset Records tab for?
+- For Richard and Ming:
+  - FA-098 to FA-101.
+  - FA-096 and FA-097 Dep Date.
+  - FA-093 start date.
+  - FA-073 lease term.
+  - Department for FA-070, FA-071 and FA-089 (D110).
 - Sendhil Mandala: which assets have been disposed of.
-- The register must be rolled forward to the month before go-live, then the load rebuilt.
 
 ## Load log
 
