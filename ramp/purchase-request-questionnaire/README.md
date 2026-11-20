@@ -70,3 +70,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-20 | General Procurement Request: questions 15 to 17 captured |
 | 2026-11-20 | General Procurement Request: questions 18 to 22 captured |
 | 2026-11-20 | General Procurement Request: questions 23 to 25, #22 and #23 conditions captured |
+| 2026-11-20 | General Procurement Request: questions 26 to 28 and their conditions captured |

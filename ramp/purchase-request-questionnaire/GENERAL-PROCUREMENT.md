@@ -43,7 +43,7 @@ In the order shown. Ramp field type is the tag on the question. Required: `Locke
 | 1 | REQUEST DETAILS – Give this request a name | Request name | None | Yes | None shown |
 | 2 | REQUEST DETAILS – Is it one-time or recurring? | Frequency | None | Locked | None shown |
 | 3 | SPEND – What is the spend amount? | Amount | None | Locked | None shown |
-| 4 | VENDOR – Specify the vendor for this request | Vendor | None | Always required | None shown. Restrict available vendors: Off |
+| 4 | VENDOR – Specify the vendor for this request | Vendor | None | Always required | Drives #26 and #27. Restrict available vendors: Off |
 | 5 | NEGOTIATIONS – Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | Drives #6 |
 | 6 | NEGOTIATIONS – If yes, provide justification and describe what was discussed or negotiated w... | Paragraph | Provide a brief summary of any prior negotiations you personally conducted with this vendor. Include the negotiated pricing, terms, discounts, or special considerations, and indicate whether Procurement participated or assisted. | Always required | Shown if #5 is "Yes — I have already discussed or negotiated with the vendor (please provide details in the justification field)" |
 | 7 | BUSINESS PURPOSE – Describe the business purpose | Paragraph | Briefly describe the business purpose (e.g., customer engagement, pipeline advancement, brand awareness). One–two sentences is sufficient. | Always required | None shown |
@@ -65,6 +65,9 @@ In the order shown. Ramp field type is the tag on the question. Required: `Locke
 | 23 | CONTRACTS / DOCUMENTATION – Include relevant links (such as terms or pricing) | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #21 is "Online click-through agreement" |
 | 24 | CONTRACTS / DOCUMENTATION- Include relevant links (such as terms or pricing) Continued | Link | None | No | None shown |
 | 25 | PAYMENT TERMS – What are the net payment terms? | Net payment terms | Number of days | No | None shown |
+| 26 | VENDOR – Vendor contact | Vendor contact | None | Always required | Shown if Vendor (#4) is "New vendor" |
+| 27 | VENDOR – Vendor address | Vendor address | None | Always required | Shown if Vendor (#4) is "New vendor" |
+| 28 | APPROVAL NOTES – Add a message for approvers to review | Text | None | No | None shown |
 
 The blurred background of the #6 condition panel confirms nothing sits between #4 and #5. The #12 description has an opening bracket with no closing one, and the #13 title has no space after the first dash, both as in Ramp. A condition listing several answers is read as "any of these". The #12 and #14 condition screenshots are identical; they are matched to questions by the order they were sent.
 
@@ -104,7 +107,7 @@ The blurred background of the #6 condition panel confirms nothing sits between #
 - Confirm the #11 condition.
 - Full titles of #13, #14, #15 and #18, and #21 option 3 (cut off).
 - The second icon on #21.
-- Confirm #18 to #22 belong to this program (sent without the program header) and whether anything follows #25.
+- Confirm #18 to #22 belong to this program (sent without the program header) and whether anything follows #28.
 - Full text of #5 option 2.
 - Options for #2 Frequency.
 - Page 2 of the program editor (the dots at the top show 2 pages; likely approvals).
