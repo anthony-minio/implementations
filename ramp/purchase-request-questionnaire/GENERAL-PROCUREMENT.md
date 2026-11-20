@@ -36,26 +36,46 @@ Screenshots: `screenshots/20261120-general-procurement-*.png`.
 
 ## Questions
 
-In the order shown. Ramp field type is the tag on the question. Required: `Locked` means the Required box is ticked and greyed out (a Ramp system field).
+In the order shown. Ramp field type is the tag on the question. Required: `Locked` means the Required box is ticked and greyed out (a Ramp system field). `...` means the text is cut off in the screenshot.
 
-| # | Title | Ramp field type | Description | Required | Options | Conditional logic |
-|---|---|---|---|---|---|---|
-| 1 | REQUEST DETAILS – Give this request a name | Request name | None | Yes | n/a | None shown |
-| 2 | REQUEST DETAILS – Is it one-time or recurring? | Frequency | None | Locked | Not shown | None shown |
-| 3 | SPEND – What is the spend amount? | Amount | None | Locked | n/a | None shown |
-| 4 | VENDOR – Specify the vendor for this request | Vendor | None | Always required | Restrict available vendors: Off | None shown |
-| 5 | NEGOTIATIONS – Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | See below | Branch icon shown on the question. Rules not captured |
+| # | Title | Ramp field type | Description | Required | Conditional logic |
+|---|---|---|---|---|---|
+| 1 | REQUEST DETAILS – Give this request a name | Request name | None | Yes | None shown |
+| 2 | REQUEST DETAILS – Is it one-time or recurring? | Frequency | None | Locked | None shown |
+| 3 | SPEND – What is the spend amount? | Amount | None | Locked | None shown |
+| 4 | VENDOR – Specify the vendor for this request | Vendor | None | Always required | None shown. Restrict available vendors: Off |
+| 5 | NEGOTIATIONS – Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | Drives #6 |
+| 6 | NEGOTIATIONS – If yes, provide justification and describe what was discussed or negotiated w... | Paragraph | Provide a brief summary of any prior negotiations you personally conducted with this vendor. Include the negotiated pricing, terms, discounts, or special considerations, and indicate whether Procurement participated or assisted. | Always required | Shown if #5 is "Yes — I have already discussed or negotiated with the vendor (please provide details in the justification field)" |
+| 7 | BUSINESS PURPOSE – Describe the business purpose | Paragraph | Briefly describe the business purpose (e.g., customer engagement, pipeline advancement, brand awareness). One–two sentences is sufficient. | Always required | None shown |
+| 8 | REQUEST TYPE – What best describes this request? | Multi select | None | Always required | Drives #9 |
+| 9 | REQUEST TYPE – If other, please explain | Paragraph | None | Always required | Shown with 1 condition. Rule not opened; presumably #8 is "Other" |
+| 10 | BUSINESS IMPACT – What is the primary expected o... | Multi select (blurred) | Not captured | Not captured | Branch icon (blurred) |
+| 11 | BUSINESS IMPACT – What is the expected business imp... | Paragraph (blurred) | Not captured | Not captured | Shown with 1 condition (blurred) |
+| 12 | BUSINESS IMPACT – What positive impact is expected f... | Paragraph (blurred) | Not captured | Not captured | Not captured |
 
-Question 5 options (both cut off in the screenshot):
+Questions 10 to 12 are read from the blurred background of the condition panel screenshot; titles and types are best guesses. That screenshot also confirms nothing sits between #4 and #5.
 
-1. Yes — I have already discussed or negotiated with the vendor (please provide detai...
+### Options
+
+#5 NEGOTIATIONS (option 2 cut off):
+
+1. Yes — I have already discussed or negotiated with the vendor (please provide details in the justification field)
 2. No — I have not engaged with the vendor. I will contact Procurement (Procurement(...
+
+#8 REQUEST TYPE:
+
+1. Customer-facing sales meeting / dinner
+2. Marketing event / sponsorship
+3. Conference / trade show
+4. Internal meeting / team event
+5. Training / enablement
+6. Other
 
 ## Not yet captured
 
-- Questions after #5, if any.
-- Whether anything sits between #4 and #5 (the screenshots don't overlap).
-- Full text of the two #5 options.
-- The conditional rules on #5: what shows, or what happens, for each answer.
+- #10 to #12 in full: titles, descriptions, options, conditions.
+- Anything after #12.
+- Full text of #5 option 2.
+- The #9 condition (assumed #8 is "Other").
 - Options for #2 Frequency.
 - Page 2 of the program editor (the dots at the top show 2 pages; likely approvals).
