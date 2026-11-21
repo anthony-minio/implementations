@@ -60,6 +60,9 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the ma
 | 12 | TIMELINE – Is there a target date or deadline by which this purchase or contract needs to be co... | Date | None | No | None shown | #18, same |
 | 13 | REQUESTER – Who is the internal business owner/requester? | Text | None | Always required | None shown | #19, same |
 | 14 | DEPARTMENT – Which department will be using this service? | Department | None | Always required | None shown | #20, worded for services |
+| 15 | PURCHASE METHOD – How will this purchase be made? | Single select | None | Always required | Drives #16 and #17. Branch icon plus the same unidentified second icon as GP #21 | #21, same options, but single select here (multi select in GP) |
+| 16 | DOCUMENTATION – Please upload all related contracts and documents. | File upload | (Required: vendor proposal, quote, order form,  MSA, DPA) | Always required | Shown if #15 is "Signed Contract" | #22, adds a description listing required documents |
+| 17 | SUPPORTING LINKS – Please provide any relevant online links related to this request. | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #15 is "Online click-through agreement" | #23, same description, different title |
 
 ### Options
 
@@ -70,9 +73,17 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the ma
 
 Option 1 differs from GP #5: it starts with "Yes ( Please provide the Justification" run straight into the GP wording.
 
+#15 PURCHASE METHOD (option 3 cut off; same as GP #21):
+
+1. Online click-through agreement
+2. Signed Contract
+3. No contract required (PO / invoice-based purchase; no vendor terms, no data acce...
+
+The description's "MinIO terms" governance option is not among them.
+
 ## Not yet captured
 
-- Questions after #14, with their conditions.
+- Questions after #17, with their conditions.
 - Full titles of #6 and #9, and #5 option 2 (cut off).
 - Change order form and AI instructions.
 - Page 2 of the program editor.
