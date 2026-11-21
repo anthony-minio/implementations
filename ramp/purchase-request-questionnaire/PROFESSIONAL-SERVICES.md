@@ -50,20 +50,24 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the ma
 | 2 | REQUEST DETAILS – Is it one-time or recurring? | Frequency | None | Locked | None shown | #2, same |
 | 3 | SPEND – What is the spend amount? | Amount | None | Locked | None shown | #3, same |
 | 4 | VENDOR- Specify the vendor for this request | Vendor | None | Always required | None shown. Restrict available vendors: Off | #4, no space before the dash |
-| 5 | NEGOTIATIONS- Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | Branch icon shown | #5, no space before the dash, leading space in the title field |
+| 5 | NEGOTIATIONS- Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | Drives #6 | #5, no space before the dash, leading space in the title field |
+| 6 | NEGOTIATIONS- If YES → Provide justification and describe what was discussed or negotiated... | Paragraph | Provide a brief summary of any prior negotiations you personally conducted with this vendor. Include the negotiated pricing, terms, discounts, or special considerations, and indicate whether Procurement participated or assisted. | Always required | Shown if #5 is option 1 | #6, same description, title worded differently |
+| 7 | SERVICES – Please describe the nature of the external services being requested. | Paragraph | None | Always required | None shown | #17, worded for services |
+| 8 | BUSINESS PURPOSE – What is the purpose of these external services? | Paragraph | None | Always required | None shown | #7, worded differently, no description |
+| 9 | CUSTOMERS / TARGET ACCOUNTS – Which priority customers, partners, or target accounts w... | Paragraph | None | Always required | None shown | #14, adds "partners"; in GP it shows only for events, here always |
 
 ### Options
 
-#5 NEGOTIATIONS (both cut off):
+#5 NEGOTIATIONS (option 2 cut off; option 1 full text from the #6 condition panel):
 
-1. Yes ( Please provide the JustificationYes — I have already discussed or negotiated w...
+1. Yes ( Please provide the JustificationYes — I have already discussed or negotiated with the vendor (please provide details in the justification field)
 2. No — I have not engaged with the vendor. I will contact Procurement (Procurement(...
 
 Option 1 differs from GP #5: it starts with "Yes ( Please provide the Justification" run straight into the GP wording.
 
 ## Not yet captured
 
-- Questions after #5, with their conditions.
-- Full text of #5 options.
+- Questions after #9, with their conditions.
+- Full titles of #6 and #9, and #5 option 2 (cut off).
 - Change order form and AI instructions.
 - Page 2 of the program editor.
