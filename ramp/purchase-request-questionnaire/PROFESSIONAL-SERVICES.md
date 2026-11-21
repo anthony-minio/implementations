@@ -65,12 +65,14 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the ma
 | 17 | SUPPORTING LINKS – Please provide any relevant online links related to this request. | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #15 is "Online click-through agreement" | #23, same description, different title |
 | 18 | SUPPORTING LINKS – Links Continued | Link | (For example: pricing page, online terms and conditions, privacy policy, Data Processing Agreement (DPA), or product documentation.) | No | None shown | #24, has a description here |
 | 19 | DATA ACCESS – Please briefly describe the type of access or data involved? | Paragraph | None | Always required | None shown (comes before the yes/no question #20) | None |
-| 20 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential comp... | Multi select | None | Always required | Branch icon plus the second icon. What it drives not yet seen | None |
-| 21 | SYSTEM INTEGRATION – Will this vendor integrate with any MinIO systems? | Multi select | None | Always required | Branch icon plus the second icon. Drives #22 | None |
+| 20 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential company information? | Multi select | None | Always required | Branch icon plus the second icon. Drives #26 | None |
+| 21 | SYSTEM INTEGRATION – Will this vendor integrate with any MinIO systems? | Multi select | None | Always required | Branch icon plus the second icon. Drives #22, #25 and #26 | None |
 | 22 | SYSTEM INTEGRATION – Please describe which MinIO systems the vendor will integrate with. | Paragraph | None | Always required | Shown if #21 is "Yes" | None |
 | 23 | THIRD-PARTY SERVICES – Does this vendor use any subcontractors or third-party service providers? | Multi select | None | Always required | Drives #24. Branch icon only, no second icon | None |
 | 24 | THIRD-PARTY SERVICES – If yes, please explain. | Paragraph | None | Always required | Shown if #23 is "Yes" | None |
-| 25 | SYSTEM INTEGRATION – Please describe the type of access, integration, or connection require... | Paragraph | None | Always required | Shown with 1 condition. Rule not opened; possibly #20 | None |
+| 25 | SYSTEM INTEGRATION – Please describe the type of access, integration, or connection require... | Paragraph | None | Always required | Shown if #21 is "Yes" (same condition as #22) | None |
+| 26 | SECURITY / COMPLIANCE – Does the vendor have a SOC 2 Type II report? | Multi select | None | Always required | Shown if #20 is "Yes" or #21 is "Yes". Branch icon plus the second icon. Drives #27 | None |
+| 27 | SECURITY / COMPLIANCE –If Yes, Please upload the SOC 2 Type II  report | File upload | None | Always required | Shown if #26 is "Yes" | None |
 
 ### Options
 
@@ -89,13 +91,12 @@ Option 1 differs from GP #5: it starts with "Yes ( Please provide the Justificat
 
 The description's "MinIO terms" governance option is not among them.
 
-#20 DATA ACCESS, #21 SYSTEM INTEGRATION and #23 THIRD-PARTY SERVICES: Yes / No. #23 full title taken from the #24 condition panel.
+#20 DATA ACCESS, #21 SYSTEM INTEGRATION, #23 THIRD-PARTY SERVICES and #26 SECURITY / COMPLIANCE: Yes / No. Full titles of #20 and #23 taken from condition panels. The #27 title has no space after the dash and two spaces before "report", as in Ramp.
 
 ## Not yet captured
 
-- Questions after #25, with their conditions.
-- What #20 drives, and the #25 condition.
-- Full titles of #20 and #25 (cut off).
+- Questions after #27, with their conditions.
+- Full title of #25 (cut off).
 - Full titles of #6 and #9, and #5 option 2 (cut off).
 - Change order form and AI instructions.
 - Page 2 of the program editor.
