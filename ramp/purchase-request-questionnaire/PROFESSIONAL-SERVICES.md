@@ -55,6 +55,11 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the ma
 | 7 | SERVICES – Please describe the nature of the external services being requested. | Paragraph | None | Always required | None shown | #17, worded for services |
 | 8 | BUSINESS PURPOSE – What is the purpose of these external services? | Paragraph | None | Always required | None shown | #7, worded differently, no description |
 | 9 | CUSTOMERS / TARGET ACCOUNTS – Which priority customers, partners, or target accounts w... | Paragraph | None | Always required | None shown | #14, adds "partners"; in GP it shows only for events, here always |
+| 10 | BUSINESS IMPACT – What business impact is expected from this engagement? | Paragraph | None | Always required | None shown | #11, worded for services, no examples; in GP it shows only for "Other" |
+| 11 | SUCCESS METRICS – How will success be measured for this engagement? | Paragraph | None | Always required | None shown | None. Closest is part of the #13 description ("how success will be evaluated") |
+| 12 | TIMELINE – Is there a target date or deadline by which this purchase or contract needs to be co... | Date | None | No | None shown | #18, same |
+| 13 | REQUESTER – Who is the internal business owner/requester? | Text | None | Always required | None shown | #19, same |
+| 14 | DEPARTMENT – Which department will be using this service? | Department | None | Always required | None shown | #20, worded for services |
 
 ### Options
 
@@ -67,7 +72,7 @@ Option 1 differs from GP #5: it starts with "Yes ( Please provide the Justificat
 
 ## Not yet captured
 
-- Questions after #9, with their conditions.
+- Questions after #14, with their conditions.
 - Full titles of #6 and #9, and #5 option 2 (cut off).
 - Change order form and AI instructions.
 - Page 2 of the program editor.
