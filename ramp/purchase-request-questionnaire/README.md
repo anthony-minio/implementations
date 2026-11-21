@@ -84,3 +84,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-21 | Professional Services Purchase Request: questions 6 to 9 captured |
 | 2026-11-21 | Professional Services Purchase Request: questions 10 to 14 captured |
 | 2026-11-21 | Professional Services Purchase Request: questions 15 to 17 and their conditions captured |
+| 2026-11-21 | Professional Services Purchase Request: questions 18 to 22 captured |

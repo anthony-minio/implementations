@@ -63,6 +63,11 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the ma
 | 15 | PURCHASE METHOD – How will this purchase be made? | Single select | None | Always required | Drives #16 and #17. Branch icon plus the same unidentified second icon as GP #21 | #21, same options, but single select here (multi select in GP) |
 | 16 | DOCUMENTATION – Please upload all related contracts and documents. | File upload | (Required: vendor proposal, quote, order form,  MSA, DPA) | Always required | Shown if #15 is "Signed Contract" | #22, adds a description listing required documents |
 | 17 | SUPPORTING LINKS – Please provide any relevant online links related to this request. | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #15 is "Online click-through agreement" | #23, same description, different title |
+| 18 | SUPPORTING LINKS – Links Continued | Link | (For example: pricing page, online terms and conditions, privacy policy, Data Processing Agreement (DPA), or product documentation.) | No | None shown | #24, has a description here |
+| 19 | DATA ACCESS – Please briefly describe the type of access or data involved? | Paragraph | None | Always required | None shown (comes before the yes/no question #20) | None |
+| 20 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential comp... | Multi select | None | Always required | Branch icon plus the second icon. What it drives not yet seen | None |
+| 21 | SYSTEM INTEGRATION – Will this vendor integrate with any MinIO systems? | Multi select | None | Always required | Branch icon plus the second icon. Likely drives #22 | None |
+| 22 | SYSTEM INTEGRATION – Please describe which MinIO systems the vendor will integrate with. | Paragraph | None | Always required | Shown with 1 condition. Rule not opened; presumably #21 is "Yes" | None |
 
 ### Options
 
@@ -81,9 +86,13 @@ Option 1 differs from GP #5: it starts with "Yes ( Please provide the Justificat
 
 The description's "MinIO terms" governance option is not among them.
 
+#20 DATA ACCESS and #21 SYSTEM INTEGRATION: Yes / No.
+
 ## Not yet captured
 
-- Questions after #17, with their conditions.
+- Questions after #22, with their conditions.
+- What #20 drives, and the #22 condition.
+- Full title of #20 (cut off).
 - Full titles of #6 and #9, and #5 option 2 (cut off).
 - Change order form and AI instructions.
 - Page 2 of the program editor.
