@@ -49,7 +49,7 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the ma
 | 1 | REQUEST DETAILS – Give this request a name | Request name | None | Yes | None shown | #1, same |
 | 2 | REQUEST DETAILS – Is it one-time or recurring? | Frequency | None | Locked | None shown | #2, same |
 | 3 | SPEND – What is the spend amount? | Amount | None | Locked | None shown | #3, same |
-| 4 | VENDOR- Specify the vendor for this request | Vendor | None | Always required | Drives #30. Restrict available vendors: Off | #4, no space before the dash |
+| 4 | VENDOR- Specify the vendor for this request | Vendor | None | Always required | Drives #30 and #31. Restrict available vendors: Off | #4, no space before the dash |
 | 5 | NEGOTIATIONS- Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | Drives #6 | #5, no space before the dash, leading space in the title field |
 | 6 | NEGOTIATIONS- If YES → Provide justification and describe what was discussed or negotiated... | Paragraph | Provide a brief summary of any prior negotiations you personally conducted with this vendor. Include the negotiated pricing, terms, discounts, or special considerations, and indicate whether Procurement participated or assisted. | Always required | Shown if #5 is option 1 | #6, same description, title worded differently |
 | 7 | SERVICES – Please describe the nature of the external services being requested. | Paragraph | None | Always required | None shown | #17, worded for services |
@@ -76,6 +76,8 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the ma
 | 28 | SECURITY / COMPLIANCE –If no, Please explain why | Paragraph | If unavailable, please provide an explanation (e.g., vendor may not yet have a SOC 2 report) | No | Shown if #26 is "No" | None |
 | 29 | PAYMENT TERMS – What are the net payment terms? | Net payment terms | Number of days | No | None shown | #25, same |
 | 30 | VENDOR – Vendor contact | Vendor contact | None | Always required | Shown if Vendor (#4) is "New vendor" | #26, same |
+| 31 | VENDOR – Vendor address | Vendor address | None | Always required | Shown if Vendor (#4) is "New vendor" | #27, same |
+| 32 | APPROVAL NOTES – Add a message for approvers to review | Paragraph | None | No | None shown | #28, Paragraph here, Text in GP |
 
 ### Options
 
@@ -98,7 +100,7 @@ The description's "MinIO terms" governance option is not among them.
 
 ## Not yet captured
 
-- Questions after #30, with their conditions.
+- Whether anything follows #32 (the #32 screenshot shows the edge of another box below it).
 - Full title of #25 (cut off).
 - Full titles of #6 and #9, and #5 option 2 (cut off).
 - Change order form and AI instructions.
