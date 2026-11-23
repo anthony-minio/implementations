@@ -42,7 +42,7 @@ Form settings are the same as General Procurement Request.
 
 ## Questions
 
-In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the matching General Procurement question.
+32 questions; #32 is the last (confirmed by Anthony 2026-11-23). In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` is the matching General Procurement question.
 
 | # | Title | Ramp field type | Description | Required | Conditional logic | GP |
 |---|---|---|---|---|---|---|
@@ -98,10 +98,16 @@ The description's "MinIO terms" governance option is not among them.
 
 #20 DATA ACCESS, #21 SYSTEM INTEGRATION, #23 THIRD-PARTY SERVICES and #26 SECURITY / COMPLIANCE: Yes / No. Full titles of #20 and #23 taken from condition panels. The #27 title has no space after the dash and two spaces before "report", as in Ramp.
 
+## Change order form
+
+No questions set up. Confirmed by Anthony 2026-11-23.
+
+## AI instructions
+
+Empty. Confirmed by Anthony 2026-11-23.
+
 ## Not yet captured
 
-- Whether anything follows #32 (the #32 screenshot shows the edge of another box below it).
 - Full title of #25 (cut off).
 - Full titles of #6 and #9, and #5 option 2 (cut off).
-- Change order form and AI instructions.
 - Page 2 of the program editor.

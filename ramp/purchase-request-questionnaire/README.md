@@ -61,7 +61,7 @@ The final draft proposal also covers, for each program:
 
 ## Status
 
-Step 1 in progress. Program list captured 2026-11-20. General Procurement Request captured 2026-11-20. Professional Services Purchase Request in progress.
+Step 1 in progress. Program list captured 2026-11-20. General Procurement Request captured 2026-11-20. Professional Services Purchase Request captured 2026-11-23. Software / SaaS Purchase Request in progress.
 
 ## Log
 
@@ -89,3 +89,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-21 | Professional Services Purchase Request: questions 26 and 27, conditions on #25 to #27 captured |
 | 2026-11-21 | Professional Services Purchase Request: questions 28 to 30 and their conditions captured |
 | 2026-11-21 | Professional Services Purchase Request: questions 31 and 32 captured |
+| 2026-11-23 | Professional Services Purchase Request: complete. #32 is the last question; change order form blank; no AI instructions |
