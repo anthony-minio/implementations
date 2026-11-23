@@ -46,6 +46,10 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 14 | ALTERNATIVES – If yes, please explain why a new tool or service is still required | Paragraph | None | Always required | Shown if #13 is "Yes ( Please Explain why a new tool or service is still needed)" | None |
 | 15 | TIMELINE – Is there a target date or deadline by which this purchase needs to be completed? | Date | None | No | None shown | GP #18, PS #12; "purchase or contract" there |
 | 16 | REQUESTER – Who is the internal business owner/requester? | Text | None | Always required | None shown | GP #19, PS #13, same |
+| 17 | DEPARTMENT – Which department will use this software? | Department | None | Always required | None shown | GP #20, PS #14, reworded |
+| 18 | USERS – Approximately how many users will need access to this software? | Text | None | Always required | None shown | None; #9 description also asks for number of users |
+| 19 | PURCHASE METHOD – How will this software purchase be made? | Multi select | None | Always required | Drives #20. Branch icon plus the second icon | GP #21 (multi select), PS #15 (single select); no "No contract required" option here |
+| 20 | CONTRACTS / DOCUMENTATION – Please upload all related contracts and documents. | File upload | (Required: vendor proposal, quote, order form,  MSA, DPA) | Always required | Shown if #19 is "Signed Contract" | GP #22; PS #16, same description |
 
 ### Options
 
@@ -63,8 +67,13 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 1. Yes ( Please Explain why a new tool or service is still needed)
 2. No- Please contact Procurement before submitting by emailing: Procurement@min...
 
+#19 PURCHASE METHOD:
+
+1. Online click-through agreement
+2. Signed Contract
+
 ## Not yet captured
 
-- Questions after #16, with their conditions.
+- Questions after #20, with their conditions.
 - What #4 drives.
 - Change order form and AI instructions.
