@@ -57,6 +57,7 @@ The final draft proposal also covers, for each program:
 | `PROGRAMS.md` | Current Ramp procurement programs: the paths being combined |
 | `GENERAL-PROCUREMENT.md` | General Procurement Request as it is set up in Ramp today |
 | `PROFESSIONAL-SERVICES.md` | Professional Services Purchase Request as it is set up in Ramp today |
+| `SOFTWARE-SAAS.md` | Software / SaaS Purchase Request as it is set up in Ramp today |
 | `screenshots/` | Source screenshots from Ramp, named `YYYYMMDD-<what>` |
 
 ## Status
@@ -90,3 +91,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-21 | Professional Services Purchase Request: questions 28 to 30 and their conditions captured |
 | 2026-11-21 | Professional Services Purchase Request: questions 31 and 32 captured |
 | 2026-11-23 | Professional Services Purchase Request: complete. #32 is the last question; change order form blank; no AI instructions |
+| 2026-11-23 | Software / SaaS Purchase Request: description, form settings and questions 1 to 4 captured |
