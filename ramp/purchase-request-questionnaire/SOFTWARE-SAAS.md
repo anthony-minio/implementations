@@ -34,7 +34,7 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 2 | REQUEST DETAILS – Is this a one-time or recurring request? | Frequency | None | Locked | None shown | GP #2, PS #2, worded differently |
 | 3 | SPEND DETAILS – What is the expected spend amount? | Amount | None | Locked | None shown | GP #3, PS #3, worded differently |
 | 4 | REQUEST TYPE – What type of request is this? | Single select | None | Always required | Drives #13 (other targets not yet seen) | GP #8 in name only: GP's options are event types, these are the purchase lifecycle |
-| 5 | VENDOR – Specify the vendor for this request | Vendor | None | Always required | None shown. Restrict available vendors: Off | GP #4, same; PS #4 |
+| 5 | VENDOR – Specify the vendor for this request | Vendor | None | Always required | Drives #38 and #39. Restrict available vendors: Off | GP #4, same; PS #4 |
 | 6 | NEGOTIATIONS – Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | Drives #7 | GP #5, same; PS #5 |
 | 7 | NEGOTIATIONS – If yes, provide justification and describe what was discussed or negotiated w... | Paragraph | Provide a brief summary of any prior negotiations you personally conducted with this vendor. Include the negotiated pricing, terms, discounts, or special considerations, and indicate whether Procurement participated or assisted. | Always required | Shown if #6 is "Yes — I have already discussed or negotiated with the vendor (please provide details in the justification field)" | GP #6, same; PS #6 |
 | 8 | BUSINESS NEED – Describe the business need and the proposed solution | Paragraph | None | Always required | None shown | GP #7, PS #8 in purpose, worded differently. |
@@ -66,6 +66,9 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 34 | IT/ SECURITY  - Will this vendor access, process, store, or integrate with MinIO systems, confide... | Multi select | None | Always required | None shown. No branch icon, no second icon | None; covers the same ground as #24 and #26 together |
 | 35 | AUTHENTICATION – Does this system support Single Sign-On (SSO)? | Multi select | e.g, Okta, Azure AD, Google Workspace)? | Always required | Drives #36 | None |
 | 36 | AUTHENTICATION – Please specify which SSO providers are supported | Paragraph | None | Always required | Shown if #35 is "Yes" | None |
+| 37 | PAYMENT TERMS – What are the net payment terms? | Net payment terms | Number of days | No | None shown | GP #25, PS #29, same |
+| 38 | VENDOR – Vendor contact | Vendor contact | None | Always required | Shown if Vendor (#5) is "New vendor" | GP #26, PS #30, same |
+| 39 | VENDOR – Vendor address | Vendor address | None | Always required | Shown if Vendor (#5) is "New vendor" | GP #27, PS #31, same |
 
 ### Options
 
@@ -92,7 +95,7 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 
 ## Not yet captured
 
-- Questions after #36, with their conditions.
+- Questions after #39 (expected: approval notes), and whether it is the last.
 - Full titles of #21, #30 and #34 (cut off).
 - What #4 drives.
 - Change order form and AI instructions.
