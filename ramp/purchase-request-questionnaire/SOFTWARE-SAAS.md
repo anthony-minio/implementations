@@ -36,8 +36,8 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 4 | REQUEST TYPE – What type of request is this? | Single select | None | Always required | Branch icon shown. What it drives not yet seen | GP #8 in name only: GP's options are event types, these are the purchase lifecycle |
 | 5 | VENDOR – Specify the vendor for this request | Vendor | None | Always required | None shown. Restrict available vendors: Off | GP #4, same; PS #4 |
 | 6 | NEGOTIATIONS – Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | Drives #7 | GP #5, same; PS #5 |
-| 7 | Not shown. Presumably the NEGOTIATIONS justification question, as GP #6 | Not shown | Not shown | Not shown | Shown if #6 is "Yes — I have already discussed or negotiated with the vendor (please provide details in the justification field)" | GP #6, PS #6 (assumed) |
-| 8 | BUSINESS NEED – Describe the business need and the proposed solution | Paragraph | None | Always required | None shown | GP #7, PS #8 in purpose, worded differently. Numbered #8 on the assumption that #7 sits between |
+| 7 | NEGOTIATIONS – If yes, provide justification and describe what was discussed or negotiated w... | Paragraph | Provide a brief summary of any prior negotiations you personally conducted with this vendor. Include the negotiated pricing, terms, discounts, or special considerations, and indicate whether Procurement participated or assisted. | Always required | Shown if #6 is "Yes — I have already discussed or negotiated with the vendor (please provide details in the justification field)" | GP #6, same; PS #6 |
+| 8 | BUSINESS NEED – Describe the business need and the proposed solution | Paragraph | None | Always required | None shown | GP #7, PS #8 in purpose, worded differently. |
 
 ### Options
 
@@ -52,7 +52,6 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 
 ## Not yet captured
 
-- #7: only its condition panel was sent. Confirm its title and that it sits between #6 and #8.
 - Questions after #8, with their conditions.
 - What #4 drives.
 - Change order form and AI instructions.
