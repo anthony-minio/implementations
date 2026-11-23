@@ -38,6 +38,11 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 6 | NEGOTIATIONS – Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | Drives #7 | GP #5, same; PS #5 |
 | 7 | NEGOTIATIONS – If yes, provide justification and describe what was discussed or negotiated w... | Paragraph | Provide a brief summary of any prior negotiations you personally conducted with this vendor. Include the negotiated pricing, terms, discounts, or special considerations, and indicate whether Procurement participated or assisted. | Always required | Shown if #6 is "Yes — I have already discussed or negotiated with the vendor (please provide details in the justification field)" | GP #6, same; PS #6 |
 | 8 | BUSINESS NEED – Describe the business need and the proposed solution | Paragraph | None | Always required | None shown | GP #7, PS #8 in purpose, worded differently. |
+| 9 | BUSINESS NEED – What business problem does this software or service solve? | Paragraph | (Primary use case and number of users.) | Always required | None shown | None; overlaps #8 |
+| 10 | BUSINESS IMPACT – What is the expected business impact? | Paragraph | (Revenue enablement, cost savings, efficiency gains, risk reduction, or compliance.) | Always required | None shown | GP #11 (shown only for "Other" there), PS #10 |
+| 11 | BUSINESS NEED – Is this replacing an existing tool or adding a new capability? | Text | (If replacing, name the tool being sunset.) | Always required | None shown | None |
+| 12 | ALTERNATIVES – What alternative tools (including existing internal tools) were considered? | Paragraph | None | Always required | None shown | None |
+| 13 | ALTERNATIVES – Have you checked if we already have an existing tool or service that meets thi... | Multi select | Before requesting a new purchase, confirm whether an existing tool in our company can meet this need. Reach out to Procurement is you are usure. | Always required | Shown with 1 condition. Rule not opened; probably #4. Branch icon shown, so it drives a later question | None |
 
 ### Options
 
@@ -50,8 +55,14 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 
 #6 NEGOTIATIONS: same two options as GP #5 (option 2 cut off).
 
+#13 ALTERNATIVES (option 2 cut off). The #13 description's "is you are usure" is as in Ramp.
+
+1. Yes ( Please Explain why a new tool or service is still needed)
+2. No- Please contact Procurement before submitting by emailing: Procurement@min...
+
 ## Not yet captured
 
-- Questions after #8, with their conditions.
+- Questions after #13, with their conditions.
+- The #13 condition and what #13 drives.
 - What #4 drives.
 - Change order form and AI instructions.
