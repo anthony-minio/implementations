@@ -62,7 +62,10 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 30 | SYSTEM INTEGRATION – Please describe the type of access, integration, or connection require... | Paragraph | None | Always required | Shown if #26 is "Yes" (same condition as #27) | PS #25, same |
 | 31 | SECURITY / COMPLIANCE – Does the vendor have a SOC 2 Type II report? | Multi select | If Yes → triggers Legal (and/or Security/Compliance) review | Always required | Shown if #24 is "Yes" or #26 is "Yes". Drives #32 and #33. Branch icon plus the second icon | PS #26, same condition; PS has no description |
 | 32 | SECURITY / COMPLIANCE – If yes, please upload the SOC 2 Type II report | File upload | None | Always required | Shown if #31 is "Yes" | PS #27 |
-| 33 | SECURITY / COMPLIANCE – If no, please explain why | Paragraph | If unavailable, please provide an explanation (e.g., vendor may not yet have a SOC 2 report) | Always required | Shown with 1 condition. Rule not opened; presumably #31 is "No" | PS #28, same description; optional there |
+| 33 | SECURITY / COMPLIANCE – If no, please explain why | Paragraph | If unavailable, please provide an explanation (e.g., vendor may not yet have a SOC 2 report) | Always required | Shown if #31 is "No" | PS #28, same description; optional there |
+| 34 | IT/ SECURITY  - Will this vendor access, process, store, or integrate with MinIO systems, confide... | Multi select | None | Always required | None shown. No branch icon, no second icon | None; covers the same ground as #24 and #26 together |
+| 35 | AUTHENTICATION – Does this system support Single Sign-On (SSO)? | Multi select | e.g, Okta, Azure AD, Google Workspace)? | Always required | Drives #36 | None |
+| 36 | AUTHENTICATION – Please specify which SSO providers are supported | Paragraph | None | Always required | Shown if #35 is "Yes" | None |
 
 ### Options
 
@@ -85,12 +88,11 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 1. Online click-through agreement
 2. Signed Contract
 
-#24 DATA ACCESS, #26 SYSTEM INTEGRATION and #28 THIRD-PARTY SERVICES: Yes / No. Full titles of #24 and #28 taken from condition panels; #28 ends "service provider" with no question mark, as in Ramp. #31 SECURITY / COMPLIANCE: Yes / No. The #23 description has a closing bracket with no opening one, as in Ramp.
+#24 DATA ACCESS, #26 SYSTEM INTEGRATION and #28 THIRD-PARTY SERVICES: Yes / No. Full titles of #24 and #28 taken from condition panels; #28 ends "service provider" with no question mark, as in Ramp. #31 SECURITY / COMPLIANCE, #34 IT/ SECURITY and #35 AUTHENTICATION: Yes / No. The #34 title uses a plain hyphen with two spaces before it; the #35 description has a closing bracket with no opening one; the #36 condition panel shows "(SSO)? " and "Yes " with trailing spaces. All as in Ramp. The #23 description has a closing bracket with no opening one, as in Ramp.
 
 ## Not yet captured
 
-- Questions after #33, with their conditions.
-- The #33 condition.
-- Full titles of #21 and #30 (cut off).
+- Questions after #36, with their conditions.
+- Full titles of #21, #30 and #34 (cut off).
 - What #4 drives.
 - Change order form and AI instructions.
