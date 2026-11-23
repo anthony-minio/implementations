@@ -33,7 +33,7 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 1 | REQUEST DETAILS – Give this request a name | Request name | None | Yes | None shown | GP #1, PS #1, same |
 | 2 | REQUEST DETAILS – Is this a one-time or recurring request? | Frequency | None | Locked | None shown | GP #2, PS #2, worded differently |
 | 3 | SPEND DETAILS – What is the expected spend amount? | Amount | None | Locked | None shown | GP #3, PS #3, worded differently |
-| 4 | REQUEST TYPE – What type of request is this? | Single select | None | Always required | Drives #13 (other targets not yet seen) | GP #8 in name only: GP's options are event types, these are the purchase lifecycle |
+| 4 | REQUEST TYPE – What type of request is this? | Single select | None | Always required | Drives #13 only (no other question conditions on it) | GP #8 in name only: GP's options are event types, these are the purchase lifecycle |
 | 5 | VENDOR – Specify the vendor for this request | Vendor | None | Always required | Drives #38 and #39. Restrict available vendors: Off | GP #4, same; PS #4 |
 | 6 | NEGOTIATIONS – Have you already engaged in discussions or negotiations with the vendor? | Multi select | If "No", contact Procurement before submitting by emailing: Procurement@minio.io | Always required | Drives #7 | GP #5, same; PS #5 |
 | 7 | NEGOTIATIONS – If yes, provide justification and describe what was discussed or negotiated w... | Paragraph | Provide a brief summary of any prior negotiations you personally conducted with this vendor. Include the negotiated pricing, terms, discounts, or special considerations, and indicate whether Procurement participated or assisted. | Always required | Shown if #6 is "Yes — I have already discussed or negotiated with the vendor (please provide details in the justification field)" | GP #6, same; PS #6 |
@@ -98,5 +98,4 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 
 - Confirm #40 is the last question.
 - Full titles of #21, #30 and #34 (cut off).
-- What #4 drives.
 - Change order form and AI instructions.
