@@ -48,8 +48,12 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 16 | REQUESTER – Who is the internal business owner/requester? | Text | None | Always required | None shown | GP #19, PS #13, same |
 | 17 | DEPARTMENT – Which department will use this software? | Department | None | Always required | None shown | GP #20, PS #14, reworded |
 | 18 | USERS – Approximately how many users will need access to this software? | Text | None | Always required | None shown | None; #9 description also asks for number of users |
-| 19 | PURCHASE METHOD – How will this software purchase be made? | Multi select | None | Always required | Drives #20. Branch icon plus the second icon | GP #21 (multi select), PS #15 (single select); no "No contract required" option here |
+| 19 | PURCHASE METHOD – How will this software purchase be made? | Multi select | None | Always required | Drives #20 and #21. Branch icon plus the second icon | GP #21 (multi select), PS #15 (single select); no "No contract required" option here |
 | 20 | CONTRACTS / DOCUMENTATION – Please upload all related contracts and documents. | File upload | (Required: vendor proposal, quote, order form,  MSA, DPA) | Always required | Shown if #19 is "Signed Contract" | GP #22; PS #16, same description |
+| 21 | CONTRACTS / DOCUMENTATION – Please provide any relevant online links related to this purc... | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #19 is "Online click-through agreement" | GP #23, PS #17, same description |
+| 22 | CONTRACTS / DOCUMENTATION – Links continued | Link | (For example: pricing page, online terms and conditions, privacy policy, Data Processing Agreement (DPA), or product documentation.) | No | None shown | GP #24, PS #18 |
+| 23 | DATA USAGE – What type of data will be used, uploaded, or stored in this system? | Paragraph | e.g., marketing content, internal documents, prompts, analytics data, customer data, etc.). | Always required | None shown | PS #19 in purpose ("type of access or data involved") |
+| 24 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential comp... | Multi select | None | Always required | Branch icon plus the second icon. What it drives not yet seen | PS #20, same |
 
 ### Options
 
@@ -72,8 +76,11 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 1. Online click-through agreement
 2. Signed Contract
 
+#24 DATA ACCESS: Yes / No. The #23 description has a closing bracket with no opening one, as in Ramp.
+
 ## Not yet captured
 
-- Questions after #20, with their conditions.
+- Questions after #24, with their conditions.
+- Full titles of #21 and #24 (cut off).
 - What #4 drives.
 - Change order form and AI instructions.
