@@ -53,7 +53,10 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 21 | CONTRACTS / DOCUMENTATION – Please provide any relevant online links related to this purc... | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #19 is "Online click-through agreement" | GP #23, PS #17, same description |
 | 22 | CONTRACTS / DOCUMENTATION – Links continued | Link | (For example: pricing page, online terms and conditions, privacy policy, Data Processing Agreement (DPA), or product documentation.) | No | None shown | GP #24, PS #18 |
 | 23 | DATA USAGE – What type of data will be used, uploaded, or stored in this system? | Paragraph | e.g., marketing content, internal documents, prompts, analytics data, customer data, etc.). | Always required | None shown | PS #19 in purpose ("type of access or data involved") |
-| 24 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential comp... | Multi select | None | Always required | Branch icon plus the second icon. What it drives not yet seen | PS #20, same |
+| 24 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential company information? | Multi select | None | Always required | Drives #25. Branch icon plus the second icon | PS #20, same |
+| 25 | DATA ACCESS – Please briefly describe the type of access or data involved? | Paragraph | None | Always required | Shown if #24 is "Yes" | PS #19, same title; in PS it comes before the yes/no and has no condition |
+| 26 | SYSTEM INTEGRATION – Will this vendor integrate with any MinIO systems? | Multi select | None | Always required | Drives #27. Branch icon plus the second icon | PS #21, same |
+| 27 | SYSTEM INTEGRATION – Please describe which MinIO systems the vendor will integrate with | Paragraph | None | No | Shown if #26 is "Yes" | PS #22 (required there) |
 
 ### Options
 
@@ -76,11 +79,11 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 1. Online click-through agreement
 2. Signed Contract
 
-#24 DATA ACCESS: Yes / No. The #23 description has a closing bracket with no opening one, as in Ramp.
+#24 DATA ACCESS and #26 SYSTEM INTEGRATION: Yes / No. #24 full title taken from the #25 condition panel. The #23 description has a closing bracket with no opening one, as in Ramp.
 
 ## Not yet captured
 
-- Questions after #24, with their conditions.
-- Full titles of #21 and #24 (cut off).
+- Questions after #27, with their conditions.
+- Full title of #21 (cut off).
 - What #4 drives.
 - Change order form and AI instructions.
