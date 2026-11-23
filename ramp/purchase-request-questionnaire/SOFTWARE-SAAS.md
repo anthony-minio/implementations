@@ -69,6 +69,7 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 37 | PAYMENT TERMS – What are the net payment terms? | Net payment terms | Number of days | No | None shown | GP #25, PS #29, same |
 | 38 | VENDOR – Vendor contact | Vendor contact | None | Always required | Shown if Vendor (#5) is "New vendor" | GP #26, PS #30, same |
 | 39 | VENDOR – Vendor address | Vendor address | None | Always required | Shown if Vendor (#5) is "New vendor" | GP #27, PS #31, same |
+| 40 | APPROVAL NOTES – Add a message for approvers to review | Paragraph | None | No | None shown | GP #28 (Text there), PS #32, same |
 
 ### Options
 
@@ -95,7 +96,7 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 
 ## Not yet captured
 
-- Questions after #39 (expected: approval notes), and whether it is the last.
+- Confirm #40 is the last question.
 - Full titles of #21, #30 and #34 (cut off).
 - What #4 drives.
 - Change order form and AI instructions.
