@@ -53,13 +53,16 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 | 21 | CONTRACTS / DOCUMENTATION – Please provide any relevant online links related to this purc... | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #19 is "Online click-through agreement" | GP #23, PS #17, same description |
 | 22 | CONTRACTS / DOCUMENTATION – Links continued | Link | (For example: pricing page, online terms and conditions, privacy policy, Data Processing Agreement (DPA), or product documentation.) | No | None shown | GP #24, PS #18 |
 | 23 | DATA USAGE – What type of data will be used, uploaded, or stored in this system? | Paragraph | e.g., marketing content, internal documents, prompts, analytics data, customer data, etc.). | Always required | None shown | PS #19 in purpose ("type of access or data involved") |
-| 24 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential company information? | Multi select | None | Always required | Drives #25. Branch icon plus the second icon | PS #20, same |
+| 24 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential company information? | Multi select | None | Always required | Drives #25 and #31. Branch icon plus the second icon | PS #20, same |
 | 25 | DATA ACCESS – Please briefly describe the type of access or data involved? | Paragraph | None | Always required | Shown if #24 is "Yes" | PS #19, same title; in PS it comes before the yes/no and has no condition |
-| 26 | SYSTEM INTEGRATION – Will this vendor integrate with any MinIO systems? | Multi select | None | Always required | Drives #27 and #30. Branch icon plus the second icon | PS #21, same |
+| 26 | SYSTEM INTEGRATION – Will this vendor integrate with any MinIO systems? | Multi select | None | Always required | Drives #27, #30 and #31. Branch icon plus the second icon | PS #21, same |
 | 27 | SYSTEM INTEGRATION – Please describe which MinIO systems the vendor will integrate with | Paragraph | None | No | Shown if #26 is "Yes" | PS #22 (required there) |
 | 28 | THIRD-PARTY SERVICES – Does this vendor use any subcontractors or third-party service provider | Multi select | None | Always required | Drives #29. Branch icon only | PS #23; there "providers?" |
 | 29 | THIRD-PARTY SERVICES – If yes, please explain | Paragraph | None | Always required | Shown if #28 is "Yes" | PS #24, same |
 | 30 | SYSTEM INTEGRATION – Please describe the type of access, integration, or connection require... | Paragraph | None | Always required | Shown if #26 is "Yes" (same condition as #27) | PS #25, same |
+| 31 | SECURITY / COMPLIANCE – Does the vendor have a SOC 2 Type II report? | Multi select | If Yes → triggers Legal (and/or Security/Compliance) review | Always required | Shown if #24 is "Yes" or #26 is "Yes". Drives #32 and #33. Branch icon plus the second icon | PS #26, same condition; PS has no description |
+| 32 | SECURITY / COMPLIANCE – If yes, please upload the SOC 2 Type II report | File upload | None | Always required | Shown if #31 is "Yes" | PS #27 |
+| 33 | SECURITY / COMPLIANCE – If no, please explain why | Paragraph | If unavailable, please provide an explanation (e.g., vendor may not yet have a SOC 2 report) | Always required | Shown with 1 condition. Rule not opened; presumably #31 is "No" | PS #28, same description; optional there |
 
 ### Options
 
@@ -82,11 +85,12 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP` and `PS` 
 1. Online click-through agreement
 2. Signed Contract
 
-#24 DATA ACCESS, #26 SYSTEM INTEGRATION and #28 THIRD-PARTY SERVICES: Yes / No. Full titles of #24 and #28 taken from condition panels; #28 ends "service provider" with no question mark, as in Ramp. The #23 description has a closing bracket with no opening one, as in Ramp.
+#24 DATA ACCESS, #26 SYSTEM INTEGRATION and #28 THIRD-PARTY SERVICES: Yes / No. Full titles of #24 and #28 taken from condition panels; #28 ends "service provider" with no question mark, as in Ramp. #31 SECURITY / COMPLIANCE: Yes / No. The #23 description has a closing bracket with no opening one, as in Ramp.
 
 ## Not yet captured
 
-- Questions after #30, with their conditions.
+- Questions after #33, with their conditions.
+- The #33 condition.
 - Full titles of #21 and #30 (cut off).
 - What #4 drives.
 - Change order form and AI instructions.

@@ -100,3 +100,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-23 | Software / SaaS Purchase Request: questions 21 to 24, #21 condition captured |
 | 2026-11-23 | Software / SaaS Purchase Request: questions 25 to 27 and their conditions captured |
 | 2026-11-23 | Software / SaaS Purchase Request: questions 28 to 30 and their conditions captured |
+| 2026-11-23 | Software / SaaS Purchase Request: questions 31 to 33 (SOC 2), #31 and #32 conditions captured |
