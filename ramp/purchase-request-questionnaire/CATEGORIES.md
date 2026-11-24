@@ -2,36 +2,40 @@
 
 Updated: 2026-11-24
 
-Every question in the three in-scope programs, grouped into categories for the review. Source: `GENERAL-PROCUREMENT.md` (GP), `PROFESSIONAL-SERVICES.md` (PS) and `SOFTWARE-SAAS.md` (SW). IDs are program plus question number, so `GP21` is General Procurement question 21. Titles are as in Ramp; `...` means cut off in the screenshot.
+The questions in the three in-scope programs, de-duplicated and grouped into categories for the review. 100 questions in Ramp today come down to 49 distinct questions. Source: `GENERAL-PROCUREMENT.md` (GP), `PROFESSIONAL-SERVICES.md` (PS) and `SOFTWARE-SAAS.md` (SW). IDs are program plus question number, so `GP21` is General Procurement question 21. Titles are as in Ramp; `...` means cut off in the screenshot.
 
 In `Shown when`, question numbers refer to the same program.
 
 `Approval` marks questions with the approval icon: Ramp uses the answer in approval conditions (tooltip on GP21, 2026-11-24).
 
+
 ## Summary
 
-| # | Category | Questions | GP | PS | SW | Used in approvals |
-|---|---|---|---|---|---|---|
-| 1 | Request basics | 9 | 3 | 3 | 3 | - |
-| 2 | Request type | 3 | 2 | - | 1 | - |
-| 3 | Vendor and negotiations | 15 | 5 | 5 | 5 | - |
-| 4 | Business need and impact | 11 | 4 | 4 | 3 | - |
-| 5 | Alternatives and existing tools | 4 | - | - | 4 | - |
-| 6 | Revenue and GTM | 5 | 4 | 1 | - | - |
-| 7 | Owner, department and timing | 9 | 3 | 3 | 3 | - |
-| 8 | Contract and commercial terms | 15 | 5 | 5 | 5 | GP21, PS15, SW19 |
-| 9 | Security and compliance | 22 | - | 10 | 12 | PS20, PS21, PS26, SW24, SW26, SW31 |
-| 10 | Software and IT | 3 | - | - | 3 | - |
-| Other | Other | 4 | 2 | 1 | 1 | - |
-| | Total | 100 | 28 | 32 | 40 | |
+A distinct question is one asked in substance the same way, whatever the wording. Questions that overlap but ask something different are kept apart and the overlap is noted.
+
+| # | Category | Distinct questions | In Ramp today | Used in approvals |
+|---|---|---|---|---|
+| 1 | Request basics | 3 | 9 | - |
+| 2 | Request type | 3 | 3 | - |
+| 3 | Vendor and negotiations | 5 | 15 | - |
+| 4 | Business need and impact | 5 | 11 | - |
+| 5 | Alternatives and existing tools | 4 | 4 | - |
+| 6 | Revenue and GTM | 4 | 5 | - |
+| 7 | Owner, department and timing | 3 | 9 | - |
+| 8 | Contract and commercial terms | 5 | 15 | D8.1 |
+| 9 | Security and compliance | 12 | 22 | D9.2, D9.4, D9.9 |
+| 10 | Software and IT | 3 | 3 | - |
+| Other | Other | 2 | 4 | - |
+| | Total | 49 | 100 | |
 
 ## Ramp question types
 
 From Ramp's public docs, checked 2026-11-24 (https://support.ramp.com/global-question-library, https://support.ramp.com/configuring-procurement-workflows). Not confirmed in our account.
 
-Text, Paragraph, Number, Date, Boolean (yes/no), Email, Link, File upload, Single select, Multi select, Address, Contact (first name, last name, phone, email; not a Ramp user), Vendor, Department, Merchants, Merchant categories, plus the Ramp request fields seen in our forms (Request name, Frequency, Amount, Net payment terms, Reason). No person or user picker is listed.
+Text, Paragraph, Number, Date, Boolean (yes/no), Email, Link, File upload, Single select, Multi select, Address, Contact (first name, last name, phone, email; not a Ramp user), Vendor, Department, Merchants, Merchant categories, plus the Ramp request fields seen in our forms (Request name, Frequency, Amount, Net payment terms, Reason). No person or user picker is listed in the docs, but our account has one: a "Select a user" question that lists MinIO users with their emails (Anthony's test question "Test User - on behalf of", screenshot `20261124-test-user-picker-on-behalf-of.png`, 2026-11-24). The public docs are incomplete on this point.
 
 Relevant to the review: Boolean exists, so Yes/No questions currently set up as Multi select can become true yes/no questions; Number exists for counts such as users.
+
 
 ## Proposed category flow
 
@@ -50,6 +54,119 @@ For discussion. Who sees each category in a combined form, if Request type becom
 | 9 | Contract and commercial terms | Everyone |
 | 10 | Security and compliance | Software and services; perhaps any new vendor |
 | 11 | Approval notes | Everyone, optional |
+
+
+# Distinct questions by category
+
+`ID` is the category and position, so `D8.1` is the first question in category 8. `Asked in` lists the original questions; the full text of each is in the appendix. `Approval` marks a question used in approval conditions.
+
+## 1. Request basics
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D1.1 | Give this request a name | GP1, PS1, SW1 | Same in all three. |  |
+| D1.2 | Is it one-time or recurring? (Frequency) | GP2, PS2, SW2 | Same; SW words it "Is this a one-time or recurring request?". |  |
+| D1.3 | What is the spend amount? (Amount) | GP3, PS3, SW3 | Same; SW words it "What is the expected spend amount?". |  |
+
+## 2. Request type
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D2.1 | What best describes this request? (event types plus Other) | GP8 | GP only. Options: sales meeting or dinner, marketing event or sponsorship, conference or trade show, internal meeting or team event, training or enablement, Other. |  |
+| D2.2 | If other, please explain | GP9 | GP only. Shown on Other. |  |
+| D2.3 | What type of request is this? (new, renewal, amendment, trial or pilot) | SW4 | SW only. A different axis from GP8: lifecycle, not what is bought. |  |
+
+## 3. Vendor and negotiations
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D3.1 | Specify the vendor for this request | GP4, PS4, SW5 | Same in all three. |  |
+| D3.2 | Have you already engaged in discussions or negotiations with the vendor? | GP5, PS5, SW6 | Same; multi select used for Yes/No in all three; PS option 1 text is garbled. |  |
+| D3.3 | If yes, provide justification and describe what was discussed or negotiated | GP6, PS6, SW7 | Same description in all three. |  |
+| D3.4 | Vendor contact (new vendor) | GP26, PS30, SW38 | Same in all three. Shown for a new vendor, at the end of the form. |  |
+| D3.5 | Vendor address (new vendor) | GP27, PS31, SW39 | Same in all three. Shown for a new vendor, at the end of the form. |  |
+
+## 4. Business need and impact
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D4.1 | Describe the goods or services being requested | GP17, PS7 | GP asks it last (#17), PS near the top (#7). SW has no separate version; SW8 covers it. |  |
+| D4.2 | Describe the business purpose / need | GP7, PS8, SW8, SW9 | Four wordings of the same question. SW asks it twice (#8 need and proposed solution, #9 problem solved, with use case and number of users). |  |
+| D4.3 | What is the primary expected outcome? (list) | GP10 | GP only. Six options; drives the ROI question. |  |
+| D4.4 | What is the expected business impact? | GP11, PS10, SW10 | In all three. GP shows it only for Other; PS and SW for everyone. |  |
+| D4.5 | How will success be measured? | PS11 | PS only. |  |
+
+## 5. Alternatives and existing tools
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D5.1 | Is this replacing an existing tool or adding a new capability? | SW11 | SW only. Free text; shown for every request type. |  |
+| D5.2 | What alternative tools (including existing internal tools) were considered? | SW12 | SW only. Shown for every request type; overlaps SW13 and SW14. |  |
+| D5.3 | Have you checked if we already have an existing tool or service that meets this need? | SW13 | SW only. New software purchase only. |  |
+| D5.4 | If yes, explain why a new tool or service is still required | SW14 | SW only. Shown on Yes to SW13. |  |
+
+## 6. Revenue and GTM
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D6.1 | What pipeline impact is expected (net-new, expansion, or renewal)? | GP12 | GP only. All five event types. |  |
+| D6.2 | Expected ROI / pipeline impact | GP13 | GP only. Optional. Sales, marketing and conference events, or a revenue outcome on GP10. Overlaps GP12. |  |
+| D6.3 | Which priority customers or target accounts are expected... | GP14, PS9 | GP for all event types; PS for everyone, adding "partners". |  |
+| D6.4 | How does this request support current GTM priorities or revenue objectives? | GP15 | GP only. All five event types. |  |
+
+## 7. Owner, department and timing
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D7.1 | Is there a target date or deadline by which this purchase needs to be completed? | GP18, PS12, SW15 | Same in all three; optional. |  |
+| D7.2 | Who is the internal business owner/requester? | GP19, PS13, SW16 | Same in all three; free text. |  |
+| D7.3 | Which department is this request for? | GP20, PS14, SW17 | Same Ramp Department field in all three; worded for each program. |  |
+
+## 8. Contract and commercial terms
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D8.1 | How will this purchase be made? (Purchase method) | GP21, PS15, SW19 | In all three; used in approval conditions in all three. GP multi select, 3 options; PS single select, 3 options; SW multi select, 2 options (no "No contract required"). | Yes |
+| D8.2 | Please upload all related contracts and documents | GP22, PS16, SW20 | Shown for Signed Contract in all three. PS and SW list required documents: proposal, quote, order form, MSA, DPA. |  |
+| D8.3 | Provide any relevant online links (terms, pricing, DPA...) | GP23, PS17, SW21 | Shown for click-through in all three; same description. |  |
+| D8.4 | Links continued | GP24, PS18, SW22 | Optional second link field; shown to everyone in all three. |  |
+| D8.5 | What are the net payment terms? | GP25, PS29, SW37 | Same in all three; optional. |  |
+
+## 9. Security and compliance
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D9.1 | What type of data will be used, uploaded, or stored in this system? | SW23 | SW only. Shown to everyone. |  |
+| D9.2 | Will this vendor require access to sensitive data, systems, or confidential company information? | PS20, SW24 | Same in both; used in approval conditions. | Yes |
+| D9.3 | Please briefly describe the type of access or data involved | PS19, SW25 | PS shows it to everyone, before the Yes/No; SW only after Yes. |  |
+| D9.4 | Will this vendor integrate with any MinIO systems? | PS21, SW26 | Same in both; used in approval conditions. | Yes |
+| D9.5 | Please describe which MinIO systems the vendor will integrate with | PS22, SW27 | Shown on integration Yes; required in PS, optional in SW. |  |
+| D9.6 | Please describe the type of access, integration, or connection required | PS25, SW30 | Shown on integration Yes in both; overlaps the question above. |  |
+| D9.7 | Does this vendor use any subcontractors or third-party service providers? | PS23, SW28 | Same in both. |  |
+| D9.8 | If yes, please explain (subcontractors) | PS24, SW29 | Same in both. |  |
+| D9.9 | Does the vendor have a SOC 2 Type II report? | PS26, SW31 | Same condition in both (data access or integration Yes); used in approval conditions. SW adds the description "If Yes → triggers Legal (and/or Security/Compliance) review". | Yes |
+| D9.10 | If yes, please upload the SOC 2 Type II report | PS27, SW32 | Same in both. |  |
+| D9.11 | If no, please explain why (SOC 2) | PS28, SW33 | Same description; optional in PS, required in SW. |  |
+| D9.12 | Will this vendor access, process, store, or integrate with MinIO systems, confide... | SW34 | SW only. Repeats the data access and integration questions; drives nothing. |  |
+
+## 10. Software and IT
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| D10.1 | Approximately how many users will need access to this software? | SW18 | SW only. Free text; also asked in the SW9 description. |  |
+| D10.2 | Does this system support Single Sign-On (SSO)? | SW35 | SW only. All request types. |  |
+| D10.3 | Please specify which SSO providers are supported | SW36 | SW only. Shown on Yes. |  |
+
+## Other
+
+| ID | Question | Asked in | Differences | Approval |
+|---|---|---|---|---|
+| DO.1 | What is the current status of our relationship with this vendor? | GP16 | GP only. Optional, event path only. Overlaps the negotiations questions. |  |
+| DO.2 | Add a message for approvers to review | GP28, PS32, SW40 | Same in all three; optional. |  |
+
+# Appendix: every question by category
+
+The 100 questions as they are in Ramp today, before de-duplication.
 
 ## 1. Request basics
 
@@ -191,7 +308,7 @@ Points for the review:
 
 - Same in all three programs. Department is the only coded field the forms collect.
 - Requester is free text. Anthony's proposal (2026-11-24): ask "Are you submitting this on behalf of someone else at MinIO?" and, if Yes, pick the person from a dropdown.
-- Ramp's public docs (checked 2026-11-24) list no person or user picker question type, and no way to submit a new purchase request on behalf of someone. A Yes can show a Text, Email or Contact question, which is free entry and does not change who Ramp treats as the requester or how approvals route. Change orders do have a "Requestor" dropdown, and approvals follow the selected person (https://support.ramp.com/change-orders). A Ramp Community feature request asks for the same on new requests (https://community.ramp.com/t/ability-to-change-requestor-for-procurement-during-entry/836). To confirm with Ramp support or the CSM.
+- Ramp supports a user picker question: Anthony's test question "Test User - on behalf of" shows "Select a user" with a searchable list of MinIO users and emails (2026-11-24). The public docs did not list it. Not yet known: the question type's name in the editor, and whether the selected user can drive approval routing. Ramp does not change the requester from a form answer as far as the docs show; change orders have a separate "Requestor" dropdown (https://support.ramp.com/change-orders).
 
 ## 8. Contract and commercial terms
 
