@@ -58,11 +58,12 @@ The final draft proposal also covers, for each program:
 | `GENERAL-PROCUREMENT.md` | General Procurement Request as it is set up in Ramp today |
 | `PROFESSIONAL-SERVICES.md` | Professional Services Purchase Request as it is set up in Ramp today |
 | `SOFTWARE-SAAS.md` | Software / SaaS Purchase Request as it is set up in Ramp today |
+| `REFERRAL-PARTNER.md` | Referral Partner Request as it is set up in Ramp today |
 | `screenshots/` | Source screenshots from Ramp, named `YYYYMMDD-<what>` |
 
 ## Status
 
-Step 1 in progress. Program list captured 2026-11-20. General Procurement Request captured 2026-11-20. Professional Services Purchase Request captured 2026-11-23. Software / SaaS Purchase Request in progress.
+Step 1 in progress. Program list captured 2026-11-20. General Procurement Request captured 2026-11-20. Professional Services Purchase Request captured 2026-11-23. Software / SaaS Purchase Request captured 2026-11-24. Referral Partner Request in progress.
 
 ## Log
 
@@ -104,3 +105,5 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-23 | Software / SaaS Purchase Request: questions 34 to 36, #33 and #36 conditions captured |
 | 2026-11-23 | Software / SaaS Purchase Request: questions 37 to 39 and their conditions captured |
 | 2026-11-23 | Software / SaaS Purchase Request: question 40 captured |
+| 2026-11-24 | Software / SaaS Purchase Request: complete. #40 is the last question; change order form blank; no AI instructions |
+| 2026-11-24 | Referral Partner Request: description, form settings and questions 1 to 5 captured |
