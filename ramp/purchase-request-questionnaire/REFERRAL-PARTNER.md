@@ -33,8 +33,12 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP`, `PS` and
 | 3 | What is the estimated total referral payout under this agreement? | Amount | None | Locked | None shown | #3 in all three, worded for referral payouts |
 | 4 | CONTRACT- Upload contracts or documents | File upload | None | No | None shown | GP #22, PS #16, SW #20; conditional on Signed Contract there, always shown and optional here |
 | 5 | PROGRAM – Referral Program & Opportunity Description | Paragraph | None | Always required | None shown | None |
+| 6 | PARTNER – Referral Partner Company | Vendor | None | Always required | Drives #7. Restrict available vendors: Off | GP #4, PS #4, SW #5 |
+| 7 | PARTNER – Referral Partner Company Point of Contact | Vendor contact | None | Always required | Shown if Vendor (#6) is "New vendor" | GP #26, PS #30, SW #38 |
+| 8 | BUSINESS – Business Owner / Internal Sponsor | Text | None | Always required | None shown | GP #19, PS #13, SW #16 (REQUESTER) |
+| 9 | BUSINESS – Department | Department | None | No | None shown | GP #20, PS #14, SW #17; required in all three |
 
 ## Not yet captured
 
-- Questions after #5, with their conditions.
+- Questions after #9, with their conditions.
 - Change order form and AI instructions.

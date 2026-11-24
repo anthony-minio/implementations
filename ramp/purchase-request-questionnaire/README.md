@@ -107,3 +107,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-23 | Software / SaaS Purchase Request: question 40 captured |
 | 2026-11-24 | Software / SaaS Purchase Request: complete. #40 is the last question; change order form blank; no AI instructions |
 | 2026-11-24 | Referral Partner Request: description, form settings and questions 1 to 5 captured |
+| 2026-11-24 | Referral Partner Request: questions 6 to 9, #7 condition captured |
