@@ -63,6 +63,43 @@ def programs(ids):
     return "All three" if len(codes) == 3 else ", ".join(codes)
 
 
+YES_NO = {"GP5", "PS5", "SW6", "PS20", "PS21", "PS23", "PS26", "SW13", "SW24", "SW26",
+          "SW28", "SW31", "SW34", "SW35"}
+RAMP_FIELD = {"Request name": "Free response", "Frequency": "Multiple choice", "Amount": "Number",
+              "Vendor": "Vendor picker", "Vendor contact": "Contact", "Vendor address": "Address",
+              "Department": "Department picker", "Net payment terms": "Number"}
+
+
+def response_type(i):
+    t = rows[i][2]
+    if t in RAMP_FIELD:
+        return f"{RAMP_FIELD[t]} (Ramp {t} field)"
+    if i in YES_NO:
+        return f"Yes/No ({t.lower()})"
+    return {"Text": "Free response (short)", "Paragraph": "Free response (long)",
+            "Single select": "Multiple choice (one answer)", "Multi select": "Multiple choice (several answers)",
+            "Date": "Date", "Link": "Link", "File upload": "File upload"}.get(t, t)
+
+
+def conditional(i):
+    return shown_when(i) != "Always"
+
+
+DRIVES = {}
+for _i in rows:
+    for _ref in re.findall(r"[A-Z]{2}\d+", shown_when(_i)):
+        DRIVES.setdefault(_ref, []).append(_i)
+
+
+def dependency(i):
+    parts = []
+    if approval(i):
+        parts.append("Approval")
+    if i in DRIVES:
+        parts.append("Shows " + ", ".join(DRIVES[i]))
+    return "; ".join(parts) or "None"
+
+
 # Categories and distinct questions from CATEGORIES.md
 cat_text = open("CATEGORIES.md").read()
 distinct = cat_text[cat_text.index("# Distinct questions by category"):cat_text.index("# Appendix")]
@@ -95,29 +132,47 @@ for num, name, qs in cats:
 L.append("")
 L.append("## Distinct questions")
 L.append("")
-L.append("| **ID** | **Question** | **Programs** | **Asked in** | **Approval** |")
-L.append("|---|---|---|---|---|")
+L.append("| **ID** | **Question** | **Programs** | **Asked in** | **Response type** | **Dependency** |")
+L.append("|---|---|---|---|---|---|")
 for num, name, qs in cats:
-    L.append(f"| **{num}. {name}** | | | | |" if num != "Other" else "| **Other** | | | | |")
+    L.append(f"| **{num}. {name}** | | | | | |" if num != "Other" else "| **Other** | | | | | |")
     for did, text, ids, _ in qs:
-        L.append(f"| **{did}** | {text} | {programs(ids)} | {', '.join(ids)} | {'Yes' if any(approval(i) for i in ids) else ''} |")
+        types = list(dict.fromkeys(re.sub(r" \(.*\)$", "", response_type(i)) for i in ids))
+        rt = " / ".join(types)
+        cond = [i for i in ids if conditional(i)]
+        if cond and len(cond) == len(ids):
+            rt += "; conditional"
+        elif cond:
+            rt += "; conditional in " + programs(cond)
+        to_d = {}
+        for i in ids:
+            for t in DRIVES.get(i, []):
+                to_d[t] = True
+        dmap = {i: d for _, _, q2 in cats for d, _, ids2, _ in q2 for i in ids2}
+        order = [d for _, _, q2 in cats for d, _, _, _ in q2]
+        shows = sorted(set(dmap[t] for t in to_d), key=order.index)
+        dep = []
+        if any(approval(i) for i in ids):
+            dep.append("Approval")
+        if shows:
+            dep.append("Shows " + ", ".join(shows))
+        L.append(f"| **{did}** | {text} | {programs(ids)} | {', '.join(ids)} | {rt} | {'; '.join(dep) or 'None'} |")
 L.append("")
 open("sections/01-SUMMARY.md", "w").write("\n".join(L))
 
 L = ["# All questions", ""]
-L.append("Every question as it is in Ramp today, by category. Rows are in the order of the distinct questions in the summary. **Program**: GP General Procurement, PS Professional Services, SW Software / SaaS. Titles are copied from Ramp; `...` means the title was cut off in the screenshot. **Approval** after the type means Ramp uses the answer in approval conditions.")
+L.append("Every question as it is in Ramp today, by category. Rows are in the order of the distinct questions in the summary. **Program**: GP General Procurement, PS Professional Services, SW Software / SaaS. Titles are copied from Ramp; `...` means the title was cut off in the screenshot. **Response type** shows Ramp's own type in brackets. **Shown when** says whether the question is conditional. **Dependency**: *Approval* means Ramp uses the answer in approval conditions; *Shows* lists the questions that appear only for certain answers to it.")
 L.append("")
 for num, name, qs in cats:
     L.append(f"## {num}. {name}" if num != "Other" else "## Other")
     L.append("")
-    L.append("| **ID** | **Question** | **Program** | **Type** | **Required** | **Shown when** |")
-    L.append("|---|---|---|---|---|---|")
+    L.append("| **ID** | **Question** | **Program** | **Response type** | **Required** | **Shown when** | **Dependency** |")
+    L.append("|---|---|---|---|---|---|---|")
     for did, _, ids, _ in qs:
         for i in ids:
             code = re.match(r"[A-Z]+", i).group(0)
             r = rows[i]
-            typ = r[2] + (", **Approval**" if approval(i) else "")
-            L.append(f"| **{i}** | {r[1]} | {code} | {typ} | {required(i)} | {shown_when(i)} |")
+            L.append(f"| **{i}** | {r[1]} | {code} | {response_type(i)} | {required(i)} | {shown_when(i)} | {dependency(i)} |")
     L.append("")
 open("sections/02-ALL-QUESTIONS.md", "w").write("\n".join(L))
 print("written")

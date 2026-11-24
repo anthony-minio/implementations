@@ -8,6 +8,7 @@ row; those become key/value tables with the first column shaded grey.
 import sys
 
 import docx
+from docx.enum.section import WD_ORIENT
 from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
@@ -18,7 +19,7 @@ NAVY = "1F3B5C"
 LABEL_GREY = "F2F4F7"
 BORDER = "BFC7D1"
 BODY_FONT = "Arial"
-CONTENT_TWIPS = 9360  # 6.5in of text width on Letter with 1in margins
+CONTENT_TWIPS = 12960  # 9in of text width on landscape Letter with 1in margins (wide question tables)
 
 
 def set_cell_fill(cell, hex_fill):
@@ -160,7 +161,8 @@ def style_images(doc):
 def main(path):
     doc = docx.Document(path)
     for section in doc.sections:
-        section.page_width, section.page_height = Inches(8.5), Inches(11)
+        section.orientation = WD_ORIENT.LANDSCAPE
+        section.page_width, section.page_height = Inches(11), Inches(8.5)
         section.left_margin = section.right_margin = Inches(1)
         section.top_margin = section.bottom_margin = Inches(1)
     style_fonts(doc)
