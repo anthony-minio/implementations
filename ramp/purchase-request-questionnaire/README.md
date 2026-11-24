@@ -63,7 +63,7 @@ The final draft proposal also covers, for each program:
 
 ## Status
 
-Step 1 in progress. Program list captured 2026-11-20. General Procurement Request captured 2026-11-20. Professional Services Purchase Request captured 2026-11-23. Software / SaaS Purchase Request captured 2026-11-24. Referral Partner Request in progress.
+Step 1 in progress. Program list captured 2026-11-20. General Procurement Request captured 2026-11-20. Professional Services Purchase Request captured 2026-11-23. Software / SaaS Purchase Request captured 2026-11-24. Referral Partner Request captured 2026-11-24. Group A capture complete. Group B (PO from Signed Contracts, Confidential Procurement Request Form) not captured.
 
 ## Log
 
@@ -108,3 +108,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-24 | Software / SaaS Purchase Request: complete. #40 is the last question; change order form blank; no AI instructions |
 | 2026-11-24 | Referral Partner Request: description, form settings and questions 1 to 5 captured |
 | 2026-11-24 | Referral Partner Request: questions 6 to 9, #7 condition captured |
+| 2026-11-24 | Referral Partner Request: complete. 10 questions; change order form has 1 question; no AI instructions |

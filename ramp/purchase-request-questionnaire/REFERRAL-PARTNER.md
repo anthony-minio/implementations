@@ -24,7 +24,7 @@ Form settings are the same as the other group A programs.
 
 ## Questions
 
-In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP`, `PS` and `SW` are the matching General Procurement, Professional Services and Software / SaaS questions.
+10 questions; #10 is the last (confirmed by Anthony 2026-11-24). In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP`, `PS` and `SW` are the matching General Procurement, Professional Services and Software / SaaS questions.
 
 | # | Title | Ramp field type | Description | Required | Conditional logic | GP / PS / SW |
 |---|---|---|---|---|---|---|
@@ -37,8 +37,20 @@ In the order shown. Same conventions as `GENERAL-PROCUREMENT.md`. `GP`, `PS` and
 | 7 | PARTNER – Referral Partner Company Point of Contact | Vendor contact | None | Always required | Shown if Vendor (#6) is "New vendor" | GP #26, PS #30, SW #38 |
 | 8 | BUSINESS – Business Owner / Internal Sponsor | Text | None | Always required | None shown | GP #19, PS #13, SW #16 (REQUESTER) |
 | 9 | BUSINESS – Department | Department | None | No | None shown | GP #20, PS #14, SW #17; required in all three |
+| 10 | APPROVALS – Message for Approvers | Text | None | No | None shown | GP #28, PS #32, SW #40 (APPROVAL NOTES) |
 
-## Not yet captured
+## Change order form
 
-- Questions after #9, with their conditions.
-- Change order form and AI instructions.
+One question. This is the only group A program with a change order form set up.
+
+| # | Title | Ramp field type | Description | Required |
+|---|---|---|---|---|
+| 1 | Why are you making this change | Reason | None | Always required |
+
+## AI instructions
+
+Empty. Confirmed by Anthony 2026-11-24.
+
+## Not captured
+
+- No vendor address question (asked for new vendors in the other three programs).
