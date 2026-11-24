@@ -57,16 +57,17 @@ The final draft proposal also covers, for each program:
 | File | Purpose |
 |---|---|
 | `PROGRAMS.md` | Current Ramp procurement programs: the paths being combined |
+| `CATEGORIES.md` | Every in-scope question grouped into categories, with a proposed category flow. The working list for the review |
 | `GENERAL-PROCUREMENT.md` | General Procurement Request as it is set up in Ramp today |
 | `PROFESSIONAL-SERVICES.md` | Professional Services Purchase Request as it is set up in Ramp today |
 | `SOFTWARE-SAAS.md` | Software / SaaS Purchase Request as it is set up in Ramp today |
 | `REFERRAL-PARTNER.md` | Referral Partner Request as it is set up in Ramp today |
-| `second-icon-explainer.png` | Shows the unidentified second icon next to the branch icon on some questions |
+| `second-icon-explainer.png` | Shows the approval icon (left of the branch icon): the question is used in approval conditions |
 | `screenshots/` | Source screenshots from Ramp, named `YYYYMMDD-<what>` |
 
 ## Status
 
-Step 1 in progress. Program list captured 2026-11-20. General Procurement Request captured 2026-11-20. Professional Services Purchase Request captured 2026-11-23. Software / SaaS Purchase Request captured 2026-11-24. Referral Partner Request captured 2026-11-24. Group A capture complete. Group B (PO from Signed Contracts, Confidential Procurement Request Form) not captured.
+Step 1 in progress. Program list captured 2026-11-20. General Procurement Request captured 2026-11-20. Professional Services Purchase Request captured 2026-11-23. Software / SaaS Purchase Request captured 2026-11-24. Referral Partner Request captured 2026-11-24. Group A capture complete. Questions grouped into categories 2026-11-24 (`CATEGORIES.md`); review next. Group B (PO from Signed Contracts, Confidential Procurement Request Form) not captured.
 
 ## Log
 
@@ -113,3 +114,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-24 | Referral Partner Request: questions 6 to 9, #7 condition captured |
 | 2026-11-24 | Referral Partner Request: complete. 10 questions; change order form has 1 question; no AI instructions |
 | 2026-11-24 | Scope: group B dropped; Referral Partner excluded. Review method agreed: categorise, then review one by one |
+| 2026-11-24 | Approval icon identified (used in approval conditions). `CATEGORIES.md` added: 100 questions in 10 categories plus Other |

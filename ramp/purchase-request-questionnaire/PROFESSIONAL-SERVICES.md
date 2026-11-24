@@ -60,18 +60,18 @@ Form settings are the same as General Procurement Request.
 | 12 | TIMELINE – Is there a target date or deadline by which this purchase or contract needs to be co... | Date | None | No | None shown | #18, same |
 | 13 | REQUESTER – Who is the internal business owner/requester? | Text | None | Always required | None shown | #19, same |
 | 14 | DEPARTMENT – Which department will be using this service? | Department | None | Always required | None shown | #20, worded for services |
-| 15 | PURCHASE METHOD – How will this purchase be made? | Single select | None | Always required | Drives #16 and #17. Branch icon plus the same unidentified second icon as GP #21 | #21, same options, but single select here (multi select in GP) |
+| 15 | PURCHASE METHOD – How will this purchase be made? | Single select | None | Always required | Drives #16 and #17. Branch icon plus the approval icon, as GP #21 | #21, same options, but single select here (multi select in GP) |
 | 16 | DOCUMENTATION – Please upload all related contracts and documents. | File upload | (Required: vendor proposal, quote, order form,  MSA, DPA) | Always required | Shown if #15 is "Signed Contract" | #22, adds a description listing required documents |
 | 17 | SUPPORTING LINKS – Please provide any relevant online links related to this request. | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #15 is "Online click-through agreement" | #23, same description, different title |
 | 18 | SUPPORTING LINKS – Links Continued | Link | (For example: pricing page, online terms and conditions, privacy policy, Data Processing Agreement (DPA), or product documentation.) | No | None shown | #24, has a description here |
 | 19 | DATA ACCESS – Please briefly describe the type of access or data involved? | Paragraph | None | Always required | None shown (comes before the yes/no question #20) | None |
-| 20 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential company information? | Multi select | None | Always required | Branch icon plus the second icon. Drives #26 | None |
-| 21 | SYSTEM INTEGRATION – Will this vendor integrate with any MinIO systems? | Multi select | None | Always required | Branch icon plus the second icon. Drives #22, #25 and #26 | None |
+| 20 | DATA ACCESS – Will this vendor require access to sensitive data, systems, or confidential company information? | Multi select | None | Always required | Branch icon plus the approval icon. Drives #26 | None |
+| 21 | SYSTEM INTEGRATION – Will this vendor integrate with any MinIO systems? | Multi select | None | Always required | Branch icon plus the approval icon. Drives #22, #25 and #26 | None |
 | 22 | SYSTEM INTEGRATION – Please describe which MinIO systems the vendor will integrate with. | Paragraph | None | Always required | Shown if #21 is "Yes" | None |
-| 23 | THIRD-PARTY SERVICES – Does this vendor use any subcontractors or third-party service providers? | Multi select | None | Always required | Drives #24. Branch icon only, no second icon | None |
+| 23 | THIRD-PARTY SERVICES – Does this vendor use any subcontractors or third-party service providers? | Multi select | None | Always required | Drives #24. Branch icon only, no approval icon | None |
 | 24 | THIRD-PARTY SERVICES – If yes, please explain. | Paragraph | None | Always required | Shown if #23 is "Yes" | None |
 | 25 | SYSTEM INTEGRATION – Please describe the type of access, integration, or connection require... | Paragraph | None | Always required | Shown if #21 is "Yes" (same condition as #22) | None |
-| 26 | SECURITY / COMPLIANCE – Does the vendor have a SOC 2 Type II report? | Multi select | None | Always required | Shown if #20 is "Yes" or #21 is "Yes". Branch icon plus the second icon. Drives #27 and #28 | None |
+| 26 | SECURITY / COMPLIANCE – Does the vendor have a SOC 2 Type II report? | Multi select | None | Always required | Shown if #20 is "Yes" or #21 is "Yes". Branch icon plus the approval icon. Drives #27 and #28 | None |
 | 27 | SECURITY / COMPLIANCE –If Yes, Please upload the SOC 2 Type II  report | File upload | None | Always required | Shown if #26 is "Yes" | None |
 | 28 | SECURITY / COMPLIANCE –If no, Please explain why | Paragraph | If unavailable, please provide an explanation (e.g., vendor may not yet have a SOC 2 report) | No | Shown if #26 is "No" | None |
 | 29 | PAYMENT TERMS – What are the net payment terms? | Net payment terms | Number of days | No | None shown | #25, same |

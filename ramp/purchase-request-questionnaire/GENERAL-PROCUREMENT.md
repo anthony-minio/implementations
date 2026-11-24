@@ -60,7 +60,7 @@ In the order shown. Ramp field type is the tag on the question. Required: `Locke
 | 18 | TIMELINE – Is there a target date or deadline by which this purchase or contract needs to be co... | Date | None | No | None shown |
 | 19 | REQUESTER – Who is the internal business owner/requester? | Text | None | Always required | None shown |
 | 20 | DEPARTMENT – Which department is this request for? | Department | None | Always required | None shown |
-| 21 | PURCHASE METHOD – How will this purchase be made? | Multi select | None | Always required | Branch icon shown, plus a second icon not yet identified. Drives #22 and #23 |
+| 21 | PURCHASE METHOD – How will this purchase be made? | Multi select | None | Always required | Branch icon shown, plus the approval icon (used in approval conditions). Drives #22 and #23 |
 | 22 | CONTRACTS / DOCUMENTATION – Please upload all contracts and documents | File upload | None | Always required | Shown if #21 is "Signed Contract" |
 | 23 | CONTRACTS / DOCUMENTATION – Include relevant links (such as terms or pricing) | Link | (For example: pricing page, online terms and conditions, online subscription agreement,privacy policy, Data Processing Agreement (DPA), or product documentation.) | Always required | Shown if #21 is "Online click-through agreement" |
 | 24 | CONTRACTS / DOCUMENTATION- Include relevant links (such as terms or pricing) Continued | Link | None | No | None shown |
@@ -70,6 +70,8 @@ In the order shown. Ramp field type is the tag on the question. Required: `Locke
 | 28 | APPROVAL NOTES – Add a message for approvers to review | Text | None | No | None shown |
 
 The blurred background of the #6 condition panel confirms nothing sits between #4 and #5. The #12 description has an opening bracket with no closing one, and the #13 title has no space after the first dash, both as in Ramp. A condition listing several answers is read as "any of these". The #12 and #14 condition screenshots are identical; they are matched to questions by the order they were sent.
+
+The approval icon is the small icon to the left of the branch icon. Its tooltip on #21 reads: "Used in 2 approval conditions. Used by rules on "CONTRACTS / DOCUMENTATION – Please upload all contracts and documents" and "CONTRACTS / DOCUMENTATION – Include relevant links (such as terms or pricing)"" (screenshot `20261124-general-procurement-43-approval-icon-tooltip.png`, 2026-11-24). So questions with that icon feed the approval policy.
 
 ### Options
 
@@ -114,7 +116,6 @@ Section "AI instructions - Guide how AI prefills requests from uploaded document
 
 - Confirm the #11 condition.
 - Full titles of #13, #14, #15 and #18, and #21 option 3 (cut off).
-- The second icon on #21.
 - Confirm #18 to #22 belong to this program (sent without the program header). #28 is taken as the last question; the change order section was sent next.
 - Full text of #5 option 2.
 - Options for #2 Frequency.
