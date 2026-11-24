@@ -1,0 +1,1889 @@
+<title>Ramp purchase request questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+
+:root {
+--paper: #fbfcfd;
+--ink: #16202b;
+--muted: #5b6673;
+--rule: #c9d0d8;
+--accent: #2e74b5;
+--head-bg: #1f3b5c;
+--head-ink: #ffffff;
+--label-bg: #eef1f5;
+--tbc-bg: #fff3d6;
+--tbc-ink: #7a5300;
+--font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+--font-body: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+--font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+}
+:root[data-theme="dark"] {
+--paper: #13181e; --ink: #e3e8ee; --muted: #9aa5b1; --rule: #34404c; --accent: #7fb2e5;
+--head-bg: #24456b; --head-ink: #ffffff; --label-bg: #1d252e; --tbc-bg: #3a2f14; --tbc-ink: #f2cf7a;
+color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 1rem; line-height: 1.55; padding-inline: 16px; padding-block: 2rem 4rem; }
+.doc { max-width: 46rem; margin-inline: auto; }
+.doc-head { display: grid; gap: .35rem; padding-block-end: 1.25rem; border-bottom: 1px solid var(--rule); margin-block-end: 1.5rem; }
+.doc-title { color: var(--ink); font-family: var(--font-display); font-weight: 600; font-size: clamp(1.8rem, 5vw, 2.4rem); line-height: 1.15; margin: 0; text-wrap: balance; }
+.doc-sub { color: var(--muted); font-size: 1.1rem; margin: 0; }
+.doc-meta { font-family: var(--font-mono); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+h1, h2, h3 { color: var(--accent); line-height: 1.25; text-wrap: balance; margin: 0; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+section.level1 { margin-block: 1rem 3rem; }
+section.level2 { margin-block-start: 2rem; }
+.head-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .5rem 1rem; margin-block-end: .75rem; }
+.head-row > :first-child { min-width: 0; }
+p, ol, ul { margin-block: 0 .9rem; max-width: 65ch; }
+li + li { margin-block-start: .35rem; }
+figure { margin: 1.25rem 0 1.5rem; display: grid; gap: .5rem; justify-items: center; }
+figure img { max-width: 100% !important; height: auto; border: 1px solid var(--rule); border-radius: 4px; background: #ffffff; }
+figure img[style*="6.5in"] { width: 100% !important; }
+figcaption { font-size: .85rem; font-style: italic; color: var(--muted); text-align: center; max-width: 60ch; }
+.table-wrap { overflow-x: auto; margin-block: 1rem 1.5rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { border: 1px solid var(--rule); padding: .4rem .6rem; text-align: left; vertical-align: top; }
+thead th { background: var(--head-bg); color: var(--head-ink); font-weight: 600; }
+table.kv td:first-child { background: var(--label-bg); font-weight: 600; width: 28%; }
+colgroup { display: none; }
+.tbc { font-family: var(--font-mono); font-size: .75em; background: var(--tbc-bg); color: var(--tbc-ink); padding: .05em .35em; border-radius: 3px; white-space: nowrap; }
+button.copy { font: 500 .75rem/1 var(--font-mono); letter-spacing: .03em; color: var(--accent); background: transparent; border: 1px solid var(--rule); border-radius: 999px; padding: .4rem .7rem; cursor: pointer; white-space: nowrap; }
+button.copy:hover { border-color: var(--accent); }
+button.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.status { font-family: var(--font-mono); font-size: .75rem; color: var(--muted); min-height: 1em; }
+@media (prefers-reduced-motion: no-preference) { button.copy { transition: border-color .15s; } }
+</style>
+
+<main class="doc">
+  <header class="doc-head">
+    <h1 class="doc-title">Ramp purchase request questions</h1>
+    <p class="doc-sub">General Procurement, Professional Services and
+Software / SaaS: questions for review</p>
+    <div class="doc-meta">
+      <span>Draft · updated 2026-11-24</span>
+      <button type="button" class="copy" id="copy-all">Copy whole document</button>
+      <span class="status" id="status" role="status"></span>
+    </div>
+  </header>
+<section id="summary" class="level1">
+<h1>Summary</h1>
+<p>Program codes: <strong>GP</strong> General Procurement (28
+questions), <strong>PS</strong> Professional Services (32),
+<strong>SW</strong> Software / SaaS (40). The 100 questions in Ramp
+today come down to 49 distinct questions. <strong>Approval</strong>
+marks a question Ramp uses in approval conditions.</p>
+<section id="categories" class="level2">
+<h2>Categories</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>#</strong></th>
+<th><strong>Category</strong></th>
+<th><strong>Distinct questions</strong></th>
+<th><strong>In Ramp today</strong></th>
+<th><strong>Programs</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1</strong></td>
+<td>Request basics</td>
+<td>3</td>
+<td>9</td>
+<td>All three</td>
+</tr>
+<tr class="even">
+<td><strong>2</strong></td>
+<td>Request type</td>
+<td>3</td>
+<td>3</td>
+<td>GP, SW</td>
+</tr>
+<tr class="odd">
+<td><strong>3</strong></td>
+<td>Vendor and negotiations</td>
+<td>5</td>
+<td>15</td>
+<td>All three</td>
+</tr>
+<tr class="even">
+<td><strong>4</strong></td>
+<td>Business need and impact</td>
+<td>5</td>
+<td>11</td>
+<td>All three</td>
+</tr>
+<tr class="odd">
+<td><strong>5</strong></td>
+<td>Alternatives and existing tools</td>
+<td>4</td>
+<td>4</td>
+<td>SW</td>
+</tr>
+<tr class="even">
+<td><strong>6</strong></td>
+<td>Revenue and GTM</td>
+<td>4</td>
+<td>5</td>
+<td>GP, PS</td>
+</tr>
+<tr class="odd">
+<td><strong>7</strong></td>
+<td>Owner, department and timing</td>
+<td>3</td>
+<td>9</td>
+<td>All three</td>
+</tr>
+<tr class="even">
+<td><strong>8</strong></td>
+<td>Contract and commercial terms</td>
+<td>5</td>
+<td>15</td>
+<td>All three</td>
+</tr>
+<tr class="odd">
+<td><strong>9</strong></td>
+<td>Security and compliance</td>
+<td>12</td>
+<td>22</td>
+<td>PS, SW</td>
+</tr>
+<tr class="even">
+<td><strong>10</strong></td>
+<td>Software and IT</td>
+<td>3</td>
+<td>3</td>
+<td>SW</td>
+</tr>
+<tr class="odd">
+<td><strong>Other</strong></td>
+<td>Other</td>
+<td>2</td>
+<td>4</td>
+<td>All three</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="distinct-questions" class="level2">
+<h2>Distinct questions</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Programs</strong></th>
+<th><strong>Asked in</strong></th>
+<th><strong>Approval</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>1. Request basics</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D1.1</strong></td>
+<td>Give this request a name</td>
+<td>All three</td>
+<td>GP1, PS1, SW1</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D1.2</strong></td>
+<td>Is it one-time or recurring? (Frequency)</td>
+<td>All three</td>
+<td>GP2, PS2, SW2</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D1.3</strong></td>
+<td>What is the spend amount? (Amount)</td>
+<td>All three</td>
+<td>GP3, PS3, SW3</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>2. Request type</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D2.1</strong></td>
+<td>What best describes this request? (event types plus Other)</td>
+<td>GP</td>
+<td>GP8</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D2.2</strong></td>
+<td>If other, please explain</td>
+<td>GP</td>
+<td>GP9</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D2.3</strong></td>
+<td>What type of request is this? (new, renewal, amendment, trial or
+pilot)</td>
+<td>SW</td>
+<td>SW4</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>3. Vendor and negotiations</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D3.1</strong></td>
+<td>Specify the vendor for this request</td>
+<td>All three</td>
+<td>GP4, PS4, SW5</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D3.2</strong></td>
+<td>Have you already engaged in discussions or negotiations with the
+vendor?</td>
+<td>All three</td>
+<td>GP5, PS5, SW6</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D3.3</strong></td>
+<td>If yes, provide justification and describe what was discussed or
+negotiated</td>
+<td>All three</td>
+<td>GP6, PS6, SW7</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D3.4</strong></td>
+<td>Vendor contact (new vendor)</td>
+<td>All three</td>
+<td>GP26, PS30, SW38</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D3.5</strong></td>
+<td>Vendor address (new vendor)</td>
+<td>All three</td>
+<td>GP27, PS31, SW39</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>4. Business need and impact</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D4.1</strong></td>
+<td>Describe the goods or services being requested</td>
+<td>GP, PS</td>
+<td>GP17, PS7</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D4.2</strong></td>
+<td>Describe the business purpose / need</td>
+<td>All three</td>
+<td>GP7, PS8, SW8, SW9</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D4.3</strong></td>
+<td>What is the primary expected outcome? (list)</td>
+<td>GP</td>
+<td>GP10</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D4.4</strong></td>
+<td>What is the expected business impact?</td>
+<td>All three</td>
+<td>GP11, PS10, SW10</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D4.5</strong></td>
+<td>How will success be measured?</td>
+<td>PS</td>
+<td>PS11</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>5. Alternatives and existing tools</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D5.1</strong></td>
+<td>Is this replacing an existing tool or adding a new capability?</td>
+<td>SW</td>
+<td>SW11</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D5.2</strong></td>
+<td>What alternative tools (including existing internal tools) were
+considered?</td>
+<td>SW</td>
+<td>SW12</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D5.3</strong></td>
+<td>Have you checked if we already have an existing tool or service that
+meets this need?</td>
+<td>SW</td>
+<td>SW13</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D5.4</strong></td>
+<td>If yes, explain why a new tool or service is still required</td>
+<td>SW</td>
+<td>SW14</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>6. Revenue and GTM</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D6.1</strong></td>
+<td>What pipeline impact is expected (net-new, expansion, or
+renewal)?</td>
+<td>GP</td>
+<td>GP12</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D6.2</strong></td>
+<td>Expected ROI / pipeline impact</td>
+<td>GP</td>
+<td>GP13</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D6.3</strong></td>
+<td>Which priority customers or target accounts are expected…</td>
+<td>GP, PS</td>
+<td>GP14, PS9</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D6.4</strong></td>
+<td>How does this request support current GTM priorities or revenue
+objectives?</td>
+<td>GP</td>
+<td>GP15</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>7. Owner, department and timing</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D7.1</strong></td>
+<td>Is there a target date or deadline by which this purchase needs to
+be completed?</td>
+<td>All three</td>
+<td>GP18, PS12, SW15</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D7.2</strong></td>
+<td>Who is the internal business owner/requester?</td>
+<td>All three</td>
+<td>GP19, PS13, SW16</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D7.3</strong></td>
+<td>Which department is this request for?</td>
+<td>All three</td>
+<td>GP20, PS14, SW17</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>8. Contract and commercial terms</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D8.1</strong></td>
+<td>How will this purchase be made? (Purchase method)</td>
+<td>All three</td>
+<td>GP21, PS15, SW19</td>
+<td>Yes</td>
+</tr>
+<tr class="odd">
+<td><strong>D8.2</strong></td>
+<td>Please upload all related contracts and documents</td>
+<td>All three</td>
+<td>GP22, PS16, SW20</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D8.3</strong></td>
+<td>Provide any relevant online links (terms, pricing, DPA…)</td>
+<td>All three</td>
+<td>GP23, PS17, SW21</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D8.4</strong></td>
+<td>Links continued</td>
+<td>All three</td>
+<td>GP24, PS18, SW22</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D8.5</strong></td>
+<td>What are the net payment terms?</td>
+<td>All three</td>
+<td>GP25, PS29, SW37</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>9. Security and compliance</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D9.1</strong></td>
+<td>What type of data will be used, uploaded, or stored in this
+system?</td>
+<td>SW</td>
+<td>SW23</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D9.2</strong></td>
+<td>Will this vendor require access to sensitive data, systems, or
+confidential company information?</td>
+<td>PS, SW</td>
+<td>PS20, SW24</td>
+<td>Yes</td>
+</tr>
+<tr class="even">
+<td><strong>D9.3</strong></td>
+<td>Please briefly describe the type of access or data involved</td>
+<td>PS, SW</td>
+<td>PS19, SW25</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D9.4</strong></td>
+<td>Will this vendor integrate with any MinIO systems?</td>
+<td>PS, SW</td>
+<td>PS21, SW26</td>
+<td>Yes</td>
+</tr>
+<tr class="even">
+<td><strong>D9.5</strong></td>
+<td>Please describe which MinIO systems the vendor will integrate
+with</td>
+<td>PS, SW</td>
+<td>PS22, SW27</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D9.6</strong></td>
+<td>Please describe the type of access, integration, or connection
+required</td>
+<td>PS, SW</td>
+<td>PS25, SW30</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D9.7</strong></td>
+<td>Does this vendor use any subcontractors or third-party service
+providers?</td>
+<td>PS, SW</td>
+<td>PS23, SW28</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D9.8</strong></td>
+<td>If yes, please explain (subcontractors)</td>
+<td>PS, SW</td>
+<td>PS24, SW29</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D9.9</strong></td>
+<td>Does the vendor have a SOC 2 Type II report?</td>
+<td>PS, SW</td>
+<td>PS26, SW31</td>
+<td>Yes</td>
+</tr>
+<tr class="odd">
+<td><strong>D9.10</strong></td>
+<td>If yes, please upload the SOC 2 Type II report</td>
+<td>PS, SW</td>
+<td>PS27, SW32</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D9.11</strong></td>
+<td>If no, please explain why (SOC 2)</td>
+<td>PS, SW</td>
+<td>PS28, SW33</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D9.12</strong></td>
+<td>Will this vendor access, process, store, or integrate with MinIO
+systems, confide…</td>
+<td>SW</td>
+<td>SW34</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>10. Software and IT</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D10.1</strong></td>
+<td>Approximately how many users will need access to this software?</td>
+<td>SW</td>
+<td>SW18</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>D10.2</strong></td>
+<td>Does this system support Single Sign-On (SSO)?</td>
+<td>SW</td>
+<td>SW35</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>D10.3</strong></td>
+<td>Please specify which SSO providers are supported</td>
+<td>SW</td>
+<td>SW36</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>Other</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>DO.1</strong></td>
+<td>What is the current status of our relationship with this
+vendor?</td>
+<td>GP</td>
+<td>GP16</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>DO.2</strong></td>
+<td>Add a message for approvers to review</td>
+<td>All three</td>
+<td>GP28, PS32, SW40</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="all-questions" class="level1">
+<h1>All questions</h1>
+<p>Every question as it is in Ramp today, by category. Rows are in the
+order of the distinct questions in the summary.
+<strong>Program</strong>: GP General Procurement, PS Professional
+Services, SW Software / SaaS. Titles are copied from Ramp;
+<code>...</code> means the title was cut off in the screenshot.
+<strong>Approval</strong> after the type means Ramp uses the answer in
+approval conditions.</p>
+<section id="request-basics" class="level2">
+<h2>1. Request basics</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GP1</strong></td>
+<td>REQUEST DETAILS – Give this request a name</td>
+<td>GP</td>
+<td>Request name</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS1</strong></td>
+<td>REQUEST DETAILS – Give this request a name</td>
+<td>PS</td>
+<td>Request name</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW1</strong></td>
+<td>REQUEST DETAILS – Give this request a name</td>
+<td>SW</td>
+<td>Request name</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>GP2</strong></td>
+<td>REQUEST DETAILS – Is it one-time or recurring?</td>
+<td>GP</td>
+<td>Frequency</td>
+<td>Yes (Ramp field)</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>PS2</strong></td>
+<td>REQUEST DETAILS – Is it one-time or recurring?</td>
+<td>PS</td>
+<td>Frequency</td>
+<td>Yes (Ramp field)</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>SW2</strong></td>
+<td>REQUEST DETAILS – Is this a one-time or recurring request?</td>
+<td>SW</td>
+<td>Frequency</td>
+<td>Yes (Ramp field)</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>GP3</strong></td>
+<td>SPEND – What is the spend amount?</td>
+<td>GP</td>
+<td>Amount</td>
+<td>Yes (Ramp field)</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS3</strong></td>
+<td>SPEND – What is the spend amount?</td>
+<td>PS</td>
+<td>Amount</td>
+<td>Yes (Ramp field)</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW3</strong></td>
+<td>SPEND DETAILS – What is the expected spend amount?</td>
+<td>SW</td>
+<td>Amount</td>
+<td>Yes (Ramp field)</td>
+<td>Always</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="request-type" class="level2">
+<h2>2. Request type</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GP8</strong></td>
+<td>REQUEST TYPE – What best describes this request?</td>
+<td>GP</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>GP9</strong></td>
+<td>REQUEST TYPE – If other, please explain</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if GP8 is “Other”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW4</strong></td>
+<td>REQUEST TYPE – What type of request is this?</td>
+<td>SW</td>
+<td>Single select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="vendor-and-negotiations" class="level2">
+<h2>3. Vendor and negotiations</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GP4</strong></td>
+<td>VENDOR – Specify the vendor for this request</td>
+<td>GP</td>
+<td>Vendor</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS4</strong></td>
+<td>VENDOR- Specify the vendor for this request</td>
+<td>PS</td>
+<td>Vendor</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW5</strong></td>
+<td>VENDOR – Specify the vendor for this request</td>
+<td>SW</td>
+<td>Vendor</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>GP5</strong></td>
+<td>NEGOTIATIONS – Have you already engaged in discussions or
+negotiations with the vendor?</td>
+<td>GP</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>PS5</strong></td>
+<td>NEGOTIATIONS- Have you already engaged in discussions or
+negotiations with the vendor?</td>
+<td>PS</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>SW6</strong></td>
+<td>NEGOTIATIONS – Have you already engaged in discussions or
+negotiations with the vendor?</td>
+<td>SW</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>GP6</strong></td>
+<td>NEGOTIATIONS – If yes, provide justification and describe what was
+discussed or negotiated w…</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if GP5 is “Yes”</td>
+</tr>
+<tr class="even">
+<td><strong>PS6</strong></td>
+<td>NEGOTIATIONS- If YES → Provide justification and describe what was
+discussed or negotiated…</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if PS5 is “Yes”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW7</strong></td>
+<td>NEGOTIATIONS – If yes, provide justification and describe what was
+discussed or negotiated w…</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if SW6 is “Yes”</td>
+</tr>
+<tr class="even">
+<td><strong>GP26</strong></td>
+<td>VENDOR – Vendor contact</td>
+<td>GP</td>
+<td>Vendor contact</td>
+<td>Yes</td>
+<td>Shown if Vendor (GP4) is “New vendor”</td>
+</tr>
+<tr class="odd">
+<td><strong>PS30</strong></td>
+<td>VENDOR – Vendor contact</td>
+<td>PS</td>
+<td>Vendor contact</td>
+<td>Yes</td>
+<td>Shown if Vendor (PS4) is “New vendor”</td>
+</tr>
+<tr class="even">
+<td><strong>SW38</strong></td>
+<td>VENDOR – Vendor contact</td>
+<td>SW</td>
+<td>Vendor contact</td>
+<td>Yes</td>
+<td>Shown if Vendor (SW5) is “New vendor”</td>
+</tr>
+<tr class="odd">
+<td><strong>GP27</strong></td>
+<td>VENDOR – Vendor address</td>
+<td>GP</td>
+<td>Vendor address</td>
+<td>Yes</td>
+<td>Shown if Vendor (GP4) is “New vendor”</td>
+</tr>
+<tr class="even">
+<td><strong>PS31</strong></td>
+<td>VENDOR – Vendor address</td>
+<td>PS</td>
+<td>Vendor address</td>
+<td>Yes</td>
+<td>Shown if Vendor (PS4) is “New vendor”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW39</strong></td>
+<td>VENDOR – Vendor address</td>
+<td>SW</td>
+<td>Vendor address</td>
+<td>Yes</td>
+<td>Shown if Vendor (SW5) is “New vendor”</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="business-need-and-impact" class="level2">
+<h2>4. Business need and impact</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GP17</strong></td>
+<td>SERVICES / GOODS – Please describe the nature of the goods or
+services being requested</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS7</strong></td>
+<td>SERVICES – Please describe the nature of the external services being
+requested.</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>GP7</strong></td>
+<td>BUSINESS PURPOSE – Describe the business purpose</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS8</strong></td>
+<td>BUSINESS PURPOSE – What is the purpose of these external
+services?</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW8</strong></td>
+<td>BUSINESS NEED – Describe the business need and the proposed
+solution</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>SW9</strong></td>
+<td>BUSINESS NEED – What business problem does this software or service
+solve?</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>GP10</strong></td>
+<td>BUSINESS IMPACT – What is the primary expected outcome?</td>
+<td>GP</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>GP11</strong></td>
+<td>BUSINESS IMPACT – What is the expected business impact of this
+request?</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if GP8 is “Other”</td>
+</tr>
+<tr class="odd">
+<td><strong>PS10</strong></td>
+<td>BUSINESS IMPACT – What business impact is expected from this
+engagement?</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>SW10</strong></td>
+<td>BUSINESS IMPACT – What is the expected business impact?</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>PS11</strong></td>
+<td>SUCCESS METRICS – How will success be measured for this
+engagement?</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="alternatives-and-existing-tools" class="level2">
+<h2>5. Alternatives and existing tools</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>SW11</strong></td>
+<td>BUSINESS NEED – Is this replacing an existing tool or adding a new
+capability?</td>
+<td>SW</td>
+<td>Text</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>SW12</strong></td>
+<td>ALTERNATIVES – What alternative tools (including existing internal
+tools) were considered?</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW13</strong></td>
+<td>ALTERNATIVES – Have you checked if we already have an existing tool
+or service that meets thi…</td>
+<td>SW</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Shown if SW4 is “New software purchase”</td>
+</tr>
+<tr class="even">
+<td><strong>SW14</strong></td>
+<td>ALTERNATIVES – If yes, please explain why a new tool or service is
+still required</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if SW13 is “Yes”</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="revenue-and-gtm" class="level2">
+<h2>6. Revenue and GTM</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GP12</strong></td>
+<td>BUSINESS IMPACT – What pipeline impact is expected (net-new,
+expansion, or renewal)?</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if GP8 is any event type (any option except “Other”)</td>
+</tr>
+<tr class="even">
+<td><strong>GP13</strong></td>
+<td>BUSINESS IMPACT –EXPECTED ROI / PIPELINE IMPACT – What is the
+anticipated financial retu…</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>No</td>
+<td>Shown if GP8 is “Customer-facing sales meeting / dinner”, “Marketing
+event / sponsorship” or “Conference / trade show”, or GP10 is
+“Relationship building / customer engagement”, “Pipeline progression /
+sales follow-up”, “Lead generation” or “Brand awareness”</td>
+</tr>
+<tr class="odd">
+<td><strong>GP14</strong></td>
+<td>CUSTOMERS / TARGET ACCOUNTS – Which priority customers or target
+accounts are expect…</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if GP8 is any event type (any option except “Other”)</td>
+</tr>
+<tr class="even">
+<td><strong>PS9</strong></td>
+<td>CUSTOMERS / TARGET ACCOUNTS – Which priority customers, partners, or
+target accounts w…</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>GP15</strong></td>
+<td>GTM ALIGNMENT – How does this request support current GTM priorities
+or revenue objective…</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if GP8 is any event type (any option except “Other”)</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="owner-department-and-timing" class="level2">
+<h2>7. Owner, department and timing</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GP18</strong></td>
+<td>TIMELINE – Is there a target date or deadline by which this purchase
+or contract needs to be co…</td>
+<td>GP</td>
+<td>Date</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS12</strong></td>
+<td>TIMELINE – Is there a target date or deadline by which this purchase
+or contract needs to be co…</td>
+<td>PS</td>
+<td>Date</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW15</strong></td>
+<td>TIMELINE – Is there a target date or deadline by which this purchase
+needs to be completed?</td>
+<td>SW</td>
+<td>Date</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>GP19</strong></td>
+<td>REQUESTER – Who is the internal business owner/requester?</td>
+<td>GP</td>
+<td>Text</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>PS13</strong></td>
+<td>REQUESTER – Who is the internal business owner/requester?</td>
+<td>PS</td>
+<td>Text</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>SW16</strong></td>
+<td>REQUESTER – Who is the internal business owner/requester?</td>
+<td>SW</td>
+<td>Text</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>GP20</strong></td>
+<td>DEPARTMENT – Which department is this request for?</td>
+<td>GP</td>
+<td>Department</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS14</strong></td>
+<td>DEPARTMENT – Which department will be using this service?</td>
+<td>PS</td>
+<td>Department</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW17</strong></td>
+<td>DEPARTMENT – Which department will use this software?</td>
+<td>SW</td>
+<td>Department</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="contract-and-commercial-terms" class="level2">
+<h2>8. Contract and commercial terms</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GP21</strong></td>
+<td>PURCHASE METHOD – How will this purchase be made?</td>
+<td>GP</td>
+<td>Multi select, <strong>Approval</strong></td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS15</strong></td>
+<td>PURCHASE METHOD – How will this purchase be made?</td>
+<td>PS</td>
+<td>Single select, <strong>Approval</strong></td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW19</strong></td>
+<td>PURCHASE METHOD – How will this software purchase be made?</td>
+<td>SW</td>
+<td>Multi select, <strong>Approval</strong></td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>GP22</strong></td>
+<td>CONTRACTS / DOCUMENTATION – Please upload all contracts and
+documents</td>
+<td>GP</td>
+<td>File upload</td>
+<td>Yes</td>
+<td>Shown if GP21 is “Signed Contract”</td>
+</tr>
+<tr class="odd">
+<td><strong>PS16</strong></td>
+<td>DOCUMENTATION – Please upload all related contracts and
+documents.</td>
+<td>PS</td>
+<td>File upload</td>
+<td>Yes</td>
+<td>Shown if PS15 is “Signed Contract”</td>
+</tr>
+<tr class="even">
+<td><strong>SW20</strong></td>
+<td>CONTRACTS / DOCUMENTATION – Please upload all related contracts and
+documents.</td>
+<td>SW</td>
+<td>File upload</td>
+<td>Yes</td>
+<td>Shown if SW19 is “Signed Contract”</td>
+</tr>
+<tr class="odd">
+<td><strong>GP23</strong></td>
+<td>CONTRACTS / DOCUMENTATION – Include relevant links (such as terms or
+pricing)</td>
+<td>GP</td>
+<td>Link</td>
+<td>Yes</td>
+<td>Shown if GP21 is “Online click-through agreement”</td>
+</tr>
+<tr class="even">
+<td><strong>PS17</strong></td>
+<td>SUPPORTING LINKS – Please provide any relevant online links related
+to this request.</td>
+<td>PS</td>
+<td>Link</td>
+<td>Yes</td>
+<td>Shown if PS15 is “Online click-through agreement”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW21</strong></td>
+<td>CONTRACTS / DOCUMENTATION – Please provide any relevant online links
+related to this purc…</td>
+<td>SW</td>
+<td>Link</td>
+<td>Yes</td>
+<td>Shown if SW19 is “Online click-through agreement”</td>
+</tr>
+<tr class="even">
+<td><strong>GP24</strong></td>
+<td>CONTRACTS / DOCUMENTATION- Include relevant links (such as terms or
+pricing) Continued</td>
+<td>GP</td>
+<td>Link</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>PS18</strong></td>
+<td>SUPPORTING LINKS – Links Continued</td>
+<td>PS</td>
+<td>Link</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>SW22</strong></td>
+<td>CONTRACTS / DOCUMENTATION – Links continued</td>
+<td>SW</td>
+<td>Link</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>GP25</strong></td>
+<td>PAYMENT TERMS – What are the net payment terms?</td>
+<td>GP</td>
+<td>Net payment terms</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS29</strong></td>
+<td>PAYMENT TERMS – What are the net payment terms?</td>
+<td>PS</td>
+<td>Net payment terms</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW37</strong></td>
+<td>PAYMENT TERMS – What are the net payment terms?</td>
+<td>SW</td>
+<td>Net payment terms</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="security-and-compliance" class="level2">
+<h2>9. Security and compliance</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>SW23</strong></td>
+<td>DATA USAGE – What type of data will be used, uploaded, or stored in
+this system?</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS20</strong></td>
+<td>DATA ACCESS – Will this vendor require access to sensitive data,
+systems, or confidential company information?</td>
+<td>PS</td>
+<td>Multi select, <strong>Approval</strong></td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW24</strong></td>
+<td>DATA ACCESS – Will this vendor require access to sensitive data,
+systems, or confidential company information?</td>
+<td>SW</td>
+<td>Multi select, <strong>Approval</strong></td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS19</strong></td>
+<td>DATA ACCESS – Please briefly describe the type of access or data
+involved?</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW25</strong></td>
+<td>DATA ACCESS – Please briefly describe the type of access or data
+involved?</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if SW24 is “Yes”</td>
+</tr>
+<tr class="even">
+<td><strong>PS21</strong></td>
+<td>SYSTEM INTEGRATION – Will this vendor integrate with any MinIO
+systems?</td>
+<td>PS</td>
+<td>Multi select, <strong>Approval</strong></td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW26</strong></td>
+<td>SYSTEM INTEGRATION – Will this vendor integrate with any MinIO
+systems?</td>
+<td>SW</td>
+<td>Multi select, <strong>Approval</strong></td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS22</strong></td>
+<td>SYSTEM INTEGRATION – Please describe which MinIO systems the vendor
+will integrate with.</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if PS21 is “Yes”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW27</strong></td>
+<td>SYSTEM INTEGRATION – Please describe which MinIO systems the vendor
+will integrate with</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>No</td>
+<td>Shown if SW26 is “Yes”</td>
+</tr>
+<tr class="even">
+<td><strong>PS25</strong></td>
+<td>SYSTEM INTEGRATION – Please describe the type of access,
+integration, or connection require…</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if PS21 is “Yes”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW30</strong></td>
+<td>SYSTEM INTEGRATION – Please describe the type of access,
+integration, or connection require…</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if SW26 is “Yes”</td>
+</tr>
+<tr class="even">
+<td><strong>PS23</strong></td>
+<td>THIRD-PARTY SERVICES – Does this vendor use any subcontractors or
+third-party service providers?</td>
+<td>PS</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW28</strong></td>
+<td>THIRD-PARTY SERVICES – Does this vendor use any subcontractors or
+third-party service provider</td>
+<td>SW</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>PS24</strong></td>
+<td>THIRD-PARTY SERVICES – If yes, please explain.</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if PS23 is “Yes”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW29</strong></td>
+<td>THIRD-PARTY SERVICES – If yes, please explain</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if SW28 is “Yes”</td>
+</tr>
+<tr class="even">
+<td><strong>PS26</strong></td>
+<td>SECURITY / COMPLIANCE – Does the vendor have a SOC 2 Type II
+report?</td>
+<td>PS</td>
+<td>Multi select, <strong>Approval</strong></td>
+<td>Yes</td>
+<td>Shown if PS20 is “Yes” or PS21 is “Yes”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW31</strong></td>
+<td>SECURITY / COMPLIANCE – Does the vendor have a SOC 2 Type II
+report?</td>
+<td>SW</td>
+<td>Multi select, <strong>Approval</strong></td>
+<td>Yes</td>
+<td>Shown if SW24 is “Yes” or SW26 is “Yes”</td>
+</tr>
+<tr class="even">
+<td><strong>PS27</strong></td>
+<td>SECURITY / COMPLIANCE –If Yes, Please upload the SOC 2 Type II
+report</td>
+<td>PS</td>
+<td>File upload</td>
+<td>Yes</td>
+<td>Shown if PS26 is “Yes”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW32</strong></td>
+<td>SECURITY / COMPLIANCE – If yes, please upload the SOC 2 Type II
+report</td>
+<td>SW</td>
+<td>File upload</td>
+<td>Yes</td>
+<td>Shown if SW31 is “Yes”</td>
+</tr>
+<tr class="even">
+<td><strong>PS28</strong></td>
+<td>SECURITY / COMPLIANCE –If no, Please explain why</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>No</td>
+<td>Shown if PS26 is “No”</td>
+</tr>
+<tr class="odd">
+<td><strong>SW33</strong></td>
+<td>SECURITY / COMPLIANCE – If no, please explain why</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if SW31 is “No”</td>
+</tr>
+<tr class="even">
+<td><strong>SW34</strong></td>
+<td>IT/ SECURITY - Will this vendor access, process, store, or integrate
+with MinIO systems, confide…</td>
+<td>SW</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="software-and-it" class="level2">
+<h2>10. Software and IT</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>SW18</strong></td>
+<td>USERS – Approximately how many users will need access to this
+software?</td>
+<td>SW</td>
+<td>Text</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>SW35</strong></td>
+<td>AUTHENTICATION – Does this system support Single Sign-On (SSO)?</td>
+<td>SW</td>
+<td>Multi select</td>
+<td>Yes</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>SW36</strong></td>
+<td>AUTHENTICATION – Please specify which SSO providers are
+supported</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>Yes</td>
+<td>Shown if SW35 is “Yes”</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="other" class="level2">
+<h2>Other</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>ID</strong></th>
+<th><strong>Question</strong></th>
+<th><strong>Program</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Required</strong></th>
+<th><strong>Shown when</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>GP16</strong></td>
+<td>VENDOR RELATIONSHIP – What is the current status of our relationship
+with this vendor?</td>
+<td>GP</td>
+<td>Paragraph</td>
+<td>No</td>
+<td>Shown if GP8 is any event type (any option except “Other”)</td>
+</tr>
+<tr class="even">
+<td><strong>GP28</strong></td>
+<td>APPROVAL NOTES – Add a message for approvers to review</td>
+<td>GP</td>
+<td>Text</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="odd">
+<td><strong>PS32</strong></td>
+<td>APPROVAL NOTES – Add a message for approvers to review</td>
+<td>PS</td>
+<td>Paragraph</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+<tr class="even">
+<td><strong>SW40</strong></td>
+<td>APPROVAL NOTES – Add a message for approvers to review</td>
+<td>SW</td>
+<td>Paragraph</td>
+<td>No</td>
+<td>Always</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+</main>
+
+<script>
+(function () {
+  const status = document.getElementById("status");
+
+  // Tables pandoc wrote without a header row are key/value tables.
+  document.querySelectorAll(".doc table").forEach((t) => {
+    if (!t.querySelector("thead")) t.classList.add("kv");
+    const wrap = document.createElement("div");
+    wrap.className = "table-wrap";
+    t.before(wrap);
+    wrap.append(t);
+  });
+
+  // Mark open questions so they stand out while reviewing.
+  const walker = document.createTreeWalker(document.querySelector(".doc"), NodeFilter.SHOW_TEXT);
+  const hits = [];
+  while (walker.nextNode()) if (walker.currentNode.nodeValue.includes("[TBC")) hits.push(walker.currentNode);
+  hits.forEach((node) => {
+    const frag = document.createDocumentFragment();
+    node.nodeValue.split(/(\[TBC[^\]]*\])/).forEach((part) => {
+      if (!part) return;
+      if (part.startsWith("[TBC")) {
+        const s = document.createElement("span");
+        s.className = "tbc";
+        s.textContent = part;
+        frag.append(s);
+      } else frag.append(part);
+    });
+    node.replaceWith(frag);
+  });
+
+  // Inline the look Google Docs keeps on paste; it ignores page stylesheets.
+  function forPaste(root) {
+    root.querySelectorAll("button.copy, .doc-meta").forEach((b) => b.remove());
+    root.querySelectorAll(".head-row").forEach((r) => r.replaceWith(...r.childNodes));
+    root.querySelectorAll(".table-wrap").forEach((w) => w.replaceWith(...w.childNodes));
+    root.querySelectorAll("h1, h2, h3").forEach((h) => (h.style.color = "#2E74B5"));
+    root.querySelectorAll("table").forEach((t) => {
+      t.setAttribute("style", "border-collapse:collapse;width:100%");
+      const kv = t.classList.contains("kv");
+      t.querySelectorAll("th, td").forEach((c) => {
+        c.setAttribute("style", "border:1px solid #BFC7D1;padding:4px 6px;vertical-align:top;font-size:10pt");
+      });
+      t.querySelectorAll("thead th").forEach((c) => {
+        c.style.background = "#1F3B5C";
+        c.style.color = "#FFFFFF";
+        c.style.fontWeight = "bold";
+      });
+      if (kv) t.querySelectorAll("tr > td:first-child").forEach((c) => {
+        c.style.background = "#F2F4F7";
+        c.style.fontWeight = "bold";
+      });
+    });
+    root.querySelectorAll("img").forEach((img) => {
+      const m = /([\d.]+)in/.exec(img.getAttribute("style") || "");
+      if (m) img.setAttribute("width", Math.round(parseFloat(m[1]) * 96));
+      img.removeAttribute("style");
+    });
+    root.querySelectorAll("figcaption").forEach((c) => c.setAttribute("style", "font-style:italic;color:#555555;font-size:9pt"));
+    root.querySelectorAll(".tbc").forEach((s) => s.setAttribute("style", "background:#FFF3D6"));
+    return root;
+  }
+
+  async function copy(source, label) {
+    const clone = forPaste(source.cloneNode(true));
+    const html = clone.outerHTML;
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([source.innerText], { type: "text/plain" }),
+        }),
+      ]);
+      status.textContent = "Copied " + label + ". Paste into Google Docs.";
+    } catch (e) {
+      const range = document.createRange();
+      range.selectNodeContents(source);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      status.textContent = label + " is selected. Press Ctrl+C (Cmd+C on a Mac) to copy it.";
+    }
+  }
+
+  document.querySelectorAll("section.level1, section.level2").forEach((sec) => {
+    const h = sec.querySelector(":scope > h1, :scope > h2");
+    if (!h) return;
+    const row = document.createElement("div");
+    row.className = "head-row";
+    h.before(row);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "copy";
+    b.textContent = "Copy section";
+    const label = h.textContent.trim();
+    b.addEventListener("click", () => copy(sec, "“" + label + "”"));
+    row.append(h, b);
+  });
+
+  document.getElementById("copy-all").addEventListener("click", () => copy(document.querySelector(".doc"), "the whole document"));
+})();
+</script>

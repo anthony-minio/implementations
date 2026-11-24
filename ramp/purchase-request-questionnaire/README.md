@@ -57,6 +57,7 @@ The final draft proposal also covers, for each program:
 | File | Purpose |
 |---|---|
 | `PROGRAMS.md` | Current Ramp procurement programs: the paths being combined |
+| `sections/`, `tools/`, `doc.env`, `output/` | Review document built with the create-doc skill: `python3 tools/make_sections.py` writes `sections/` from the capture files and `CATEGORIES.md`, then `bash tools/build.sh`. Published at https://claude.ai/artifact/WHhQAHwfQ5gprRZ2fi8HKc. Never edit `output/` or `sections/` by hand |
 | `CATEGORIES.md` | Every in-scope question grouped into categories, with a proposed category flow. The working list for the review |
 | `GENERAL-PROCUREMENT.md` | General Procurement Request as it is set up in Ramp today |
 | `PROFESSIONAL-SERVICES.md` | Professional Services Purchase Request as it is set up in Ramp today |
@@ -117,3 +118,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-24 | Approval icon identified (used in approval conditions). `CATEGORIES.md` added: 100 questions in 10 categories plus Other |
 | 2026-11-24 | Ramp docs checked: no person picker, no submit-on-behalf for new requests; Boolean and Number types exist. Noted in `CATEGORIES.md` |
 | 2026-11-24 | `CATEGORIES.md` de-duplicated: 100 questions come down to 49 distinct questions; full list kept as an appendix. Corrected: Ramp has a user picker question (Anthony's test) |
+| 2026-11-24 | Review document published: summary of distinct questions and all 100 questions, each with programs |
