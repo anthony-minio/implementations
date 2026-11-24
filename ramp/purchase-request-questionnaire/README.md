@@ -115,3 +115,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-24 | Referral Partner Request: complete. 10 questions; change order form has 1 question; no AI instructions |
 | 2026-11-24 | Scope: group B dropped; Referral Partner excluded. Review method agreed: categorise, then review one by one |
 | 2026-11-24 | Approval icon identified (used in approval conditions). `CATEGORIES.md` added: 100 questions in 10 categories plus Other |
+| 2026-11-24 | Ramp docs checked: no person picker, no submit-on-behalf for new requests; Boolean and Number types exist. Noted in `CATEGORIES.md` |

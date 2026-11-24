@@ -25,6 +25,14 @@ In `Shown when`, question numbers refer to the same program.
 | Other | Other | 4 | 2 | 1 | 1 | - |
 | | Total | 100 | 28 | 32 | 40 | |
 
+## Ramp question types
+
+From Ramp's public docs, checked 2026-11-24 (https://support.ramp.com/global-question-library, https://support.ramp.com/configuring-procurement-workflows). Not confirmed in our account.
+
+Text, Paragraph, Number, Date, Boolean (yes/no), Email, Link, File upload, Single select, Multi select, Address, Contact (first name, last name, phone, email; not a Ramp user), Vendor, Department, Merchants, Merchant categories, plus the Ramp request fields seen in our forms (Request name, Frequency, Amount, Net payment terms, Reason). No person or user picker is listed.
+
+Relevant to the review: Boolean exists, so Yes/No questions currently set up as Multi select can become true yes/no questions; Number exists for counts such as users.
+
 ## Proposed category flow
 
 For discussion. Who sees each category in a combined form, if Request type becomes the main branch.
@@ -182,7 +190,8 @@ Who owns the request, which department, and any deadline.
 Points for the review:
 
 - Same in all three programs. Department is the only coded field the forms collect.
-- Requester is free text. Anthony's proposal (2026-11-24): ask "Are you submitting this on behalf of someone else at MinIO?" and, if Yes, pick the person from a dropdown. Depends on what Ramp supports.
+- Requester is free text. Anthony's proposal (2026-11-24): ask "Are you submitting this on behalf of someone else at MinIO?" and, if Yes, pick the person from a dropdown.
+- Ramp's public docs (checked 2026-11-24) list no person or user picker question type, and no way to submit a new purchase request on behalf of someone. A Yes can show a Text, Email or Contact question, which is free entry and does not change who Ramp treats as the requester or how approvals route. Change orders do have a "Requestor" dropdown, and approvals follow the selected person (https://support.ramp.com/change-orders). A Ramp Community feature request asks for the same on new requests (https://community.ramp.com/t/ability-to-change-requestor-for-procurement-during-entry/836). To confirm with Ramp support or the CSM.
 
 ## 8. Contract and commercial terms
 
