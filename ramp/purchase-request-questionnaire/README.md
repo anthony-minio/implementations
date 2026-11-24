@@ -35,14 +35,16 @@ Agreed with Anthony 2026-11-20.
 
 | Group | Programs | Goal |
 |---|---|---|
-| A | General Procurement Request, Software / SaaS Purchase Request, Referral Partner Request, Professional Services Purchase Request | Combine into one program if possible |
-| B | PO from Signed Contracts, Confidential Procurement Request Form | Compare what each does, then decide whether they can be combined |
+| A | General Procurement Request, Software / SaaS Purchase Request, Professional Services Purchase Request | Combine into one program if possible |
+| Out of scope | Referral Partner Request | Excluded 2026-11-24: referral payouts should be handled a different way. Captured in `REFERRAL-PARTNER.md` for reference |
+| Out of scope | PO from Signed Contracts, Confidential Procurement Request Form (was group B) | Dropped from scope 2026-11-24 |
 
 Order of work:
 
 1. Questions and program descriptions, for all programs in both groups. Starting with General Procurement Request.
    1. Capture every program first.
    2. Then discuss, across all of them: optimized question flow, question logic, optimizing the questions themselves, and anything else that comes up.
+   3. Method (agreed 2026-11-24): group every question into high-level categories, then review the questions one by one, category by category. Open points such as the event questions and the SOC 2 description are settled in that review.
 2. Approval workflows, after the questions are settled.
 
 The final draft proposal also covers, for each program:
@@ -59,6 +61,7 @@ The final draft proposal also covers, for each program:
 | `PROFESSIONAL-SERVICES.md` | Professional Services Purchase Request as it is set up in Ramp today |
 | `SOFTWARE-SAAS.md` | Software / SaaS Purchase Request as it is set up in Ramp today |
 | `REFERRAL-PARTNER.md` | Referral Partner Request as it is set up in Ramp today |
+| `second-icon-explainer.png` | Shows the unidentified second icon next to the branch icon on some questions |
 | `screenshots/` | Source screenshots from Ramp, named `YYYYMMDD-<what>` |
 
 ## Status
@@ -109,3 +112,4 @@ Step 1 in progress. Program list captured 2026-11-20. General Procurement Reques
 | 2026-11-24 | Referral Partner Request: description, form settings and questions 1 to 5 captured |
 | 2026-11-24 | Referral Partner Request: questions 6 to 9, #7 condition captured |
 | 2026-11-24 | Referral Partner Request: complete. 10 questions; change order form has 1 question; no AI instructions |
+| 2026-11-24 | Scope: group B dropped; Referral Partner excluded. Review method agreed: categorise, then review one by one |
